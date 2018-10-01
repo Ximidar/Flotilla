@@ -6,7 +6,7 @@ Flotilla is a collection of tools for 3D printing connected over a NATS interfac
 ### What tools are included?
 
 - Commango
-Daemon for controlling the Printer Serial Port. This tool will share the serial port with other devices over DBUS. Any other program can tap into the Serial Feed and Write lines to the printer.
+Daemon for controlling the Printer Serial Port. This tool will share the serial port with other devices over NATS. Any other program can tap into the Serial Feed and Write lines to the printer.
 
 - Flotilla_CLI
 CLI tool for Executing commands to Flotilla. Currently it is just a CLIGUI tool for connecting to Commango
