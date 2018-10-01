@@ -1,6 +1,9 @@
-[submodule "mango_cli"]
-	path = mango_cli
-	url = https://github.com/Ximidar/mango_cli.git
+[submodule "Flotilla_CLI"]
+	path = Flotilla_CLI
+	url = https://github.com/Ximidar/Flotilla_CLI.git
 [submodule "Commango"]
 	path = Commango
 	url = https://github.com/Ximidar/Commango.git
+[submodule "data_structures"]
+	path = data_structures
+	url = https://github.com/Ximidar/data_structures
