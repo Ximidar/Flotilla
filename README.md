@@ -28,3 +28,6 @@ GUI for interacting with your printer. I haven't decided what framework to use. 
 ### Why are you writing this in go?
 Go strikes a balance between developing rapidly and developing clean code that is easy to read. C++ is too heavy for this project and a python printer server has already been made. Go is the easiest language to cross compile I have ever experienced, and it is extremely easy to write tests for it. 
 
+### What Environment do you use to write this code?
+I am using Sublime Text 3 and I set up my environment following this [guide](https://www.alexedwards.net/blog/streamline-your-sublime-text-and-go-workflow)
+
