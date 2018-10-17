@@ -4,7 +4,4 @@
 [submodule "Commango"]
 	path = Commango
 	url = https://github.com/Ximidar/Commango.git
-[submodule "DataStructures"]
-	path = DataStructures
-	url = https://github.com/Ximidar/DataStructures.git
 
