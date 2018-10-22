@@ -8,3 +8,6 @@
 [submodule "DataStructures"]
 	path = DataStructures
 	url = https://github.com/Ximidar/DataStructures.git
+[submodule "Flotilla_File_Manager"]
+	path = Flotilla_File_Manager
+	url = ./Flotilla_File_Manager/
