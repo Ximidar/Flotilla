@@ -1,6 +1,7 @@
 [submodule "Flotilla_CLI"]
 	path = Flotilla_CLI
 	url = https://github.com/Ximidar/Flotilla_CLI.git
+
 [submodule "Commango"]
 	path = Commango
 	url = https://github.com/Ximidar/Commango.git
@@ -8,6 +9,7 @@
 [submodule "DataStructures"]
 	path = DataStructures
 	url = https://github.com/Ximidar/DataStructures.git
+
 [submodule "Flotilla_File_Manager"]
 	path = Flotilla_File_Manager
-	url = ./Flotilla_File_Manager/
+	url = https://github.com/Ximidar/Flotilla_File_Manager.git
