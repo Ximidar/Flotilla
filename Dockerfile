@@ -7,6 +7,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 	nano \
 	wget \
 	git \
+	unzip \
 	&& rm -rf /var/lib/apt/lists/*
 
 ENV FLOTILLA_DIR=$GOPATH/src/github.com/ximidar/Flotilla/
@@ -19,3 +20,6 @@ RUN bash $FLOTILLA_DIR/BuildResources/Build/scripts/setupGo.sh
 #RUN go test $FLOTILLA_DIR/BuildResources/Test/...
 
 RUN bash $FLOTILLA_DIR/BuildResources/Build/scripts/buildFlotilla.sh
+
+ADD https://github.com/nats-io/gnatsd/releases/download/v1.3.0/gnatsd-v1.3.0-linux-amd64.zip $HOME/nats.zip
+RUN unzip $HOME/nats.zip /usr/local/nats/
