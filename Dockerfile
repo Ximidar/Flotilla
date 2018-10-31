@@ -17,7 +17,8 @@ COPY . $FLOTILLA_DIR
 RUN bash $FLOTILLA_DIR/BuildResources/Build/scripts/setupGo.sh
 
 # not enough tests and this command doesn't work.
-#RUN go test $FLOTILLA_DIR/BuildResources/Test/...
+WORKDIR $FLOTILLA_DIR/BuildResources/Test/FlotillaFileManager/
+RUN go test ./...
 
 RUN bash $FLOTILLA_DIR/BuildResources/Build/scripts/buildFlotilla.sh
 
