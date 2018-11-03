@@ -10,17 +10,24 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 	unzip \
 	&& rm -rf /var/lib/apt/lists/*
 
+# Download NATS
+RUN wget https://github.com/nats-io/gnatsd/releases/download/v1.3.0/gnatsd-v1.3.0-linux-amd64.zip -O $HOME/nats.zip
+RUN unzip $HOME/nats.zip -d /usr/local/ && mv /usr/local/gnatsd-v1.3.0-linux-amd64/ /usr/local/nats
+ENV PATH=$PATH:/usr/local/nats/
+
+# Get Flotilla Source
 ENV FLOTILLA_DIR=$GOPATH/src/github.com/ximidar/Flotilla/
 RUN mkdir -p $FLOTILLA_DIR
 COPY . $FLOTILLA_DIR
 
+# Download Go packages
 RUN bash $FLOTILLA_DIR/BuildResources/Build/scripts/setupGo.sh
 
+# Test
 # not enough tests and this command doesn't work.
 WORKDIR $FLOTILLA_DIR/BuildResources/Test/FlotillaFileManager/
 RUN go test ./...
 
+# Build
+WORKDIR $HOME/
 RUN bash $FLOTILLA_DIR/BuildResources/Build/scripts/buildFlotilla.sh
-
-ADD https://github.com/nats-io/gnatsd/releases/download/v1.3.0/gnatsd-v1.3.0-linux-amd64.zip $HOME/nats.zip
-RUN unzip $HOME/nats.zip /usr/local/nats/
