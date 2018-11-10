@@ -2,7 +2,7 @@
 * @Author: Ximidar
 * @Date:   2018-10-29 20:36:43
 * @Last Modified by:   Ximidar
-* @Last Modified time: 2018-10-31 00:27:41
+* @Last Modified time: 2018-11-10 13:02:48
  */
 
 package FileStreamer_test
@@ -20,11 +20,13 @@ import (
 )
 
 type fileStreamerAdapter struct {
-	t *testing.T
+	t        *testing.T
+	callback func()
 }
 
 func (fsa *fileStreamerAdapter) LineReader(line string) {
-	fmt.Println(line)
+	fmt.Println("Reading: ", line)
+	fsa.callback()
 
 }
 
@@ -63,11 +65,17 @@ func TestFileStreamer(t *testing.T) {
 	check_err(t, "TestFileStreamer getting benchy", err)
 
 	fmt.Println(benchy.Path)
+	fs := new(FileStreamer.FileStreamer)
 
 	// Create the File Streamer object and select the file
 	adapter := fileStreamerAdapter{t: t}
-	fs, err := FileStreamer.NewFileStreamer(&adapter)
+	fs, err = FileStreamer.NewFileStreamer(&adapter)
 	check_err(t, "TestFileStreamer Making the adapter and file streamer", err)
+	// Create a function for the adapter to request the next line
+	requestLine := func() {
+		fs.MonitorFeedback("ok")
+	}
+	adapter.callback = requestLine
 
 	fs.SelectFile(benchy)
 
