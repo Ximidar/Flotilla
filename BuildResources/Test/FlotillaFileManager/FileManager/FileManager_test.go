@@ -2,12 +2,13 @@
 * @Author: Ximidar
 * @Date:   2018-10-21 17:54:57
 * @Last Modified by:   Ximidar
-* @Last Modified time: 2018-11-10 14:30:48
+* @Last Modified time: 2018-11-11 12:03:21
  */
 
 package FileManagerTest
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -91,9 +92,88 @@ func Test_AddFile(t *testing.T) {
 
 }
 
+func Test_DeleteFile(t *testing.T) {
+	// make a filesystem
+	fm, err := FileManager.NewFileManager()
+	check_err(t, "Could not create File manager. Test_AddFile", err)
+
+	// First verify that the file we want is not there
+	DeleteAllFiles(fm)
+
+	// add file
+	_, filename, _, _ := runtime.Caller(0)
+	benchyOrgFile, _ := filepath.Abs(filepath.Clean(filepath.Dir(filename) + "/../Resources/3D_Benchy.gcode"))
+	fmt.Println("Benchy Path is: ", benchyOrgFile)
+	destPath := filepath.Clean(fm.RootFolderPath + "/3D_Benchy.gcode")
+	fm.AddFile(benchyOrgFile, destPath)
+
+	// delete file by full path
+	err = fm.DeleteFile(destPath)
+	check_err(t, "Could not delete file by full path Test_DeleteFile", err)
+	if ok := FileExistsInStructure(fm, "/3D_Benchy.gcode"); ok {
+		t.Fatal("Test_DeleteFile Failed. Did not actually delete file")
+	}
+
+	// add file
+	fm.AddFile(benchyOrgFile, destPath)
+
+	// delete file by relative path
+	err = fm.DeleteFile("/3D_Benchy.gcode")
+	check_err(t, "Could not delete file by relative path Test_DeleteFile", err)
+	if ok := FileExistsInStructure(fm, "/3D_Benchy.gcode"); ok {
+		t.Fatal("Test_DeleteFile Failed. Did not actually delete file")
+	}
+
+	// try to delete non-existant file by relative and full path
+	err = fm.DeleteFile(fm.RootFolderPath + "/non/existant/file.gcode")
+	if err == nil {
+		check_err(t, "Could not delete fake file by full path Test_DeleteFile", errors.New("There was not an error. this is not expected behaviour"))
+	}
+
+	err = fm.DeleteFile("/non/existant/file.gcode")
+	if err == nil {
+		check_err(t, "Could not delete fake file by relative path Test_DeleteFile", errors.New("There was not an error. this is not expected behaviour"))
+	}
+}
+
+func Test_MoveFile(t *testing.T) {
+	// make a filesystem
+	fm, err := FileManager.NewFileManager()
+	check_err(t, "Could not create File manager. Test_AddFile", err)
+
+	// First verify that the file we want is not there
+	DeleteAllFiles(fm)
+
+	// add file
+	_, filename, _, _ := runtime.Caller(0)
+	benchyOrgFile, _ := filepath.Abs(filepath.Clean(filepath.Dir(filename) + "/../Resources/3D_Benchy.gcode"))
+	fmt.Println("Benchy Path is: ", benchyOrgFile)
+	destPath := filepath.Clean(fm.RootFolderPath + "/3D_Benchy.gcode")
+	fm.AddFile(benchyOrgFile, destPath)
+
+	// add folder TODO update this part to use fm function instead of just making a directory
+	os.Mkdir(fm.RootFolderPath+"/testfolder/", 0750)
+
+	// move file to folder
+	err = fm.MoveFile(destPath, fm.RootFolderPath+"/testfolder/3D_Benchy.gcode")
+	check_err(t, "could not move file to folder Test_MoveFile", err)
+
+	// try to move file outside controlled space
+	fm.MoveFile(fm.RootFolderPath+"/testfolder/3D_Benchy.gcode", destPath)
+	err = fm.MoveFile(destPath, "/not/a/real/folder")
+	if err == nil {
+		check_err(t, "Test_MoveFile failed to produce error", errors.New("There was not an error. this is not expected behaviour"))
+	}
+
+	// try to move non existant file
+	err = fm.MoveFile("not/a/real/file.gcode", "/not/a/real/dest.gcode")
+	if err == nil {
+		check_err(t, "Test_MoveFile failed to produce error", errors.New("There was not an error. this is not expected behaviour"))
+	}
+}
+
 //FileExistsInStructure will query the structure for existing files
 func FileExistsInStructure(fm *FileManager.FileManager, file string) bool {
-
 	_, err := fm.GetFileByPath(file)
 	if err != nil {
 		fm.PrintStructure()
@@ -109,7 +189,12 @@ func DeleteAllFiles(fm *FileManager.FileManager) {
 
 	for _, value := range files {
 		fmt.Println("Deleting", value.Path)
-		os.Remove(value.Path)
+		if value.IsDir {
+			os.RemoveAll(value.Path)
+		} else {
+			os.Remove(value.Path)
+		}
+
 	}
 }
 
