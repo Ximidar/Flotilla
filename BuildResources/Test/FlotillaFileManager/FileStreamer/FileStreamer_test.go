@@ -2,7 +2,7 @@
 * @Author: Ximidar
 * @Date:   2018-10-29 20:36:43
 * @Last Modified by:   Ximidar
-* @Last Modified time: 2018-11-10 13:02:48
+* @Last Modified time: 2018-11-22 21:29:41
  */
 
 package FileStreamer_test
@@ -30,7 +30,7 @@ func (fsa *fileStreamerAdapter) LineReader(line string) {
 
 }
 
-func (fsa *fileStreamerAdapter) ProgressUpdate(file *Files.File, currentLine int, readBytes int) {
+func (fsa *fileStreamerAdapter) ProgressUpdate(file *Files.File, currentLine int64, readBytes int64) {
 	fmt.Printf("File: %v\nCurrent Line: %v\nReadBytes: %v\n", file.Name, currentLine, readBytes)
 	progress := float64(readBytes) / float64(file.Size) * 100
 	fmt.Println("Progress: ", progress)
