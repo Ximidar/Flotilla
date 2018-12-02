@@ -2,17 +2,21 @@
 * @Author: Ximidar
 * @Date:   2018-08-25 10:51:03
 * @Last Modified by:   Ximidar
-* @Last Modified time: 2018-10-21 17:49:03
+* @Last Modified time: 2018-11-29 12:57:10
  */
 package FlotillaInterface_test
 
 import (
+	"encoding/json"
 	"fmt"
 	"testing"
 	"time"
 
 	"github.com/ximidar/Flotilla/Flotilla_CLI/FlotillaInterface"
+	"github.com/ximidar/Flotilla/Flotilla_File_Manager/Files"
 )
+
+// TODO add functions to turn NATS server on and off and different nodes on and off
 
 func Test_Get_Available_Ports(t *testing.T) {
 	fmt.Println("Testing Get Available Ports")
@@ -68,4 +72,34 @@ func Test_Comm_set_up_and_write(t *testing.T) {
 
 	stop_reading = true
 
+}
+
+func Test_Get_Structure(t *testing.T) {
+	fi, err := FlotillaInterface.NewFlotillaInterface()
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	structure, err := fi.GetFileStructure()
+	if err != nil {
+		t.Fatal(err)
+	}
+	PrintStructure(structure)
+
+	data, ok := structure["root"]
+	if !ok {
+
+		t.Fatal("Could not navigate map")
+	}
+	fmt.Println(data.Path)
+}
+
+func PrintStructure(structure map[string]*Files.File) {
+	marshed, err := json.MarshalIndent(structure, "", "    ")
+	if err != nil {
+		fmt.Println("Couldn't get json structure:", err)
+		return
+	}
+	fmt.Println(string(marshed))
 }
