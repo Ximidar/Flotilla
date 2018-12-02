@@ -11,19 +11,25 @@ Daemon for controlling the Printer Serial Port. This tool will share the serial 
 - Flotilla_CLI
 CLI tool for Executing commands to Flotilla. Currently it is just a CLIGUI tool for connecting to Commango
 
+- FM
+File Manager that will organize and keep track of files.
+
 ### What tools are coming?
 
-- FM
-File Manager that will organize and keep track of gcode files.
-
 - Web Interface
-Go Buffalo Server to host a webpage users can use on their home networks. This will use the Go Buffalo Package.
-
-- API
-An API Server that will act as the main point of communication for any services that want to connect over cloud infrastructures. It will provide a secure connection over ssl to your print server. This may be tied into BuffaloMango using Go Buffalo as well
+Go Server to host a webpage users can use on their home networks.
 
 - Tango
-GUI for interacting with your printer. I haven't decided what framework to use. Go doesn't have very many GUI frameworks yet.
+GUI for interacting with your printer. Will build with Qt(Maybe the go version, maybe just straight c++. NATS is supposed to be interfacable with any language right?)
+
+- Node Launcher
+Program for keeping track of nodes and launching them. This will also keep track of any custom nodes made by third parties and launch those too. This will keep track of output from each node and keep track of the lifecycle of each node. If a node goes down this will restart it or blare warning lights or something.
+
+- Config Node
+This will control the configuration options for Flotilla. Other nodes can query this node for what mode they should be in, extra options, everything. This will also let the programs know when it is time to update their configuration.
+
+- CommStatus
+This will monitor the output from the Commango and keep track of things like temperature, error status, current position, ect.
 
 ### Why are you writing this in go?
 Go strikes a balance between developing rapidly and developing clean code that is easy to read. C++ is too heavy for this project and a python printer server has already been made. Go is the easiest language to cross compile I have ever experienced, and it is extremely easy to write tests for it. 
