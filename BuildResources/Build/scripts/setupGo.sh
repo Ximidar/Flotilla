@@ -2,7 +2,7 @@
 # @Author: Ximidar
 # @Date:   2018-10-21 18:57:47
 # @Last Modified by:   Ximidar
-# @Last Modified time: 2018-10-21 22:07:56
+# @Last Modified time: 2018-12-07 14:42:38
 
 # NATS
 go get github.com/nats-io/go-nats
@@ -10,6 +10,7 @@ go get github.com/nats-io/go-nats
 # Flotilla_CLI
 go get github.com/spf13/cobra
 go get github.com/ximidar/gocui
+go get github.com/dustin/go-humanize
 
 # Flotilla_File_Manager
 go get -u golang.org/x/sys/...
