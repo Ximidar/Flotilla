@@ -1,4 +1,6 @@
 # Flotilla
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FXimidar%2FFlotilla.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2FXimidar%2FFlotilla?ref=badge_shield)
+
 
 ### What is this?
 Flotilla is a collection of tools for 3D printing connected over a NATS interface. Right now this is not much to look at, but as I progress the code base we will see more and more tools and features.
@@ -37,3 +39,7 @@ Go strikes a balance between developing rapidly and developing clean code that i
 ### What Environment do you use to write this code?
 I am using Sublime Text 3 and I set up my environment following this [guide](https://www.alexedwards.net/blog/streamline-your-sublime-text-and-go-workflow)
 
+
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FXimidar%2FFlotilla.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2FXimidar%2FFlotilla?ref=badge_large)
