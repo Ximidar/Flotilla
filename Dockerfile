@@ -29,3 +29,6 @@ RUN bash $FLOTILLA_DIR/BuildResources/Test/scripts/test.sh
 # Build
 WORKDIR $HOME/
 RUN bash $FLOTILLA_DIR/BuildResources/Build/scripts/buildFlotilla.sh
+
+CMD bash $FLOTILLA_DIR/BuildResources/Build/scripts/buildFlotilla.sh
+

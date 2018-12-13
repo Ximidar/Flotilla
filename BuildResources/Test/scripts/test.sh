@@ -2,15 +2,16 @@
 # @Author: Ximidar
 # @Date:   2018-12-12 22:52:23
 # @Last Modified by:   Ximidar
-# @Last Modified time: 2018-12-12 23:16:51
+# @Last Modified time: 2018-12-12 23:33:56
 
 #This file is used to run all tests 
 
 GLOBAL_RET=0
 check_retval(){
     echo $1
-    if [ "$1" != "0" ]
-    then GLOBAL_RET=$(($GLOBAL_RET+1))
+    if [ "$1" != "0" ] ; then
+    	GLOBAL_RET=$(($GLOBAL_RET+1))
+    	exit $GLOBAL_RET
     fi
 }
 
@@ -48,12 +49,6 @@ check_retval $?
 cd $TEST_FOLDER/FlotillaFileManager/FileStreamer
 go test
 check_retval $?
-
-# testing complete
-echo "Testing Complete
-Failed: $GLOBAL_RET
-"
-
 
 # Exit with the failed score
 exit $GLOBAL_RET

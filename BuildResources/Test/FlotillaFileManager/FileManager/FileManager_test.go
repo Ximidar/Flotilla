@@ -2,7 +2,7 @@
 * @Author: Ximidar
 * @Date:   2018-10-21 17:54:57
 * @Last Modified by:   Ximidar
-* @Last Modified time: 2018-11-11 12:03:21
+* @Last Modified time: 2018-12-13 00:06:26
  */
 
 package FileManagerTest
@@ -14,6 +14,7 @@ import (
 	"path/filepath"
 	"runtime"
 	"testing"
+	"time"
 
 	"github.com/ximidar/Flotilla/Flotilla_File_Manager/FileManager"
 	"github.com/ximidar/Flotilla/Flotilla_File_Manager/Files"
@@ -62,6 +63,7 @@ func Test_AddFile(t *testing.T) {
 	// Add a file by full path
 	err = fm.AddFile(benchyOrgFile, destPath)
 	check_err(t, "Add File Failed Test_AddFile", err)
+	<-time.After(500 * time.Millisecond)
 	if ok := FileExistsInStructure(fm, "/3D_Benchy.gcode"); !ok {
 		t.Fatal("Test_AddFile Failed. Could not add full path")
 	}
@@ -110,6 +112,7 @@ func Test_DeleteFile(t *testing.T) {
 	// delete file by full path
 	err = fm.DeleteFile(destPath)
 	check_err(t, "Could not delete file by full path Test_DeleteFile", err)
+	<-time.After(2 * time.Second)
 	if ok := FileExistsInStructure(fm, "/3D_Benchy.gcode"); ok {
 		t.Fatal("Test_DeleteFile Failed. Did not actually delete file")
 	}
@@ -119,6 +122,7 @@ func Test_DeleteFile(t *testing.T) {
 
 	// delete file by relative path
 	err = fm.DeleteFile("/3D_Benchy.gcode")
+	<-time.After(500 * time.Millisecond)
 	check_err(t, "Could not delete file by relative path Test_DeleteFile", err)
 	if ok := FileExistsInStructure(fm, "/3D_Benchy.gcode"); ok {
 		t.Fatal("Test_DeleteFile Failed. Did not actually delete file")
