@@ -2,7 +2,7 @@
 # @Author: Ximidar
 # @Date:   2018-10-21 18:57:47
 # @Last Modified by:   Ximidar
-# @Last Modified time: 2018-12-07 14:42:38
+# @Last Modified time: 2018-12-12 14:40:56
 
 # NATS
 go get github.com/nats-io/go-nats
@@ -20,4 +20,7 @@ go get github.com/fsnotify/fsnotify
 mkdir -p $GOPATH/src/go.bug.st/
 git clone https://github.com/bugst/go-serial.git -b v1 $GOPATH/src/go.bug.st/serial.v1
 go get github.com/creack/goselect
+
+# Fake Serial Device
+go get github.com/pkg/term/termios
 
