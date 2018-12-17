@@ -2,12 +2,13 @@
 * @Author: Ximidar
 * @Date:   2018-10-29 20:36:43
 * @Last Modified by:   Ximidar
-* @Last Modified time: 2018-11-22 21:29:41
+* @Last Modified time: 2018-12-15 20:11:12
  */
 
 package FileStreamer_test
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -92,6 +93,10 @@ func TestFileStreamer(t *testing.T) {
 	fmt.Println("Starting print(simulated)")
 	err = fs.StreamFile()
 	check_err(t, "TestFileStreamer Streaming the File", err)
+
+	if !fs.DonePlaying {
+		check_err(t, "TestFileStreamer Failed to flip done bool", errors.New("Failed to flip done bool"))
+	}
 
 }
 
