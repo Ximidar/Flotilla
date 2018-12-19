@@ -28,8 +28,8 @@ func TestTemperatureMonitor(t *testing.T) {
 	CommonTestTools.CheckErr(t, "TestTemperatureMonitor", err)
 
 	// Test for negatives
-	sampletemp = "T:-21.25 /23.01 B:22.50 /-50.72 @:0 B@:0"
-	err = stringTestTB(temps, sampletemp, -21.25, 23.01, 22.50, -50.72)
+	sampletemp = "T:-21.25 /-23.01 B:-22.50 /-50.72 @:0 B@:0"
+	err = stringTestTB(temps, sampletemp, -21.25, -23.01, -22.50, -50.72)
 	CommonTestTools.CheckErr(t, "TestTemperatureMonitor", err)
 
 	// Test for changed spaces
