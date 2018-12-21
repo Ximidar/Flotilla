@@ -9,6 +9,7 @@ package TemperatureTests
 
 import (
 	"errors"
+	"fmt"
 	"testing"
 
 	"github.com/ximidar/Flotilla/BuildResources/Test/CommonTestTools"
@@ -52,4 +53,37 @@ func stringTestTB(temps *StatusMonitor.TemperatureMonitor, rawtest string, tempT
 		err = errors.New("B Target Was not Set Correctly")
 	}
 	return err
+}
+
+func TestGetTempCommand(t *testing.T) {
+	temps := new(StatusMonitor.TemperatureMonitor)
+	err := temps.CompileRegex()
+	if err != nil {
+		CommonTestTools.CheckErr(t, "TestTemperatureMonitor", err)
+	}
+
+	// Test bed
+	expected := "M140 S100"
+	result, _ := temps.GetTempCommand("B", 100)
+
+	if expected != result {
+		err := fmt.Errorf("expected did not equal result: %v", result)
+		CommonTestTools.CheckErr(t, "TestGetTempCommand", err)
+	}
+
+	// test T1
+	expected = "M104 T1 S100"
+	result, _ = temps.GetTempCommand("T1", 100)
+
+	if expected != result {
+		err := fmt.Errorf("expected did not equal result: %v", result)
+		CommonTestTools.CheckErr(t, "TestGetTempCommand", err)
+	}
+
+	// test err
+	_, err = temps.GetTempCommand("weird heater", 1000)
+	if err == nil {
+		err = errors.New("Failed to produce error")
+		CommonTestTools.CheckErr(t, "TestGetTempCommand", err)
+	}
 }
