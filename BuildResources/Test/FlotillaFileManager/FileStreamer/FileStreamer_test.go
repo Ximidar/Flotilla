@@ -2,7 +2,7 @@
 * @Author: Ximidar
 * @Date:   2018-10-29 20:36:43
 * @Last Modified by:   Ximidar
-* @Last Modified time: 2018-12-15 20:11:12
+* @Last Modified time: 2018-12-25 13:05:10
  */
 
 package FileStreamer_test
@@ -14,7 +14,9 @@ import (
 	"path/filepath"
 	"runtime"
 	"testing"
+	"time"
 
+	"github.com/ximidar/Flotilla/DataStructures/StatusStructures/CommRelayStructures"
 	"github.com/ximidar/Flotilla/Flotilla_File_Manager/FileManager"
 	"github.com/ximidar/Flotilla/Flotilla_File_Manager/FileStreamer"
 	"github.com/ximidar/Flotilla/Flotilla_File_Manager/Files"
@@ -25,13 +27,13 @@ type fileStreamerAdapter struct {
 	callback func()
 }
 
-func (fsa *fileStreamerAdapter) LineReader(line string) {
-	fmt.Println("Reading: ", line)
-	fsa.callback()
+func (fsa *fileStreamerAdapter) LineReader(line *CommRelayStructures.Line) {
+	fmt.Println("Reading: ", line.Line)
+	go fsa.callback()
 
 }
 
-func (fsa *fileStreamerAdapter) ProgressUpdate(file *Files.File, currentLine int64, readBytes int64) {
+func (fsa *fileStreamerAdapter) ProgressUpdate(file *Files.File, currentLine uint64, readBytes uint64) {
 	fmt.Printf("File: %v\nCurrent Line: %v\nReadBytes: %v\n", file.Name, currentLine, readBytes)
 	progress := float64(readBytes) / float64(file.Size) * 100
 	fmt.Println("Progress: ", progress)
@@ -74,7 +76,7 @@ func TestFileStreamer(t *testing.T) {
 	check_err(t, "TestFileStreamer Making the adapter and file streamer", err)
 	// Create a function for the adapter to request the next line
 	requestLine := func() {
-		fs.MonitorFeedback("ok")
+		fs.MonitorFeedback()
 	}
 	adapter.callback = requestLine
 
@@ -85,12 +87,23 @@ func TestFileStreamer(t *testing.T) {
 		t.Fatal("Benchy is not the selected file")
 	}
 
+	// callbacks for pause and play
+	pauseResumeCallback := func() {
+		<-time.After(2 * time.Second)
+		fmt.Println("\nPAUSE")
+		fs.Pause()
+		<-time.After(2 * time.Second)
+		fmt.Println("\nResume!")
+		fs.Resume()
+	}
+
 	// Stream the file
 	fmt.Println("Setup Print Vars")
-	fs.SetPlaying(true)
 	fs.DonePlaying = false
+	fs.Play()
 
 	fmt.Println("Starting print(simulated)")
+	go pauseResumeCallback()
 	err = fs.StreamFile()
 	check_err(t, "TestFileStreamer Streaming the File", err)
 
