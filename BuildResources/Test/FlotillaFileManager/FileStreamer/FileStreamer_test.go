@@ -2,7 +2,7 @@
 * @Author: Ximidar
 * @Date:   2018-10-29 20:36:43
 * @Last Modified by:   Ximidar
-* @Last Modified time: 2018-12-25 13:05:10
+* @Last Modified time: 2018-12-28 14:29:57
  */
 
 package FileStreamer_test
@@ -23,8 +23,9 @@ import (
 )
 
 type fileStreamerAdapter struct {
-	t        *testing.T
-	callback func()
+	t           *testing.T
+	callback    func()
+	DoneChannel chan bool
 }
 
 func (fsa *fileStreamerAdapter) LineReader(line *CommRelayStructures.Line) {
@@ -37,6 +38,11 @@ func (fsa *fileStreamerAdapter) ProgressUpdate(file *Files.File, currentLine uin
 	fmt.Printf("File: %v\nCurrent Line: %v\nReadBytes: %v\n", file.Name, currentLine, readBytes)
 	progress := float64(readBytes) / float64(file.Size) * 100
 	fmt.Println("Progress: ", progress)
+}
+
+func (fsa *fileStreamerAdapter) SendStatus(status string) {
+	fmt.Println(status)
+	fsa.DoneChannel <- true
 }
 
 // TestSetup will test the basic setup of the filestreamer
@@ -100,12 +106,14 @@ func TestFileStreamer(t *testing.T) {
 	// Stream the file
 	fmt.Println("Setup Print Vars")
 	fs.DonePlaying = false
-	fs.Play()
+	fs.SetPlaying(false)
+	adapter.DoneChannel = make(chan bool, 10)
 
 	fmt.Println("Starting print(simulated)")
 	go pauseResumeCallback()
-	err = fs.StreamFile()
-	check_err(t, "TestFileStreamer Streaming the File", err)
+	fs.Play()
+	<-adapter.DoneChannel
+	//check_err(t, "TestFileStreamer Streaming the File", err)
 
 	if !fs.DonePlaying {
 		check_err(t, "TestFileStreamer Failed to flip done bool", errors.New("Failed to flip done bool"))
