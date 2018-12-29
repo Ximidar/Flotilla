@@ -2,38 +2,47 @@
 * @Author: Ximidar
 * @Date:   2018-10-29 20:36:43
 * @Last Modified by:   Ximidar
-* @Last Modified time: 2018-11-22 21:29:41
+* @Last Modified time: 2018-12-28 14:29:57
  */
 
 package FileStreamer_test
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
 	"runtime"
 	"testing"
+	"time"
 
+	"github.com/ximidar/Flotilla/DataStructures/StatusStructures/CommRelayStructures"
 	"github.com/ximidar/Flotilla/Flotilla_File_Manager/FileManager"
 	"github.com/ximidar/Flotilla/Flotilla_File_Manager/FileStreamer"
 	"github.com/ximidar/Flotilla/Flotilla_File_Manager/Files"
 )
 
 type fileStreamerAdapter struct {
-	t        *testing.T
-	callback func()
+	t           *testing.T
+	callback    func()
+	DoneChannel chan bool
 }
 
-func (fsa *fileStreamerAdapter) LineReader(line string) {
-	fmt.Println("Reading: ", line)
-	fsa.callback()
+func (fsa *fileStreamerAdapter) LineReader(line *CommRelayStructures.Line) {
+	fmt.Println("Reading: ", line.Line)
+	go fsa.callback()
 
 }
 
-func (fsa *fileStreamerAdapter) ProgressUpdate(file *Files.File, currentLine int64, readBytes int64) {
+func (fsa *fileStreamerAdapter) ProgressUpdate(file *Files.File, currentLine uint64, readBytes uint64) {
 	fmt.Printf("File: %v\nCurrent Line: %v\nReadBytes: %v\n", file.Name, currentLine, readBytes)
 	progress := float64(readBytes) / float64(file.Size) * 100
 	fmt.Println("Progress: ", progress)
+}
+
+func (fsa *fileStreamerAdapter) SendStatus(status string) {
+	fmt.Println(status)
+	fsa.DoneChannel <- true
 }
 
 // TestSetup will test the basic setup of the filestreamer
@@ -73,7 +82,7 @@ func TestFileStreamer(t *testing.T) {
 	check_err(t, "TestFileStreamer Making the adapter and file streamer", err)
 	// Create a function for the adapter to request the next line
 	requestLine := func() {
-		fs.MonitorFeedback("ok")
+		fs.MonitorFeedback()
 	}
 	adapter.callback = requestLine
 
@@ -84,14 +93,31 @@ func TestFileStreamer(t *testing.T) {
 		t.Fatal("Benchy is not the selected file")
 	}
 
+	// callbacks for pause and play
+	pauseResumeCallback := func() {
+		<-time.After(2 * time.Second)
+		fmt.Println("\nPAUSE")
+		fs.Pause()
+		<-time.After(2 * time.Second)
+		fmt.Println("\nResume!")
+		fs.Resume()
+	}
+
 	// Stream the file
 	fmt.Println("Setup Print Vars")
-	fs.SetPlaying(true)
 	fs.DonePlaying = false
+	fs.SetPlaying(false)
+	adapter.DoneChannel = make(chan bool, 10)
 
 	fmt.Println("Starting print(simulated)")
-	err = fs.StreamFile()
-	check_err(t, "TestFileStreamer Streaming the File", err)
+	go pauseResumeCallback()
+	fs.Play()
+	<-adapter.DoneChannel
+	//check_err(t, "TestFileStreamer Streaming the File", err)
+
+	if !fs.DonePlaying {
+		check_err(t, "TestFileStreamer Failed to flip done bool", errors.New("Failed to flip done bool"))
+	}
 
 }
 
