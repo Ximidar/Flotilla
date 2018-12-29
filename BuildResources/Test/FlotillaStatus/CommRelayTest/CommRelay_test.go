@@ -2,7 +2,7 @@
 * @Author: Ximidar
 * @Date:   2018-12-18 11:39:47
 * @Last Modified by:   Ximidar
-* @Last Modified time: 2018-12-26 19:04:37
+* @Last Modified time: 2018-12-29 01:36:57
  */
 
 package CommRelayTest
@@ -27,7 +27,10 @@ func TestCommRelaySetup(t *testing.T) {
 	callbackok := func() {
 		fmt.Println("Got OK")
 	}
-	_, err := CommRelay.NewCommRelay(callback, callbackok)
+	finishcall := func() {
+		fmt.Println("Got Finish")
+	}
+	_, err := CommRelay.NewCommRelay(callback, callbackok, finishcall)
 	CommonTestTools.CheckErr(t, "TestCommRelay setup failed", err)
 }
 
@@ -42,8 +45,11 @@ func TestCommRelayLines(t *testing.T) {
 	callbackok := func() {
 		fmt.Println("Got OK")
 	}
+	finishcall := func() {
+		fmt.Println("Got Finish")
+	}
 
-	commRelay, err := CommRelay.NewCommRelay(callback, callbackok)
+	commRelay, err := CommRelay.NewCommRelay(callback, callbackok, finishcall)
 	CommonTestTools.CheckErr(t, "TestCommRelayLines setup failed", err)
 
 	// Reset Lines to zero
