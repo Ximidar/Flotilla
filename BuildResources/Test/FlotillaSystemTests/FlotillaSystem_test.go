@@ -2,7 +2,7 @@
 * @Author: Ximidar
 * @Date:   2019-01-13 15:38:04
 * @Last Modified by:   Ximidar
-* @Last Modified time: 2019-01-14 21:46:20
+* @Last Modified time: 2019-01-15 12:17:55
  */
 
 // FlotillaSystemTest is a test package to test multiple nodes together.
@@ -10,6 +10,8 @@
 package FlotillaSystemTest
 
 import (
+	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"os/exec"
@@ -18,9 +20,14 @@ import (
 	"testing"
 	"time"
 
+	nats "github.com/nats-io/go-nats"
 	"github.com/ximidar/Flotilla/BuildResources/Test/CommonTestTools"
 	FakeSerialDevice "github.com/ximidar/Flotilla/BuildResources/Test/FakeSerialDevice/SerialDevice"
+	DS "github.com/ximidar/Flotilla/DataStructures"
+	FS "github.com/ximidar/Flotilla/DataStructures/FileStructures"
+	"github.com/ximidar/Flotilla/DataStructures/StatusStructures/PlayStructures"
 	"github.com/ximidar/Flotilla/Flotilla_CLI/FlotillaInterface"
+	"github.com/ximidar/Flotilla/Flotilla_File_Manager/Files"
 )
 
 // StartTestFlotilla will start a Flotilla instance with the most recently compiled binaries
@@ -104,14 +111,18 @@ func run(serial *FakeSerialDevice.FakeSerial, exitChan chan bool) {
 		case buf := <-serial.ReceiveStream:
 			buffer = append(buffer, buf)
 			if buf == 10 { // if we detect a newline
-				fmt.Print(string(buffer))
+				//fmt.Print(string(buffer))
 				buffer = []byte{}
 
 				okb := []byte(ok)
-				<-time.After(10 * time.Millisecond) // Pretend to process command
+				<-time.After(10 * time.Microsecond) // Pretend to process command
 				serial.SendBytes(okb)
 
 			}
+		case <-time.After(100 * time.Millisecond):
+			okb := []byte(ok)
+			serial.SendBytes(okb)
+
 		case <-exitChan:
 			return
 		}
@@ -149,16 +160,127 @@ func TestFlotillaPrinting(t *testing.T) {
 	serial.SendBytes([]byte("start\n"))
 	<-time.After(100 * time.Millisecond)
 
+	// Check the status
+	PrintStatus(FI.NC)
+
 	// Select the Benchy
 	Files, err := FI.GetFileStructure()
-	CommonTestTools.CheckErr(t, "TestFlotillaSystem", err)
-	Benchy := Files["root"].Contents["3D_Benchy.gcode"]
-	FI.SelectAndPlayFile(Benchy)
-	serial.SendBytes([]byte("ok\n"))
+	CommonTestTools.CheckErr(t, "TestFlotillaSystem Get file structure", err)
+	Benchy := Files["root"].Contents["full_bed_print.gcode"]
+	err = selectFile(Benchy, FI.NC)
+	CommonTestTools.CheckErr(t, "TestFlotillaSystem select file", err)
+
+	// Play
+	err = playFile(FI.NC)
+	CommonTestTools.CheckErr(t, "TestFlotillaSystem set play", err)
+	<-time.After(100 * time.Millisecond)
+	PrintStatus(FI.NC)
 
 	// Wait until the benchy has finished playing
+	waitForDoneSignal(FI.NC)
+	PrintStatus(FI.NC)
 
 	// Exit Flotilla system
-	<-time.After(5 * time.Second)
+	<-time.After(2 * time.Second)
 
+}
+
+func PrintStatus(nc *nats.Conn) {
+	reply, err := nc.Request(PlayStructures.GetStatus, []byte(nil), nats.DefaultTimeout)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	status, err := PlayStructures.NewStatusFlagsFromJSON(reply.Data)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	fmt.Printf("IsPlaying: %v\nIsPaused: %v\nIsReady: %v\nIsError: %v\nCurrentAction: %v\n",
+		status.IsPlaying,
+		status.IsPaused,
+		status.IsReady,
+		status.IsError,
+		status.CurrentAction)
+}
+
+func selectFile(file *Files.File, nc *nats.Conn) error {
+	selectAction, err := FS.NewFileAction(FS.SelectFile, file.Path)
+	if err != nil {
+		return err
+	}
+
+	reply, err := selectAction.SendAction(nc, 5*time.Second)
+	if err != nil {
+		return err
+	}
+
+	rJSON, err := returnReplyJSON(reply)
+	if err != nil {
+		return err
+	}
+	if rJSON.Success {
+		return nil
+	}
+	return errors.New(string(rJSON.Message))
+}
+
+func playFile(nc *nats.Conn) error {
+	streamAction, err := PlayStructures.NewPlayAction(PlayStructures.PLAY)
+	if err != nil {
+		return err
+	}
+
+	err = streamAction.Send(nc)
+	if err != nil {
+		return err
+	}
+	return nil
+
+}
+
+func returnReplyJSON(msg *nats.Msg) (*DS.ReplyJSON, error) {
+	msgdata := DS.ReplyJSON{}
+
+	// unmarshal msg data
+	err := json.Unmarshal(msg.Data, &msgdata)
+	if err != nil {
+		return nil, err
+	}
+
+	return &msgdata, nil
+}
+
+func returnReplyString(msg *nats.Msg) (*DS.ReplyString, error) {
+	msgdata := DS.ReplyString{}
+
+	// unmarshal msg data
+	err := json.Unmarshal(msg.Data, &msgdata)
+	if err != nil {
+		return nil, err
+	}
+
+	return &msgdata, nil
+}
+
+func waitForDoneSignal(NC *nats.Conn) {
+	flags, err := PlayStructures.NewStatusObserver()
+	if err != nil {
+		fmt.Println("Error in testing!", err)
+	}
+
+	NC.Subscribe(PlayStructures.PublishStatus, flags.UpdateStatusFromNats)
+
+	blockChan := make(chan bool, 10)
+
+	doneFunc := func() {
+		blockChan <- true
+	}
+
+	flags.AddFunction(PlayStructures.DONE, doneFunc)
+
+	fmt.Println("Waiting for done")
+	<-blockChan
+	fmt.Println("Done has been set")
 }

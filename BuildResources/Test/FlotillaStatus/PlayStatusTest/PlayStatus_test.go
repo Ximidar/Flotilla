@@ -2,7 +2,7 @@
 * @Author: Ximidar
 * @Date:   2018-12-22 15:55:19
 * @Last Modified by:   Ximidar
-* @Last Modified time: 2019-01-04 15:01:41
+* @Last Modified time: 2019-01-14 22:30:38
  */
 
 package PlayStatusTest
@@ -81,7 +81,7 @@ func TestChangeStates(t *testing.T) {
 	}
 
 	// Set Cancel
-	intendedState = PlayStructures.CANCEL
+	intendedState = PlayStructures.IDLE
 	err = ps.UpdateStatus(PlayStructures.CANCEL)
 	CommonTestTools.CheckErr(t, "TestPlayStatusSetup", err)
 	if ps.IsPlaying || ps.IsReady {
