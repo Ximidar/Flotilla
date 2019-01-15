@@ -2,7 +2,7 @@
 * @Author: Ximidar
 * @Date:   2019-01-13 15:38:04
 * @Last Modified by:   Ximidar
-* @Last Modified time: 2019-01-15 12:17:55
+* @Last Modified time: 2019-01-15 15:12:43
  */
 
 // FlotillaSystemTest is a test package to test multiple nodes together.
@@ -115,13 +115,13 @@ func run(serial *FakeSerialDevice.FakeSerial, exitChan chan bool) {
 				buffer = []byte{}
 
 				okb := []byte(ok)
-				<-time.After(10 * time.Microsecond) // Pretend to process command
+				<-time.After(50 * time.Microsecond) // Pretend to process command
 				serial.SendBytes(okb)
 
 			}
-		case <-time.After(100 * time.Millisecond):
-			okb := []byte(ok)
-			serial.SendBytes(okb)
+		// case <-time.After(100 * time.Millisecond):
+		// 	waitb := []byte("wait\n")
+		// 	serial.SendBytes(waitb)
 
 		case <-exitChan:
 			return
@@ -175,6 +175,63 @@ func TestFlotillaPrinting(t *testing.T) {
 	CommonTestTools.CheckErr(t, "TestFlotillaSystem set play", err)
 	<-time.After(100 * time.Millisecond)
 	PrintStatus(FI.NC)
+	serial.SendBytes([]byte("ok\n"))
+
+	// Wait until the benchy has finished playing
+	waitForDoneSignal(FI.NC)
+	PrintStatus(FI.NC)
+
+	// Exit Flotilla system
+	<-time.After(2 * time.Second)
+
+}
+func TestFlotillaPrintingLongPrint(t *testing.T) {
+	FI, err := FlotillaInterface.NewFlotillaInterface()
+	CommonTestTools.CheckErr(t, "TestFlotillaSystem", err)
+	exitChan, err := StartTestFlotilla()
+	CommonTestTools.CheckErr(t, "TestFlotillaSystem", err)
+
+	// In case we need to ctrl-c out this will always run
+	sendExitSig := func() {
+		fmt.Println("Sending exit sig")
+		exitChan <- true
+		<-time.After(2 * time.Second)
+	}
+	defer sendExitSig()
+
+	// Allow time for server startup
+	<-time.After(100 * time.Millisecond)
+
+	// Create a Fake Serial Device
+	serial := FakeSerialDevice.NewFakeSerial()
+	go serial.ReadMaster()
+	go run(serial, exitChan)
+
+	// Connect to the Fake Serial Device
+	err = FI.CommSetConnectionOptions(FakeSerialDevice.SerialName, 115200)
+	CommonTestTools.CheckErr(t, "TestFlotillaSystem", err)
+	err = FI.CommConnect()
+	CommonTestTools.CheckErr(t, "TestFlotillaSystem", err)
+	// send Start
+	serial.SendBytes([]byte("start\n"))
+	<-time.After(100 * time.Millisecond)
+
+	// Check the status
+	PrintStatus(FI.NC)
+
+	// Select the Benchy
+	Files, err := FI.GetFileStructure()
+	CommonTestTools.CheckErr(t, "TestFlotillaSystem Get file structure", err)
+	Benchy := Files["root"].Contents["3D_Benchy.gcode"]
+	err = selectFile(Benchy, FI.NC)
+	CommonTestTools.CheckErr(t, "TestFlotillaSystem select file", err)
+
+	// Play
+	err = playFile(FI.NC)
+	CommonTestTools.CheckErr(t, "TestFlotillaSystem set play", err)
+	<-time.After(100 * time.Millisecond)
+	PrintStatus(FI.NC)
+	serial.SendBytes([]byte("ok\n"))
 
 	// Wait until the benchy has finished playing
 	waitForDoneSignal(FI.NC)
