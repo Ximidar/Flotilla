@@ -2,7 +2,7 @@
 * @Author: Ximidar
 * @Date:   2019-01-13 15:38:04
 * @Last Modified by:   Ximidar
-* @Last Modified time: 2019-01-14 18:09:35
+* @Last Modified time: 2019-01-14 21:46:20
  */
 
 // FlotillaSystemTest is a test package to test multiple nodes together.
@@ -60,6 +60,8 @@ func StartTestFlotilla() (chan bool, error) {
 		if killerr != nil {
 			fmt.Println(killerr)
 		}
+		fmt.Println("Everything has been killed")
+		exitChan <- true
 	}
 
 	StartProcs := func() {
@@ -126,6 +128,7 @@ func TestFlotillaPrinting(t *testing.T) {
 	sendExitSig := func() {
 		fmt.Println("Sending exit sig")
 		exitChan <- true
+		<-time.After(2 * time.Second)
 	}
 	defer sendExitSig()
 
