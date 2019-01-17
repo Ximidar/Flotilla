@@ -2,7 +2,7 @@
 * @Author: Ximidar
 * @Date:   2019-01-13 15:38:04
 * @Last Modified by:   Ximidar
-* @Last Modified time: 2019-01-15 15:12:43
+* @Last Modified time: 2019-01-16 14:48:02
  */
 
 // FlotillaSystemTest is a test package to test multiple nodes together.
@@ -119,10 +119,6 @@ func run(serial *FakeSerialDevice.FakeSerial, exitChan chan bool) {
 				serial.SendBytes(okb)
 
 			}
-		// case <-time.After(100 * time.Millisecond):
-		// 	waitb := []byte("wait\n")
-		// 	serial.SendBytes(waitb)
-
 		case <-exitChan:
 			return
 		}
