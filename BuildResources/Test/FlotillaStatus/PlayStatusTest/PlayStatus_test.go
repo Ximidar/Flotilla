@@ -2,7 +2,7 @@
 * @Author: Ximidar
 * @Date:   2018-12-22 15:55:19
 * @Last Modified by:   Ximidar
-* @Last Modified time: 2019-01-14 22:30:38
+* @Last Modified time: 2019-01-29 14:26:58
  */
 
 package PlayStatusTest
@@ -81,19 +81,11 @@ func TestChangeStates(t *testing.T) {
 	}
 
 	// Set Cancel
-	intendedState = PlayStructures.IDLE
+	intendedState = PlayStructures.DONE
 	err = ps.UpdateStatus(PlayStructures.CANCEL)
 	CommonTestTools.CheckErr(t, "TestPlayStatusSetup", err)
 	if ps.IsPlaying || ps.IsReady {
 		err = errors.New("State did not change")
-		CommonTestTools.CheckErr(t, "TestPlayStatusSetup", err)
-	}
-
-	// Set Play without Readying again
-	intendedState = PlayStructures.PLAY
-	err = ps.UpdateStatus(PlayStructures.PLAY)
-	if err == nil {
-		err = errors.New("error was not thrown")
 		CommonTestTools.CheckErr(t, "TestPlayStatusSetup", err)
 	}
 
@@ -134,7 +126,7 @@ func TestRollCall(t *testing.T) {
 	rc.RegisterNode(Register4)
 	rc.RegisterNode(Register5)
 
-	if !rc.AllNodesEqual() {
+	if !rc.AllNodesEqual(PlayStructures.IDLE) {
 		t.Fatal("All nodes are equal")
 	}
 
@@ -145,7 +137,7 @@ func TestRollCall(t *testing.T) {
 	}
 
 	// Check if all nodes are equal, They should not be
-	if rc.AllNodesEqual() {
+	if rc.AllNodesEqual(PlayStructures.PLAY) {
 		t.Fatal("All nodes are not equal.")
 	}
 
@@ -158,7 +150,7 @@ func TestRollCall(t *testing.T) {
 		t.Fatal("Error produced while updating status")
 	}
 
-	if !rc.AllNodesEqual() {
+	if !rc.AllNodesEqual(PlayStructures.PLAY) {
 		t.Fatal("All nodes are supposed to be equal")
 	}
 
@@ -186,7 +178,7 @@ func TestLargeRollCall(t *testing.T) {
 		rc.RegisterNode(millnodes[index])
 	}
 
-	if !rc.AllNodesEqual() {
+	if !rc.AllNodesEqual(PlayStructures.IDLE) {
 		t.Fatal("All nodes are supposed to be equal")
 	}
 
@@ -196,7 +188,7 @@ func TestLargeRollCall(t *testing.T) {
 		time.After(20 * time.Millisecond)
 		for {
 			<-time.After(10 * time.Millisecond)
-			if rc.AllNodesEqual() {
+			if rc.AllNodesEqual(PlayStructures.PLAY) {
 				exitSignal <- true
 				return
 			}
