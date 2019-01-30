@@ -2,7 +2,7 @@
 * @Author: Ximidar
 * @Date:   2019-01-13 15:38:04
 * @Last Modified by:   Ximidar
-* @Last Modified time: 2019-01-16 14:48:02
+* @Last Modified time: 2019-01-29 16:40:58
  */
 
 // FlotillaSystemTest is a test package to test multiple nodes together.
@@ -119,6 +119,8 @@ func run(serial *FakeSerialDevice.FakeSerial, exitChan chan bool) {
 				serial.SendBytes(okb)
 
 			}
+		case <-time.After(100 * time.Millisecond):
+			serial.SendBytes([]byte("wait\n"))
 		case <-exitChan:
 			return
 		}
@@ -181,7 +183,9 @@ func TestFlotillaPrinting(t *testing.T) {
 	<-time.After(2 * time.Second)
 
 }
+
 func TestFlotillaPrintingLongPrint(t *testing.T) {
+	t.Skip("Skip due to taking too long. Comment out if you want a long print to occur")
 	FI, err := FlotillaInterface.NewFlotillaInterface()
 	CommonTestTools.CheckErr(t, "TestFlotillaSystem", err)
 	exitChan, err := StartTestFlotilla()
