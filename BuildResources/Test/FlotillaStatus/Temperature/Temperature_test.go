@@ -11,17 +11,23 @@ import (
 	"errors"
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/ximidar/Flotilla/BuildResources/Test/CommonTestTools"
 	"github.com/ximidar/Flotilla/FlotillaStatus/StatusMonitor"
 )
 
 func TestTemperatureMonitor(t *testing.T) {
+	publishTemp := func(t *StatusMonitor.Temperature) {
+		fmt.Println(t)
+	}
 	temps := new(StatusMonitor.TemperatureMonitor)
 	err := temps.CompileRegex()
 	if err != nil {
 		CommonTestTools.CheckErr(t, "TestTemperatureMonitor", err)
 	}
+	temps.PublishTemperature = publishTemp
+	temps.ResetTemps()
 
 	// Test a sample temp text
 	sampletemp := "T:21.25 /23.01 B:22.50 /50.72 @:0 B@:0"
@@ -56,11 +62,16 @@ func stringTestTB(temps *StatusMonitor.TemperatureMonitor, rawtest string, tempT
 }
 
 func TestGetTempCommand(t *testing.T) {
+	publishTemp := func(t *StatusMonitor.Temperature) {
+		fmt.Println(t)
+	}
 	temps := new(StatusMonitor.TemperatureMonitor)
 	err := temps.CompileRegex()
 	if err != nil {
 		CommonTestTools.CheckErr(t, "TestTemperatureMonitor", err)
 	}
+	temps.PublishTemperature = publishTemp
+	temps.ResetTemps()
 
 	// Test bed
 	expected := "M140 S100"
@@ -85,5 +96,30 @@ func TestGetTempCommand(t *testing.T) {
 	if err == nil {
 		err = errors.New("Failed to produce error")
 		CommonTestTools.CheckErr(t, "TestGetTempCommand", err)
+	}
+}
+
+func TestTempHistory(t *testing.T) {
+	publishTemp := func(t *StatusMonitor.Temperature) {
+		//fmt.Println(t)
+	}
+	temps, err := StatusMonitor.NewStatusMonitor(publishTemp)
+	CommonTestTools.CheckErr(t, "TestTemperatureMonitor", err)
+	err = temps.TempMonitor.CompileRegex()
+	CommonTestTools.CheckErr(t, "TestTemperatureMonitor", err)
+
+	// Add a bunch of temps
+	for i := 0; i < 200; i++ {
+		temps.TempMonitor.UpdateTemperature(fmt.Sprintf("T:%v/%v B:%v / %v", i, i+1, i+2, i+3))
+		<-time.After(10 * time.Millisecond)
+	}
+
+	history := temps.TempMonitor.GetTempHistory()
+	if len(history) != 100 {
+		t.Fatal("Length Does not equal 100 Actual:", len(history))
+	}
+
+	for _, line := range history {
+		fmt.Printf("Target: %v Actual: %v Time %v\n", line.Target["T"], line.Temp["T"], line.Time.Unix())
 	}
 }
