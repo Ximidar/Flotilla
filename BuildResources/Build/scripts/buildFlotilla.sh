@@ -2,24 +2,37 @@
 # @Author: Ximidar
 # @Date:   2018-10-21 22:12:32
 # @Last Modified by:   Ximidar
-# @Last Modified time: 2018-12-13 00:13:02
+# @Last Modified time: 2019-02-12 12:10:02
 
-COMMANGO=$FLOTILLA_DIR/Commango/
-FLOTILLA_CLI=$FLOTILLA_DIR/Flotilla_CLI/
-FLOTILLA_FILE_MANAGER=$FLOTILLA_DIR/Flotilla_File_Manager/
+# Paths to different important locations
 BINDIR=/home/flotilla/bin
+ROOTFLOTILLA=/home/flotilla/Flotilla
+NODELAUNCHER=$FLOTILLA_DIR/NodeLauncher
+
+# Make Directories
 mkdir -p $BINDIR
+mkdir -p $ROOTFLOTILLA
 
+# Build Node Launcher
+echo "Making Node Launcher"
+cd $NODELAUNCHER
+make
+echo "Done making Node Launcher"
 
-#Build all assets
-cd $COMMANGO
-make
-cd $FLOTILLA_CLI
-make
-cd $FLOTILLA_FILE_MANAGER
-make
+# Copy NodeLauncher to BINDIR
+echo "Copying $NODELAUNCHER/bin/ to $BINDIR/"
+cp -r $NODELAUNCHER/bin/* $BINDIR/
 
-#Copy all built binaries to the bindir
-cp -r $COMMANGO/bin/* $BINDIR/
-cp -r $FLOTILLA_CLI/bin/* $BINDIR/
-cp -r $FLOTILLA_FILE_MANAGER/bin/* $BINDIR/
+# Use NodeLauncher to build Flotilla Folder
+echo "Building Flotilla Root Folder at $ROOTFLOTILLA"
+cd $BINDIR/
+./NodeLauncher CreateRoot -p $ROOTFLOTILLA
+
+# Place NATS Server into Folder with built binaries
+echo "Copying Nats Server to Core Flotilla"
+cp /usr/local/nats/gnatsd $ROOTFLOTILLA/bin/CoreFlotilla/
+
+echo "Placing all made files under user and group 1000"
+chown 1000:1000 -R /home/flotilla
+
+echo "Done Building Flotilla!"

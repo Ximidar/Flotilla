@@ -2,7 +2,7 @@
 * @Author: Ximidar
 * @Date:   2018-10-29 20:36:43
 * @Last Modified by:   Ximidar
-* @Last Modified time: 2018-12-28 14:29:57
+* @Last Modified time: 2019-02-12 11:42:59
  */
 
 package FileStreamer_test
@@ -28,6 +28,15 @@ type fileStreamerAdapter struct {
 	DoneChannel chan bool
 }
 
+func (fsa *fileStreamerAdapter) NotifyDone() {
+	fmt.Println("Done!")
+	fsa.DoneChannel <- true
+}
+
+func (fsa *fileStreamerAdapter) SendError(mess string) {
+	fmt.Println("Error!", mess)
+}
+
 func (fsa *fileStreamerAdapter) LineReader(line *CommRelayStructures.Line) {
 	fmt.Println("Reading: ", line.Line)
 	go fsa.callback()
@@ -42,7 +51,6 @@ func (fsa *fileStreamerAdapter) ProgressUpdate(file *Files.File, currentLine uin
 
 func (fsa *fileStreamerAdapter) SendStatus(status string) {
 	fmt.Println(status)
-	fsa.DoneChannel <- true
 }
 
 // TestSetup will test the basic setup of the filestreamer

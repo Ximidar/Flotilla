@@ -15,20 +15,28 @@ To test building:
 ```
 docker build -t ximidar/flotilla:latest .
 ```
-This command will run all tests then build all binaries.
+This command will run all tests then build the Flotilla Package.
 
 To get the binaries out:
 ```
-mkdir bin
+mkdir buildFlotilla
 
 # Run this command inside of Flotilla directory
 docker build -t ximidar/flotilla:latest .
 
 # Run this command anywhere
-docker run -v ~/path_to_your_bin/bin/:/home/flotilla/bin ximidar/flotilla:latest
+docker run -v ./buildFlotilla:/home/flotilla/ ximidar/flotilla:latest
 ```
-This will drop all binaries into `~/path_to_your_bin/bin/`
-You will still need to provide your own NATS server for all of these to run together. Go Here(https://nats.io/download/nats-io/gnatsd/) and grab the right server.
+This will drop a Flotilla Package Folder into `./buildFlotilla`
+
+### Note
+Currently this will only make the x86 Flotilla Package. You will have to construct an arm package yourself for right now. This will change soon. 
 
 ### Running Flotilla
-Currently you will have to start the NATS server, Flotilla_File_Manager, and Commango in seperate command windows. Then to interface with Flotilla run `./FlotillaCLI ui` Which will start up a ui. If everything is working correctly, Which is not guarunteed, you will be able to control the serial and browse the files. 
+To start Flotilla use the `NodeLauncher` Program in the `Flotilla/bin/Extras` folder. You will need to remember the path to where you placed your Flotilla Folder. For simplicity I placed mine in my home folder. To start Flotilla run this command:
+
+```
+~/Flotilla/bin/Extras/NodeLauncher Start -p ~/Flotilla/
+```
+
+This will start a Flotilla Instance using the binaries in the `~/Flotilla` folder
