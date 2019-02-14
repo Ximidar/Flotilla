@@ -2,7 +2,7 @@
 # @Author: Ximidar
 # @Date:   2018-10-21 18:57:47
 # @Last Modified by:   Ximidar
-# @Last Modified time: 2019-02-12 11:53:15
+# @Last Modified time: 2019-02-14 14:06:21
 
 # NATS
 echo "Getting nats-io"
@@ -31,4 +31,8 @@ go get github.com/creack/goselect
 # Fake Serial Device
 echo "Getting termios"
 go get github.com/pkg/term/termios
+
+# Monitor
+go get "gopkg.in/natefinch/lumberjack.v2"
+go get "github.com/spf13/viper"
 
