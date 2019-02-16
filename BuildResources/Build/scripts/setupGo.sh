@@ -2,7 +2,7 @@
 # @Author: Ximidar
 # @Date:   2018-10-21 18:57:47
 # @Last Modified by:   Ximidar
-# @Last Modified time: 2019-02-14 14:06:21
+# @Last Modified time: 2019-02-15 20:31:02
 
 # NATS
 echo "Getting nats-io"
@@ -33,6 +33,8 @@ echo "Getting termios"
 go get github.com/pkg/term/termios
 
 # Monitor
+echo "Getting lumberjack"
 go get "gopkg.in/natefinch/lumberjack.v2"
+echo "Getting viper"
 go get "github.com/spf13/viper"
 
