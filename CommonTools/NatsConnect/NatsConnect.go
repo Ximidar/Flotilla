@@ -2,7 +2,7 @@
 * @Author: Ximidar
 * @Date:   2019-02-15 16:06:10
 * @Last Modified by:   Ximidar
-* @Last Modified time: 2019-02-15 16:47:04
+* @Last Modified time: 2019-02-20 14:47:13
  */
 
 // Package NatsConnect will be used for standardizing connecting to NATS
@@ -17,7 +17,11 @@ import (
 // AttemptConn will attempt to connect to a Nats Server using NatsConnect
 func AttemptConn(natsAddress string, options ...nats.Option) (*nats.Conn, error) {
 	attemptConn := new(NatsConnect)
-	return attemptConn.Connect(natsAddress, options...)
+	nc, err := attemptConn.Connect(natsAddress, options...)
+	if err != nil {
+		return nil, err
+	}
+	return nc, err
 }
 
 // NatsConnect will attempt to connect to a nats server and retry

@@ -2,7 +2,7 @@
 * @Author: Ximidar
 * @Date:   2019-02-16 21:15:36
 * @Last Modified by:   Ximidar
-* @Last Modified time: 2019-02-17 13:34:30
+* @Last Modified time: 2019-02-17 14:20:04
  */
 
 package Config_test
@@ -74,7 +74,6 @@ func TestLoader(t *testing.T) {
 	err = ConfigStructures.DecodeBytes(nats_server["nats_server"], &nats_server2)
 	CommonTestTools.CheckErr(t, "Test Loader Couldn't decode the map", err)
 
-	//map[tls_cert:/workspace/certs/flotilla.cert http_server:true http_port:5070 tls:false]
 	CommonTestTools.CheckEquals(t, "/workspace/certs/flotilla.cert", nats_server2["tls_cert"].(string))
 	CommonTestTools.CheckEquals(t, true, nats_server2["http_server"].(bool))
 	CommonTestTools.CheckEquals(t, 5070, nats_server2["http_port"].(int))

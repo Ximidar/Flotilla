@@ -2,13 +2,14 @@
 * @Author: Ximidar
 * @Date:   2019-02-15 14:47:34
 * @Last Modified by:   Ximidar
-* @Last Modified time: 2019-02-15 14:47:56
+* @Last Modified time: 2019-02-20 14:41:59
  */
 
 package version
 
 import (
 	"encoding/json"
+	"strings"
 
 	nats "github.com/nats-io/go-nats"
 )
@@ -28,7 +29,14 @@ type Nats struct {
 func NewNats(nc *nats.Conn, Name string) (*Nats, error) {
 
 	nv := new(Nats)
-	nv.requestName = Name + ".Version"
+
+	// Check for suffix having a period. Subjects apparently cannot have 2 periods in them
+	if strings.HasSuffix(Name, ".") {
+		nv.requestName = Name + "Version"
+	} else {
+		nv.requestName = Name + ".Version"
+	}
+
 	nv.nc = nc
 
 	// Subscribe to name events
