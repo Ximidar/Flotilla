@@ -2,22 +2,29 @@
 * @Author: Ximidar
 * @Date:   2019-02-15 16:06:10
 * @Last Modified by:   Ximidar
-* @Last Modified time: 2019-02-20 14:47:13
+* @Last Modified time: 2019-02-20 20:12:58
  */
 
 // Package NatsConnect will be used for standardizing connecting to NATS
 package NatsConnect
 
 import (
+	"fmt"
 	"time"
 
 	nats "github.com/nats-io/go-nats"
 )
 
-// AttemptConn will attempt to connect to a Nats Server using NatsConnect
-func AttemptConn(natsAddress string, options ...nats.Option) (*nats.Conn, error) {
-	attemptConn := new(NatsConnect)
-	nc, err := attemptConn.Connect(natsAddress, options...)
+// DefaultConn will Create a NatsConnect object and not modify past the server URL and
+// a name for the connection. This function will return a nats.Conn and an error
+func DefaultConn(natsAddress string, name string) (*nats.Conn, error) {
+	attemptConn, err := NewNatsConnect()
+	if err != nil {
+		return nil, err
+	}
+	attemptConn.Options.Url = natsAddress
+	attemptConn.Options.Name = name
+	nc, err := attemptConn.Connect()
 	if err != nil {
 		return nil, err
 	}
@@ -27,20 +34,40 @@ func AttemptConn(natsAddress string, options ...nats.Option) (*nats.Conn, error)
 // NatsConnect will attempt to connect to a nats server and retry
 type NatsConnect struct {
 	NC      *nats.Conn
-	address string
-	options []nats.Option
+	Options nats.Options
+}
+
+// NewNatsConnect will create a NatsConnect Object
+func NewNatsConnect() (*NatsConnect, error) {
+	natsConn := new(NatsConnect)
+	natsConn.Options = nats.GetDefaultOptions()
+	natsConn.setOptions()
+	natsConn.NC = nil
+
+	return natsConn, nil
+
+}
+
+func (nc *NatsConnect) setOptions() {
+	// Options
+	nc.Options.AllowReconnect = true
+	nc.Options.MaxReconnect = 10
+	nc.Options.ReconnectWait = 5 * time.Second
+	nc.Options.Timeout = 15 * time.Second
+
+	// Callbacks
+	nc.Options.ReconnectedCB = nc.ReconnectHandler
+	nc.Options.ClosedCB = nc.ClosedHandler
+	nc.Options.DisconnectedCB = nc.DisconnectHandler
 }
 
 // Connect will attempt to Connect to a Nats Server. Once the Connection has been made
 // It will be passed back
-func (nc *NatsConnect) Connect(natsAddress string, options ...nats.Option) (*nats.Conn, error) {
-	// Store Variables
-	nc.address = natsAddress
-	nc.options = options
+func (nc *NatsConnect) Connect() (*nats.Conn, error) {
 
 	// attempt a Connection to Nats
 	var err error
-	nc.NC, err = nats.Connect(nc.address, nc.options...)
+	nc.NC, err = nc.Options.Connect()
 	if err != nil {
 		if nc.recoverable(err) {
 			return nc.RetryNatsConn()
@@ -57,7 +84,7 @@ func (nc *NatsConnect) RetryNatsConn() (*nats.Conn, error) {
 	for i := 0; i < 5; i++ {
 		// Wait 6 seconds before trying connection again
 		<-time.After(6 * time.Second)
-		nc.NC, err = nats.Connect(nc.address, nc.options...)
+		nc.NC, err = nc.Options.Connect()
 		if err == nil {
 			return nc.NC, nil
 		} // else try again
@@ -77,4 +104,23 @@ func (nc *NatsConnect) recoverable(err error) bool {
 	default:
 		return false
 	}
+}
+
+// Connection Handlers
+
+// DisconnectHandler will be fired off when the nats.Conn closes
+func (nc *NatsConnect) DisconnectHandler(conn *nats.Conn) {
+	fmt.Println("NATS Disconnected due to:", conn.LastError())
+
+}
+
+// ClosedHandler will be fired off when the nats.Conn is closed
+func (nc *NatsConnect) ClosedHandler(conn *nats.Conn) {
+	fmt.Println("NATS Closed due to:", conn.LastError())
+
+}
+
+// ReconnectHandler will be fired off when the nats.Conn is reconnected
+func (nc *NatsConnect) ReconnectHandler(conn *nats.Conn) {
+	fmt.Println("NATS Reconnected")
 }
