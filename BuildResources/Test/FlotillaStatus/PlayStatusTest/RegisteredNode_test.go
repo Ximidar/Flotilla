@@ -2,7 +2,7 @@
 * @Author: Ximidar
 * @Date:   2019-01-29 14:27:42
 * @Last Modified by:   Ximidar
-* @Last Modified time: 2019-01-29 15:29:29
+* @Last Modified time: 2019-02-22 13:08:12
  */
 
 package PlayStatusTest
@@ -12,6 +12,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/nats-io/gnatsd/test"
 	nats "github.com/nats-io/go-nats"
 	"github.com/ximidar/Flotilla/BuildResources/Test/CommonTestTools"
 	"github.com/ximidar/Flotilla/DataStructures/StatusStructures/PlayStructures"
@@ -21,12 +22,16 @@ import (
 // Before running this test package you will need a nats server up
 
 func TestNatsUp(t *testing.T) {
+	server := test.RunDefaultServer()
+	defer server.Shutdown()
 	_, err := nats.Connect(nats.DefaultURL)
 	CommonTestTools.CheckErr(t, "TestNatsUp Nats is not up", err)
 
 }
 
 func TestMakeRegisteredNode(t *testing.T) {
+	server := test.RunDefaultServer()
+	defer server.Shutdown()
 	// Create Nats Conn to use
 	NC, err := nats.Connect(nats.DefaultURL)
 	CommonTestTools.CheckErr(t, "TestMakeRegisteredNode", err)
@@ -45,6 +50,8 @@ func TestMakeRegisteredNode(t *testing.T) {
 }
 
 func TestUpdateNodeStatus(t *testing.T) {
+	server := test.RunDefaultServer()
+	defer server.Shutdown()
 	// Create Nats Conn to use
 	NC, err := nats.Connect(nats.DefaultURL)
 	CommonTestTools.CheckErr(t, "TestMakeRegisteredNode", err)

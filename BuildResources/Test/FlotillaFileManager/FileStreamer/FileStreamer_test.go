@@ -2,7 +2,7 @@
 * @Author: Ximidar
 * @Date:   2018-10-29 20:36:43
 * @Last Modified by:   Ximidar
-* @Last Modified time: 2019-02-12 11:42:59
+* @Last Modified time: 2019-02-21 13:39:50
  */
 
 package FileStreamer_test
@@ -70,10 +70,12 @@ func check_err(t *testing.T, mess string, err error) {
 	}
 }
 
+var TestLocation = "/tmp/testing/FileManager"
+
 // TestFileStreamer will attempt to select a file and stream it
 func TestFileStreamer(t *testing.T) {
 	fmt.Println("Testing the Streaming Capabilities")
-	fm, err := FileManager.NewFileManager()
+	fm, err := FileManager.NewFileManager(TestLocation)
 
 	check_err(t, "TestFileStreamer Making File Manager", err)
 

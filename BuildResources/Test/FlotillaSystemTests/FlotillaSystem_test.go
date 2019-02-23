@@ -2,7 +2,7 @@
 * @Author: Ximidar
 * @Date:   2019-01-13 15:38:04
 * @Last Modified by:   Ximidar
-* @Last Modified time: 2019-01-29 16:40:58
+* @Last Modified time: 2019-02-22 16:18:39
  */
 
 // FlotillaSystemTest is a test package to test multiple nodes together.
@@ -13,6 +13,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
+	"io/ioutil"
 	"os"
 	"os/exec"
 	"path"
@@ -20,9 +22,11 @@ import (
 	"testing"
 	"time"
 
+	"github.com/nats-io/gnatsd/test"
 	nats "github.com/nats-io/go-nats"
 	"github.com/ximidar/Flotilla/BuildResources/Test/CommonTestTools"
 	FakeSerialDevice "github.com/ximidar/Flotilla/BuildResources/Test/FakeSerialDevice/SerialDevice"
+	"github.com/ximidar/Flotilla/CommonTools/NatsConnect"
 	DS "github.com/ximidar/Flotilla/DataStructures"
 	FS "github.com/ximidar/Flotilla/DataStructures/FileStructures"
 	"github.com/ximidar/Flotilla/DataStructures/StatusStructures/PlayStructures"
@@ -30,40 +34,49 @@ import (
 	"github.com/ximidar/Flotilla/Flotilla_File_Manager/Files"
 )
 
+var TestLocation = "/tmp/FlotillaSystem/Test/Flotilla"
+
 // StartTestFlotilla will start a Flotilla instance with the most recently compiled binaries
 // Make sure you actually compile Flotilla before running, This also does not include
 // A NATS instance yet. So you will have to supply that for now
 func StartTestFlotilla() (chan bool, error) {
+	os.RemoveAll(TestLocation)
+	server := test.RunDefaultServer()
+	// wait for server startup to happen
+	<-time.After(200 * time.Millisecond)
+	_, err := NatsConnect.DefaultConn(nats.DefaultURL, "testcon")
+	if err != nil {
+		panic(err)
+	}
 
-	fileManagerProc, err := CreateProcess("Flotilla_File_Manager", "FlotillaFileManager")
+	NodeLauncher, err := CreateProcess("NodeLauncher", "NodeLauncher",
+		"CreateRoot", "-p", TestLocation, "-a", "amd64", "-l", "true")
 	if err != nil {
 		return nil, err
 	}
 
-	flotillaStatusProc, err := CreateProcess("FlotillaStatus", "FlotillaStatus")
+	err = NodeLauncher.Run()
+	NodeLauncher.Wait()
+	if err != nil {
+		return nil, err
+	}
+	err = setupTestFiles()
 	if err != nil {
 		return nil, err
 	}
 
-	commango, err := CreateProcess("Commango", "Commango")
-
+	NodeLauncher, err = CreateProcess("NodeLauncher", "NodeLauncher",
+		"Start", "-p", TestLocation, "-n=false")
 	if err != nil {
 		return nil, err
 	}
-
 	exitChan := make(chan bool, 10)
 
 	killEverything := func() {
 		fmt.Println("Killing Everything")
-		killerr := syscall.Kill(commango.Process.Pid, syscall.SIGKILL)
-		if killerr != nil {
-			fmt.Println(killerr)
-		}
-		killerr = syscall.Kill(flotillaStatusProc.Process.Pid, syscall.SIGKILL)
-		if killerr != nil {
-			fmt.Println(killerr)
-		}
-		killerr = syscall.Kill(fileManagerProc.Process.Pid, syscall.SIGKILL)
+		NodeLauncher.Process.Kill()
+		<-time.After(2 * time.Second)
+		killerr := syscall.Kill(NodeLauncher.Process.Pid, syscall.SIGKILL)
 		if killerr != nil {
 			fmt.Println(killerr)
 		}
@@ -71,30 +84,33 @@ func StartTestFlotilla() (chan bool, error) {
 		exitChan <- true
 	}
 
-	StartProcs := func() {
-		commango.Start()
-		flotillaStatusProc.Start()
-		fileManagerProc.Start()
+	StartProc := func() {
+		NodeLauncher.Start()
 		select {
 		case <-exitChan:
 			killEverything()
+			os.RemoveAll(TestLocation)
+			server.Shutdown()
 			return
 		}
 	}
-	go StartProcs()
+	go StartProc()
+
+	// Wait a little bit for the server to start up before continuing the test
+	<-time.After(5 * time.Second)
 
 	return exitChan, nil
 
 }
 
-func CreateProcess(FolderName string, ExeName string) (*exec.Cmd, error) {
+func CreateProcess(FolderName string, ExeName string, args ...string) (*exec.Cmd, error) {
 	ProgBinFolder, err := CommonTestTools.FindFlotillaBinFolder(FolderName)
 	if err != nil {
 		return nil, err
 	}
 
 	Executable := path.Clean(ProgBinFolder + "/" + ExeName)
-	cmd := CommonTestTools.MakeProcess(Executable, "")
+	cmd := CommonTestTools.MakeProcess(Executable, args...)
 
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
@@ -128,10 +144,10 @@ func run(serial *FakeSerialDevice.FakeSerial, exitChan chan bool) {
 }
 
 func TestFlotillaPrinting(t *testing.T) {
-	FI, err := FlotillaInterface.NewFlotillaInterface()
-	CommonTestTools.CheckErr(t, "TestFlotillaSystem", err)
 	exitChan, err := StartTestFlotilla()
-	CommonTestTools.CheckErr(t, "TestFlotillaSystem", err)
+	CommonTestTools.CheckErr(t, "Could not start Flotilla test", err)
+	FI, err := FlotillaInterface.NewFlotillaInterface()
+	CommonTestTools.CheckErr(t, "Could not create new flotilla interface", err)
 
 	// In case we need to ctrl-c out this will always run
 	sendExitSig := func() {
@@ -145,15 +161,16 @@ func TestFlotillaPrinting(t *testing.T) {
 	<-time.After(100 * time.Millisecond)
 
 	// Create a Fake Serial Device
+	os.RemoveAll("/tmp/fakeprinter")
 	serial := FakeSerialDevice.NewFakeSerial()
 	go serial.ReadMaster()
 	go run(serial, exitChan)
 
 	// Connect to the Fake Serial Device
 	err = FI.CommSetConnectionOptions(FakeSerialDevice.SerialName, 115200)
-	CommonTestTools.CheckErr(t, "TestFlotillaSystem", err)
+	CommonTestTools.CheckErr(t, "Could not set connection options", err)
 	err = FI.CommConnect()
-	CommonTestTools.CheckErr(t, "TestFlotillaSystem", err)
+	CommonTestTools.CheckErr(t, "Could not connect", err)
 	// send Start
 	serial.SendBytes([]byte("start\n"))
 	<-time.After(100 * time.Millisecond)
@@ -163,72 +180,14 @@ func TestFlotillaPrinting(t *testing.T) {
 
 	// Select the Benchy
 	Files, err := FI.GetFileStructure()
-	CommonTestTools.CheckErr(t, "TestFlotillaSystem Get file structure", err)
-	Benchy := Files["root"].Contents["full_bed_print.gcode"]
-	err = selectFile(Benchy, FI.NC)
-	CommonTestTools.CheckErr(t, "TestFlotillaSystem select file", err)
+	CommonTestTools.CheckErr(t, "Could not Get file structure", err)
+	fullbprint := Files["root"].Contents["full_bed_print.gcode"]
+	err = selectFile(fullbprint, FI.NC)
+	CommonTestTools.CheckErr(t, "could not select file", err)
 
 	// Play
 	err = playFile(FI.NC)
-	CommonTestTools.CheckErr(t, "TestFlotillaSystem set play", err)
-	<-time.After(100 * time.Millisecond)
-	PrintStatus(FI.NC)
-	serial.SendBytes([]byte("ok\n"))
-
-	// Wait until the benchy has finished playing
-	waitForDoneSignal(FI.NC)
-	PrintStatus(FI.NC)
-
-	// Exit Flotilla system
-	<-time.After(2 * time.Second)
-
-}
-
-func TestFlotillaPrintingLongPrint(t *testing.T) {
-	t.Skip("Skip due to taking too long. Comment out if you want a long print to occur")
-	FI, err := FlotillaInterface.NewFlotillaInterface()
-	CommonTestTools.CheckErr(t, "TestFlotillaSystem", err)
-	exitChan, err := StartTestFlotilla()
-	CommonTestTools.CheckErr(t, "TestFlotillaSystem", err)
-
-	// In case we need to ctrl-c out this will always run
-	sendExitSig := func() {
-		fmt.Println("Sending exit sig")
-		exitChan <- true
-		<-time.After(2 * time.Second)
-	}
-	defer sendExitSig()
-
-	// Allow time for server startup
-	<-time.After(100 * time.Millisecond)
-
-	// Create a Fake Serial Device
-	serial := FakeSerialDevice.NewFakeSerial()
-	go serial.ReadMaster()
-	go run(serial, exitChan)
-
-	// Connect to the Fake Serial Device
-	err = FI.CommSetConnectionOptions(FakeSerialDevice.SerialName, 115200)
-	CommonTestTools.CheckErr(t, "TestFlotillaSystem", err)
-	err = FI.CommConnect()
-	CommonTestTools.CheckErr(t, "TestFlotillaSystem", err)
-	// send Start
-	serial.SendBytes([]byte("start\n"))
-	<-time.After(100 * time.Millisecond)
-
-	// Check the status
-	PrintStatus(FI.NC)
-
-	// Select the Benchy
-	Files, err := FI.GetFileStructure()
-	CommonTestTools.CheckErr(t, "TestFlotillaSystem Get file structure", err)
-	Benchy := Files["root"].Contents["3D_Benchy.gcode"]
-	err = selectFile(Benchy, FI.NC)
-	CommonTestTools.CheckErr(t, "TestFlotillaSystem select file", err)
-
-	// Play
-	err = playFile(FI.NC)
-	CommonTestTools.CheckErr(t, "TestFlotillaSystem set play", err)
+	CommonTestTools.CheckErr(t, "could not set play", err)
 	<-time.After(100 * time.Millisecond)
 	PrintStatus(FI.NC)
 	serial.SendBytes([]byte("ok\n"))
@@ -262,7 +221,64 @@ func PrintStatus(nc *nats.Conn) {
 		status.CurrentAction)
 }
 
+func setupTestFiles() error {
+	gopath := os.Getenv("GOPATH")
+	testPrintDir := path.Clean(gopath + "/src/github.com/ximidar/Flotilla/BuildResources/Test/FlotillaSystemTests/staticfiles")
+
+	if _, err := os.Stat(testPrintDir); os.IsNotExist(err) {
+		fmt.Println("Directory does not exist", testPrintDir)
+		return err
+	}
+
+	// Place all files in locations
+	files, err := ioutil.ReadDir(testPrintDir)
+	if err != nil {
+		fmt.Println("Could not read directory", testPrintDir)
+		return err
+	}
+
+	if len(files) == 0 {
+		return errors.New("no test files")
+	}
+
+	for _, file := range files {
+		err := Copy(path.Clean(testPrintDir+"/"+file.Name()), path.Clean(TestLocation+"/GCODE/"+file.Name()))
+		if err != nil {
+			fmt.Println("Couldn't copy file", file.Name())
+			return err
+		}
+	}
+
+	return nil
+}
+func Copy(src, dst string) error {
+	fmt.Printf("Copying file#######\nfrom %v\nto %v\n", src, dst)
+	in, err := os.Open(src)
+	if err != nil {
+		return err
+	}
+	defer in.Close()
+
+	out, err := os.Create(dst)
+	if err != nil {
+		return err
+	}
+	defer out.Close()
+
+	_, err = io.Copy(out, in)
+	if err != nil {
+		return err
+	}
+	return out.Close()
+}
+
 func selectFile(file *Files.File, nc *nats.Conn) error {
+
+	if file == nil || nc == nil {
+		fmt.Println("Either the nats connection or the file is invalid", file, nc)
+		return errors.New("either the nats connection or the file is invalid")
+	}
+
 	selectAction, err := FS.NewFileAction(FS.SelectFile, file.Path)
 	if err != nil {
 		return err

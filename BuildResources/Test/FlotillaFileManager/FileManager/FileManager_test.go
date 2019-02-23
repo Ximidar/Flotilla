@@ -2,7 +2,7 @@
 * @Author: Ximidar
 * @Date:   2018-10-21 17:54:57
 * @Last Modified by:   Ximidar
-* @Last Modified time: 2018-12-13 00:06:26
+* @Last Modified time: 2019-02-21 13:37:16
  */
 
 package FileManagerTest
@@ -20,10 +20,12 @@ import (
 	"github.com/ximidar/Flotilla/Flotilla_File_Manager/Files"
 )
 
+var TestLocation = "/tmp/testing/FileManager"
+
 func Test_Setup(t *testing.T) {
 	fmt.Println("Testing File Manager Setup")
 
-	_, err := FileManager.NewFileManager()
+	_, err := FileManager.NewFileManager(TestLocation)
 
 	if err != nil {
 		t.Fatal(err)
@@ -32,7 +34,7 @@ func Test_Setup(t *testing.T) {
 }
 
 func Test_Structure(t *testing.T) {
-	fm, err := FileManager.NewFileManager()
+	fm, err := FileManager.NewFileManager(TestLocation)
 
 	if err != nil {
 		t.Fatal(err)
@@ -48,7 +50,7 @@ func Test_Structure(t *testing.T) {
 
 func Test_AddFile(t *testing.T) {
 	// make a filesystem
-	fm, err := FileManager.NewFileManager()
+	fm, err := FileManager.NewFileManager(TestLocation)
 	check_err(t, "Could not create File manager. Test_AddFile", err)
 
 	// First verify that the file we want is not there
@@ -96,7 +98,7 @@ func Test_AddFile(t *testing.T) {
 
 func Test_DeleteFile(t *testing.T) {
 	// make a filesystem
-	fm, err := FileManager.NewFileManager()
+	fm, err := FileManager.NewFileManager(TestLocation)
 	check_err(t, "Could not create File manager. Test_AddFile", err)
 
 	// First verify that the file we want is not there
@@ -142,7 +144,7 @@ func Test_DeleteFile(t *testing.T) {
 
 func Test_MoveFile(t *testing.T) {
 	// make a filesystem
-	fm, err := FileManager.NewFileManager()
+	fm, err := FileManager.NewFileManager(TestLocation)
 	check_err(t, "Could not create File manager. Test_AddFile", err)
 
 	// First verify that the file we want is not there

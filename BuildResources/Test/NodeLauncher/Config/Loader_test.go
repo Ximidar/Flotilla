@@ -2,7 +2,7 @@
 * @Author: Ximidar
 * @Date:   2019-02-16 21:15:36
 * @Last Modified by:   Ximidar
-* @Last Modified time: 2019-02-21 02:38:53
+* @Last Modified time: 2019-02-21 14:53:27
  */
 
 package Config_test
@@ -12,7 +12,6 @@ import (
 	"fmt"
 	"os"
 	"testing"
-	"time"
 
 	"github.com/ximidar/Flotilla/BuildResources/Test/CommonTestTools"
 	"github.com/ximidar/Flotilla/DataStructures/ConfigStructures"
@@ -30,12 +29,9 @@ func TestLoader(t *testing.T) {
 	ConfigLoader, err := Config.NewLoader(rf)
 	CommonTestTools.CheckErr(t, "Test Loader Couldn't make the Loader object", err)
 
-	// Allow some time to rewrite the config
-	<-time.After(200 * time.Millisecond)
-
-	// Get the GCODE Folder default Which should be "/GCODE"
-	expected := "/GCODE"
-	result := ConfigLoader.Config.GetString("file_manager.gcode_folder")
+	// Get the GCODE Folder default Which should be 5071
+	expected := 5071
+	result := ConfigLoader.Config.GetInt("file_manager.file_streamer.port")
 
 	CommonTestTools.CheckEquals(t, expected, result)
 

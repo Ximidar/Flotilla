@@ -2,7 +2,7 @@
 * @Author: Ximidar
 * @Date:   2019-02-21 01:36:15
 * @Last Modified by:   Ximidar
-* @Last Modified time: 2019-02-21 02:47:45
+* @Last Modified time: 2019-02-21 14:54:29
  */
 
 package Config_test
@@ -48,10 +48,10 @@ func TestConfigNatsInterface(t *testing.T) {
 	// Request a value for the gcode and the path variables
 	type fileconfig struct {
 		RootPath  string `json:"path.root"`
-		GcodePath string `json:"file_manager.gcode_folder"`
+		GcodePath int    `json:"file_manager.file_streamer.port"`
 	}
 
-	raw, err := ConfigStructures.RequestConfigJSON(conn, "path.root", "file_manager.gcode_folder")
+	raw, err := ConfigStructures.RequestConfigJSON(conn, "path.root", "file_manager.file_streamer.port")
 	CommonTestTools.CheckErr(t, "Cannot Request configuration", err)
 
 	conf := new(fileconfig)
@@ -59,5 +59,5 @@ func TestConfigNatsInterface(t *testing.T) {
 	CommonTestTools.CheckErr(t, "Cannot Unmarshal json", err)
 
 	// Check that things are kosher
-	CommonTestTools.CheckEquals(t, conf.GcodePath, "/GCODE")
+	CommonTestTools.CheckEquals(t, conf.GcodePath, 5071)
 }

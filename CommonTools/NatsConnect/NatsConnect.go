@@ -2,7 +2,7 @@
 * @Author: Ximidar
 * @Date:   2019-02-15 16:06:10
 * @Last Modified by:   Ximidar
-* @Last Modified time: 2019-02-20 20:12:58
+* @Last Modified time: 2019-02-22 15:30:06
  */
 
 // Package NatsConnect will be used for standardizing connecting to NATS
@@ -10,6 +10,7 @@ package NatsConnect
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	nats "github.com/nats-io/go-nats"
@@ -23,7 +24,8 @@ func DefaultConn(natsAddress string, name string) (*nats.Conn, error) {
 		return nil, err
 	}
 	attemptConn.Options.Url = natsAddress
-	attemptConn.Options.Name = name
+	attemptConn.Options.Name = strings.ToLower(strings.Replace(name, ".", "", -1))
+
 	nc, err := attemptConn.Connect()
 	if err != nil {
 		return nil, err
