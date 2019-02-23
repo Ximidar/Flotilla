@@ -2,7 +2,7 @@
 * @Author: Ximidar
 * @Date:   2019-02-21 01:36:15
 * @Last Modified by:   Ximidar
-* @Last Modified time: 2019-02-21 14:54:29
+* @Last Modified time: 2019-02-22 17:26:30
  */
 
 package Config_test
@@ -19,13 +19,22 @@ import (
 	"github.com/ximidar/Flotilla/NodeLauncher/Config"
 )
 
-func SetupServer() {
-	test.RunDefaultServer()
+func checkConn() bool {
+	_, err := nats.Connect(nats.DefaultURL)
+	if err == nil {
+		return true
+	}
+	return false
 }
 
 func TestConfigNatsInterface(t *testing.T) {
-	// Start a default Nats Server
-	test.RunDefaultServer()
+
+	// Wait for previous tests to stop their servers
+	if !checkConn() {
+		// Start a default Nats Server
+		server := test.RunDefaultServer()
+		defer server.Shutdown()
+	}
 
 	// Make a nats.Conn
 	conn, err := NatsConnect.DefaultConn(nats.DefaultURL, "configTest")

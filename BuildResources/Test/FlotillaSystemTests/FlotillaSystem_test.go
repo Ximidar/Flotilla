@@ -2,7 +2,7 @@
 * @Author: Ximidar
 * @Date:   2019-01-13 15:38:04
 * @Last Modified by:   Ximidar
-* @Last Modified time: 2019-02-22 16:18:39
+* @Last Modified time: 2019-02-22 17:12:39
  */
 
 // FlotillaSystemTest is a test package to test multiple nodes together.
@@ -74,14 +74,13 @@ func StartTestFlotilla() (chan bool, error) {
 
 	killEverything := func() {
 		fmt.Println("Killing Everything")
-		NodeLauncher.Process.Kill()
-		<-time.After(2 * time.Second)
-		killerr := syscall.Kill(NodeLauncher.Process.Pid, syscall.SIGKILL)
+
+		killerr := syscall.Kill(NodeLauncher.Process.Pid, syscall.SIGINT)
 		if killerr != nil {
 			fmt.Println(killerr)
 		}
 		fmt.Println("Everything has been killed")
-		exitChan <- true
+
 	}
 
 	StartProc := func() {
@@ -89,15 +88,17 @@ func StartTestFlotilla() (chan bool, error) {
 		select {
 		case <-exitChan:
 			killEverything()
+			NodeLauncher.Wait()
 			os.RemoveAll(TestLocation)
 			server.Shutdown()
-			return
+			exitChan <- true
 		}
+
 	}
 	go StartProc()
 
 	// Wait a little bit for the server to start up before continuing the test
-	<-time.After(5 * time.Second)
+	<-time.After(2 * time.Second)
 
 	return exitChan, nil
 
@@ -153,7 +154,8 @@ func TestFlotillaPrinting(t *testing.T) {
 	sendExitSig := func() {
 		fmt.Println("Sending exit sig")
 		exitChan <- true
-		<-time.After(2 * time.Second)
+		<-exitChan
+		fmt.Println("Exiting Complete")
 	}
 	defer sendExitSig()
 
