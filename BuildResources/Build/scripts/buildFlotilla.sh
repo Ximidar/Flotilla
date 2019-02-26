@@ -2,11 +2,11 @@
 # @Author: Ximidar
 # @Date:   2018-10-21 22:12:32
 # @Last Modified by:   Ximidar
-# @Last Modified time: 2019-02-17 15:27:48
+# @Last Modified time: 2019-02-25 20:45:10
 
 # Paths to different important locations
-BINDIR=/home/flotilla/bin
-ARCH_FOLDER=/home/flotilla/build
+BINDIR=$HOME/bin
+ARCH_FOLDER=$HOME/build
 AMD64=$ARCH_FOLDER/AMD64
 ARM=$ARCH_FOLDER/ARM
 ARM64=$ARCH_FOLDER/ARM64
@@ -57,11 +57,8 @@ check_retval $?
 
 # Place NATS Server into Folder with built binaries
 echo "Copying Nats Server to Flotilla Packages"
-cp /usr/local/natsAMD64/gnatsd $AMD64/Flotilla/bin/CoreFlotilla/
-cp /usr/local/natsARM64/gnatsd $ARM64/Flotilla/bin/CoreFlotilla/
-cp /usr/local/natsARM6/gnatsd $ARM/Flotilla/bin/CoreFlotilla/
-
-echo "Placing all made files under user and group 1000"
-chown 1000:1000 -R /home/flotilla
+cp $NATS_LOC/AMD64/gnatsd $AMD64/Flotilla/bin/CoreFlotilla/
+cp $NATS_LOC/ARM64/gnatsd $ARM64/Flotilla/bin/CoreFlotilla/
+cp $NATS_LOC/ARM6/gnatsd $ARM/Flotilla/bin/CoreFlotilla/
 
 echo "Done Building Flotilla!"
