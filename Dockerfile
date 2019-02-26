@@ -10,11 +10,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 	unzip \
 	&& rm -rf /var/lib/apt/lists/*
 
-# Add the flotilla user
-RUN useradd -rm -d /home/flotilla -s /bin/bash -g root -G root -u 1000 flotilla
-RUN chown -R flotilla $GOPATH
+# Add Home variable for later use
 ENV HOME=/home/flotilla
-USER flotilla
 
 # Setup scripts and variables for setup
 ENV NATS_LOC=$HOME/nats/
@@ -33,7 +30,7 @@ RUN mkdir -p $FLOTILLA_DIR
 COPY . $FLOTILLA_DIR
 
 # Test
-#RUN bash $FLOTILLA_DIR/BuildResources/Test/scripts/test.sh
+RUN bash $FLOTILLA_DIR/BuildResources/Test/scripts/test.sh
 
 # Build
 WORKDIR $HOME/

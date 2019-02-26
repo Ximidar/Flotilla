@@ -2,7 +2,7 @@
 # @Author: Ximidar
 # @Date:   2018-10-21 18:57:47
 # @Last Modified by:   Ximidar
-# @Last Modified time: 2019-02-21 13:34:27
+# @Last Modified time: 2019-02-26 12:21:03
 
 # NATS
 echo "Getting nats-io"
@@ -34,12 +34,12 @@ go get github.com/pkg/term/termios
 
 # NodeLauncher
 echo "Getting lumberjack"
-go get "gopkg.in/natefinch/lumberjack.v2"
+go get gopkg.in/natefinch/lumberjack.v2
 echo "Getting viper"
-go get "github.com/spf13/viper"
+go get github.com/spf13/viper
 
 # Test
 echo "Getting go-nats"
-go get "github.com/nats-io/go-nats"
+go get github.com/nats-io/go-nats
 echo "Getting nats server"
-go get "github.com/nats-io/gnatsd"
+go get github.com/nats-io/gnatsd

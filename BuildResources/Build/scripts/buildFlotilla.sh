@@ -2,7 +2,7 @@
 # @Author: Ximidar
 # @Date:   2018-10-21 22:12:32
 # @Last Modified by:   Ximidar
-# @Last Modified time: 2019-02-25 21:53:04
+# @Last Modified time: 2019-02-26 12:26:23
 
 # Paths to different important locations
 BINDIR=$HOME/bin
@@ -15,8 +15,8 @@ NODELAUNCHER=$FLOTILLA_DIR/NodeLauncher
 # Function for detecting failure
 GLOBAL_RET=0
 check_retval(){
-    echo $1
     if [ "$1" != "0" ] ; then
+    	echo "$2"
     	GLOBAL_RET=$(($GLOBAL_RET+1))
     	exit $GLOBAL_RET
     fi
@@ -34,8 +34,7 @@ cd $NODELAUNCHER
 if make; then
 	echo "Done making Node Launcher"
 else
-	echo "Building NodeLauncher failed"
-	check_retval "1" 
+	check_retval "1" "Building NodeLauncher failed"
 fi
 
 # Copy NodeLauncher to BINDIR
@@ -48,15 +47,15 @@ cd $BINDIR/
 
 echo "Building Flotilla For AMD64"
 ./NodeLauncher CreateRoot -p $AMD64/Flotilla -a amd64 -l false
-check_retval $?
+check_retval $? "Could not create Flotilla for AMD64"
 
 echo "Building Flotilla For ARM64"
 ./NodeLauncher CreateRoot -p $ARM64/Flotilla -a arm64 -l false
-check_retval $?
+check_retval $? "Could not create Flotilla for AMD64"
 
 echo "Building Flotilla For ARM"
 ./NodeLauncher CreateRoot -p $ARM/Flotilla -a arm -l false
-check_retval $?
+check_retval $? "Could not create Flotilla for AMD64"
 
 
 # Place NATS Server into Folder with built binaries
@@ -64,5 +63,8 @@ echo "Copying Nats Server to Flotilla Packages"
 cp $NATS_LOC/AMD64/gnatsd $AMD64/Flotilla/bin/CoreFlotilla/
 cp $NATS_LOC/ARM64/gnatsd $ARM64/Flotilla/bin/CoreFlotilla/
 cp $NATS_LOC/ARM6/gnatsd $ARM/Flotilla/bin/CoreFlotilla/
+
+echo "Making user 1000 own all files"
+chown 1000:1000 -R $ARCH_FOLDER
 
 echo "Done Building Flotilla!"
