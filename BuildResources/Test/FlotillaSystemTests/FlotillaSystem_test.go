@@ -2,7 +2,7 @@
 * @Author: Ximidar
 * @Date:   2019-01-13 15:38:04
 * @Last Modified by:   Ximidar
-* @Last Modified time: 2019-02-22 17:12:39
+* @Last Modified time: 2019-02-26 13:09:39
  */
 
 // FlotillaSystemTest is a test package to test multiple nodes together.
@@ -22,6 +22,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/nats-io/gnatsd/server"
 	"github.com/nats-io/gnatsd/test"
 	nats "github.com/nats-io/go-nats"
 	"github.com/ximidar/Flotilla/BuildResources/Test/CommonTestTools"
@@ -41,16 +42,20 @@ var TestLocation = "/tmp/FlotillaSystem/Test/Flotilla"
 // A NATS instance yet. So you will have to supply that for now
 func StartTestFlotilla() (chan bool, error) {
 	os.RemoveAll(TestLocation)
-	server := test.RunDefaultServer()
-	// wait for server startup to happen
-	<-time.After(200 * time.Millisecond)
+
+	// Figure out if we need to start a nats server
+	var nserver *server.Server
 	_, err := NatsConnect.DefaultConn(nats.DefaultURL, "testcon")
 	if err != nil {
-		panic(err)
+		nserver = test.RunDefaultServer()
+		// wait for server startup to happen
+		<-time.After(200 * time.Millisecond)
+	} else {
+		fmt.Println("Server already exists on the default port. No need to create another one")
 	}
 
 	NodeLauncher, err := CreateProcess("NodeLauncher", "NodeLauncher",
-		"CreateRoot", "-p", TestLocation, "-a", "amd64", "-l", "true")
+		"CreateRoot", "-p", TestLocation, "-a=amd64", "-l=true")
 	if err != nil {
 		return nil, err
 	}
@@ -90,7 +95,7 @@ func StartTestFlotilla() (chan bool, error) {
 			killEverything()
 			NodeLauncher.Wait()
 			os.RemoveAll(TestLocation)
-			server.Shutdown()
+			nserver.Shutdown()
 			exitChan <- true
 		}
 

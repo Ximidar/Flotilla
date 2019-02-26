@@ -2,7 +2,7 @@
 * @Author: Ximidar
 * @Date:   2018-10-21 17:54:57
 * @Last Modified by:   Ximidar
-* @Last Modified time: 2019-02-21 13:37:16
+* @Last Modified time: 2019-02-26 13:39:58
  */
 
 package FileManagerTest
@@ -180,6 +180,8 @@ func Test_MoveFile(t *testing.T) {
 
 //FileExistsInStructure will query the structure for existing files
 func FileExistsInStructure(fm *FileManager.FileManager, file string) bool {
+	for fm.UpdatingStructure {
+	}
 	_, err := fm.GetFileByPath(file)
 	if err != nil {
 		fm.PrintStructure()
