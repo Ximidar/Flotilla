@@ -2,17 +2,26 @@
 # @Author: Ximidar
 # @Date:   2018-12-12 22:52:23
 # @Last Modified by:   Ximidar
-# @Last Modified time: 2019-02-25 23:23:31
+# @Last Modified time: 2019-02-26 12:52:39
 
 #This file is used to run all tests 
 
-GLOBAL_RET=0
-check_retval(){
-    echo $1
+checkError(){
     if [ "$1" != "0" ] ; then
-    	GLOBAL_RET=$(($GLOBAL_RET+1))
-    	exit $GLOBAL_RET
+    	echo "$2"
+    	exit $1
     fi
+}
+
+test_location(){
+	echo "Testing $1"
+	if cd $2 ; then
+		go test ./...
+		checkError $? "Test $1 Failed"
+	else
+		echo "Could not reach $1 at destination $2"
+		exit 1
+	fi
 }
 
 # Go to the testing location
@@ -28,7 +37,11 @@ else
 fi
 
 # Run actual tests
-go test ./...
-exit "0"
-# Don't pass tests for right now.
-#check_retval $?
+# Go to each test directly and run tests in order. go test ./... fails the tests because nats is
+# a finicky hellion when shutting down between tests. Instead travel to each folder and test individualy
+
+test_location "Data Structures" $TEST_FOLDER/DataStructures
+test_location "Flotilla Status" $TEST_FOLDER/FlotillaStatus
+test_location "Node Launcher" $TEST_FOLDER/NodeLauncher
+test_location "Flotilla File Manager" $TEST_FOLDER/FlotillaFileManager
+test_location "Flotilla System Tests" $TEST_FOLDER/FlotillaSystemTests
