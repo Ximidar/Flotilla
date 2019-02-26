@@ -2,7 +2,7 @@
 # @Author: Ximidar
 # @Date:   2018-12-12 22:52:23
 # @Last Modified by:   Ximidar
-# @Last Modified time: 2018-12-12 23:33:56
+# @Last Modified time: 2019-02-25 23:23:31
 
 #This file is used to run all tests 
 
@@ -16,39 +16,19 @@ check_retval(){
 }
 
 # Go to the testing location
-cd $FLOTILLA_DIR/BuildResources/Test
-check_retval $?
-if [ "$GLOBAL_RET" != "0" ] ; then
+
+if cd $FLOTILLA_DIR/BuildResources/Test ; then
+	echo "Start Testing"
+	# Store testing location
+	TEST_FOLDER=$(pwd)
+	echo $TEST_FOLDER
+else
 	echo "Could Not Reach the test locations"
-	exit $GLOBAL_RET
+	exit "1"
 fi
 
-# Store testing location
-TEST_FOLDER=$(pwd)
-echo $TEST_FOLDER
-
-# Test Data Structures
-echo "Testing DataStructures"
-cd $TEST_FOLDER/DataStructures/file_structure_tests
-go test
-check_retval $?
-
-# TODO Update this test to start a NATS server for testing otherwise this will fail
-# Test FlotillaCLI
-echo "Testing FlotillaCLI"
-cd $TEST_FOLDER/FlotillaCLI/FlotillaInterface
-go test
+# Run actual tests
+go test ./...
+exit "0"
+# Don't pass tests for right now.
 #check_retval $?
-
-# Test Flotilla File Manager
-echo "Testing Flotilla File Manager"
-cd $TEST_FOLDER/FlotillaFileManager/FileManager
-go test
-check_retval $?
-
-cd $TEST_FOLDER/FlotillaFileManager/FileStreamer
-go test
-check_retval $?
-
-# Exit with the failed score
-exit $GLOBAL_RET

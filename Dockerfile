@@ -11,24 +11,29 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 	&& rm -rf /var/lib/apt/lists/*
 
 # Add the flotilla user
-RUN adduser --disabled-password --gecos '' --home /home/flotilla -u 10000 flotilla
-RUN chown flotilla $GOPATH
-USER flotilla 
+RUN useradd -rm -d /home/flotilla -s /bin/bash -g root -G root -u 1000 flotilla
+RUN chown -R flotilla $GOPATH
+ENV HOME=/home/flotilla
+USER flotilla
 
-# Define and make the Flotilla Directory
+# Setup scripts and variables for setup
+ENV NATS_LOC=$HOME/nats/
+RUN mkdir -p $HOME/scripts && mkdir -p $NATS_LOC
+COPY ./BuildResources/Build/scripts/* $HOME/scripts/
+
+# Download NATS
+RUN bash $HOME/scripts/setupNats.sh
+
+# Download Go packages
+RUN bash $HOME/scripts/setupGo.sh
+
+# Define, make, and populate the Flotilla Directory
 ENV FLOTILLA_DIR=$GOPATH/src/github.com/ximidar/Flotilla/
 RUN mkdir -p $FLOTILLA_DIR
 COPY . $FLOTILLA_DIR
 
-# Download NATS
-ENV NATS_LOC=$HOME/nats
-RUN bash $FLOTILLA_DIR/BuildResources/Build/scripts/setupNats.sh
-
-# Download Go packages
-RUN bash $FLOTILLA_DIR/BuildResources/Build/scripts/setupGo.sh
-
 # Test
-RUN bash $FLOTILLA_DIR/BuildResources/Test/scripts/test.sh
+#RUN bash $FLOTILLA_DIR/BuildResources/Test/scripts/test.sh
 
 # Build
 WORKDIR $HOME/

@@ -2,7 +2,7 @@
 # @Author: Ximidar
 # @Date:   2018-10-21 22:12:32
 # @Last Modified by:   Ximidar
-# @Last Modified time: 2019-02-25 20:45:10
+# @Last Modified time: 2019-02-25 21:53:04
 
 # Paths to different important locations
 BINDIR=$HOME/bin
@@ -31,8 +31,12 @@ mkdir -p $ARM
 # Build Node Launcher
 echo "Making Node Launcher"
 cd $NODELAUNCHER
-make
-echo "Done making Node Launcher"
+if make; then
+	echo "Done making Node Launcher"
+else
+	echo "Building NodeLauncher failed"
+	check_retval "1" 
+fi
 
 # Copy NodeLauncher to BINDIR
 echo "Copying $NODELAUNCHER/bin/ to $BINDIR/"
