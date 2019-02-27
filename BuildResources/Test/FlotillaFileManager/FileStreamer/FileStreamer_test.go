@@ -2,7 +2,7 @@
 * @Author: Ximidar
 * @Date:   2018-10-29 20:36:43
 * @Last Modified by:   Ximidar
-* @Last Modified time: 2019-02-21 13:39:50
+* @Last Modified time: 2019-02-27 15:29:38
  */
 
 package FileStreamer_test
@@ -16,10 +16,10 @@ import (
 	"testing"
 	"time"
 
+	FS "github.com/ximidar/Flotilla/DataStructures/FileStructures"
 	"github.com/ximidar/Flotilla/DataStructures/StatusStructures/CommRelayStructures"
 	"github.com/ximidar/Flotilla/Flotilla_File_Manager/FileManager"
 	"github.com/ximidar/Flotilla/Flotilla_File_Manager/FileStreamer"
-	"github.com/ximidar/Flotilla/Flotilla_File_Manager/Files"
 )
 
 type fileStreamerAdapter struct {
@@ -43,7 +43,7 @@ func (fsa *fileStreamerAdapter) LineReader(line *CommRelayStructures.Line) {
 
 }
 
-func (fsa *fileStreamerAdapter) ProgressUpdate(file *Files.File, currentLine uint64, readBytes uint64) {
+func (fsa *fileStreamerAdapter) ProgressUpdate(file *FS.File, currentLine uint64, readBytes uint64) {
 	fmt.Printf("File: %v\nCurrent Line: %v\nReadBytes: %v\n", file.Name, currentLine, readBytes)
 	progress := float64(readBytes) / float64(file.Size) * 100
 	fmt.Println("Progress: ", progress)
@@ -70,7 +70,7 @@ func check_err(t *testing.T, mess string, err error) {
 	}
 }
 
-var TestLocation = "/tmp/testing/FileManager"
+var TestLocation = "/tmp/testing/FileStreamer"
 
 // TestFileStreamer will attempt to select a file and stream it
 func TestFileStreamer(t *testing.T) {
@@ -131,7 +131,7 @@ func TestFileStreamer(t *testing.T) {
 
 }
 
-func GetBenchy(fm *FileManager.FileManager) (*Files.File, error) {
+func GetBenchy(fm *FileManager.FileManager) (*FS.File, error) {
 	_, filename, _, _ := runtime.Caller(0)
 	benchyOrgFile, _ := filepath.Abs(filepath.Clean(filepath.Dir(filename) + "/../Resources/3D_Benchy.gcode"))
 	fmt.Println("Benchy Path is: ", benchyOrgFile)
@@ -140,10 +140,12 @@ func GetBenchy(fm *FileManager.FileManager) (*Files.File, error) {
 	if _, err := os.Stat(benchyOrgFile); !os.IsNotExist(err) {
 		err := fm.AddFile(benchyOrgFile, destPath)
 		if err != nil {
+			fmt.Println("Could not Add Benchy", err)
 			return nil, err
 		}
 		file, err := fm.GetFileByPath("3D_Benchy.gcode")
 		if err != nil {
+			fmt.Println("Could not get File", err)
 			structure, _ := fm.GetJSONStructure()
 			fmt.Println(string(structure))
 			return nil, err
