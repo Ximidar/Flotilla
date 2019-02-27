@@ -2,7 +2,7 @@
 # @Author: Ximidar
 # @Date:   2018-10-21 18:57:47
 # @Last Modified by:   Ximidar
-# @Last Modified time: 2019-02-26 12:21:03
+# @Last Modified time: 2019-02-26 17:12:00
 
 # NATS
 echo "Getting nats-io"
@@ -43,3 +43,9 @@ echo "Getting go-nats"
 go get github.com/nats-io/go-nats
 echo "Getting nats server"
 go get github.com/nats-io/gnatsd
+
+
+# Setup Protobuffer
+# wget https://github.com/protocolbuffers/protobuf/releases/download/v3.6.1/protobuf-cpp-3.6.1.zip
+echo "Getting Protobuf"
+go get -u github.com/golang/protobuf/protoc-gen-go
