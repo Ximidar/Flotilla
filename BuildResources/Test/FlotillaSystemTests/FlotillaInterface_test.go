@@ -2,7 +2,7 @@
 * @Author: Ximidar
 * @Date:   2018-08-25 10:51:03
 * @Last Modified by:   Ximidar
-* @Last Modified time: 2019-02-22 17:48:08
+* @Last Modified time: 2019-02-27 17:17:02
  */
 package FlotillaSystemTest
 
@@ -12,8 +12,8 @@ import (
 	"testing"
 
 	"github.com/ximidar/Flotilla/BuildResources/Test/CommonTestTools"
+	FS "github.com/ximidar/Flotilla/DataStructures/FileStructures"
 	"github.com/ximidar/Flotilla/Flotilla_CLI/FlotillaInterface"
-	"github.com/ximidar/Flotilla/Flotilla_File_Manager/Files"
 )
 
 func TestGetAvailablePorts(t *testing.T) {
@@ -57,18 +57,11 @@ func Test_Get_Structure(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	PrintStructure(structure)
-
-	data, ok := structure["root"]
-	if !ok {
-
-		t.Fatal("Could not navigate map")
-	}
-	fmt.Println(data.Path)
+	PrintStructure(structure.GetContents())
 }
 
-func PrintStructure(structure map[string]*Files.File) {
-	marshed, err := json.MarshalIndent(structure, "", "    ")
+func PrintStructure(structure []*FS.File) {
+	marshed, err := json.MarshalIndent(structure, "", "||")
 	if err != nil {
 		fmt.Println("Couldn't get json structure:", err)
 		return

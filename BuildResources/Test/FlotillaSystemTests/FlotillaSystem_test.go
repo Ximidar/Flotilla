@@ -2,7 +2,7 @@
 * @Author: Ximidar
 * @Date:   2019-01-13 15:38:04
 * @Last Modified by:   Ximidar
-* @Last Modified time: 2019-02-26 13:09:39
+* @Last Modified time: 2019-02-27 17:11:03
  */
 
 // FlotillaSystemTest is a test package to test multiple nodes together.
@@ -32,7 +32,7 @@ import (
 	FS "github.com/ximidar/Flotilla/DataStructures/FileStructures"
 	"github.com/ximidar/Flotilla/DataStructures/StatusStructures/PlayStructures"
 	"github.com/ximidar/Flotilla/Flotilla_CLI/FlotillaInterface"
-	"github.com/ximidar/Flotilla/Flotilla_File_Manager/Files"
+	"github.com/ximidar/Flotilla/Flotilla_File_Manager/FileManager"
 )
 
 var TestLocation = "/tmp/FlotillaSystem/Test/Flotilla"
@@ -159,8 +159,13 @@ func TestFlotillaPrinting(t *testing.T) {
 	sendExitSig := func() {
 		fmt.Println("Sending exit sig")
 		exitChan <- true
-		<-exitChan
-		fmt.Println("Exiting Complete")
+		select {
+		case <-exitChan:
+			fmt.Println("Exiting Complete")
+		case <-time.After(5 * time.Second):
+			fmt.Println("Exiting After 5 Seconds")
+		}
+
 	}
 	defer sendExitSig()
 
@@ -188,11 +193,13 @@ func TestFlotillaPrinting(t *testing.T) {
 	// Select the Benchy
 	Files, err := FI.GetFileStructure()
 	CommonTestTools.CheckErr(t, "Could not Get file structure", err)
-	fullbprint := Files["root"].Contents["full_bed_print.gcode"]
+	fullbprint, err := FileManager.PullFile(Files.GetContents(), "full_bed_print.gcode")
+	CommonTestTools.CheckErr(t, "could not pull file", err)
 	err = selectFile(fullbprint, FI.NC)
 	CommonTestTools.CheckErr(t, "could not select file", err)
 
 	// Play
+	fmt.Println("Attempting to Play file", fullbprint.GetName())
 	err = playFile(FI.NC)
 	CommonTestTools.CheckErr(t, "could not set play", err)
 	<-time.After(100 * time.Millisecond)
@@ -279,31 +286,35 @@ func Copy(src, dst string) error {
 	return out.Close()
 }
 
-func selectFile(file *Files.File, nc *nats.Conn) error {
+func selectFile(file *FS.File, nc *nats.Conn) error {
 
 	if file == nil || nc == nil {
 		fmt.Println("Either the nats connection or the file is invalid", file, nc)
 		return errors.New("either the nats connection or the file is invalid")
 	}
 
-	selectAction, err := FS.NewFileAction(FS.SelectFile, file.Path)
+	selectAction, err := FS.NewFileAction(FS.FileAction_SelectFile, file.GetPath())
 	if err != nil {
+		fmt.Println("Could not create file action", err)
 		return err
 	}
 
-	reply, err := selectAction.SendAction(nc, 5*time.Second)
+	reply, err := FS.SendAction(nc, 5*time.Second, selectAction)
 	if err != nil {
+		fmt.Println("Could not send file action", err)
 		return err
 	}
 
-	rJSON, err := returnReplyJSON(reply)
+	rString := new(DS.ReplyString)
+	err = json.Unmarshal(reply.Data, &rString)
 	if err != nil {
+		fmt.Println("Couldn't read the response", string(reply.Data))
 		return err
 	}
-	if rJSON.Success {
+	if rString.Success {
 		return nil
 	}
-	return errors.New(string(rJSON.Message))
+	return errors.New(string(rString.Message))
 }
 
 func playFile(nc *nats.Conn) error {
