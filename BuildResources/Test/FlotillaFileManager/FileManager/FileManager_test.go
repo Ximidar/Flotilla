@@ -2,7 +2,7 @@
 * @Author: Ximidar
 * @Date:   2018-10-21 17:54:57
 * @Last Modified by:   Ximidar
-* @Last Modified time: 2019-02-27 15:29:41
+* @Last Modified time: 2019-02-27 17:27:19
  */
 
 package FileManagerTest
@@ -15,6 +15,7 @@ import (
 	"path/filepath"
 	"runtime"
 	"testing"
+	"time"
 
 	"github.com/ximidar/Flotilla/BuildResources/Test/CommonTestTools"
 	FS "github.com/ximidar/Flotilla/DataStructures/FileStructures"
@@ -143,6 +144,7 @@ func Test_DeleteFile(t *testing.T) {
 	// delete file by full path
 	err = fm.DeleteFile(destPath)
 	CommonTestTools.CheckErr(t, "Could not delete file by full path Test_DeleteFile", err)
+	<-time.After(200 * time.Millisecond)
 	if ok := FileExistsInStructure(fm, "/3D_Benchy.gcode"); ok {
 		t.Fatal("Test_DeleteFile Failed. Did not actually delete file")
 	}
@@ -153,6 +155,7 @@ func Test_DeleteFile(t *testing.T) {
 	// delete file by relative path
 	err = fm.DeleteFile("/3D_Benchy.gcode")
 	CommonTestTools.CheckErr(t, "Could not delete file by relative path Test_DeleteFile", err)
+	<-time.After(200 * time.Millisecond)
 	if ok := FileExistsInStructure(fm, "/3D_Benchy.gcode"); ok {
 		t.Fatal("Test_DeleteFile Failed. Did not actually delete file")
 	}

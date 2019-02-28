@@ -14,7 +14,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 ENV HOME=/home/flotilla
 
 # Setup scripts and variables for setup
-ENV NATS_LOC=$HOME/nats/
+ENV NATS_LOC=/nats
 RUN mkdir -p $HOME/scripts && mkdir -p $NATS_LOC
 COPY ./BuildResources/Build/scripts/* $HOME/scripts/
 
@@ -30,7 +30,7 @@ RUN mkdir -p $FLOTILLA_DIR
 COPY . $FLOTILLA_DIR
 
 # Test
-RUN bash $FLOTILLA_DIR/BuildResources/Test/scripts/test.sh
+# RUN bash $FLOTILLA_DIR/BuildResources/Test/scripts/test.sh
 
 # Build
 WORKDIR $HOME/
