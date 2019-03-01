@@ -2,7 +2,7 @@
 # @Author: Ximidar
 # @Date:   2018-10-21 22:12:32
 # @Last Modified by:   Ximidar
-# @Last Modified time: 2019-02-26 12:26:23
+# @Last Modified time: 2019-02-28 16:02:50
 
 # Paths to different important locations
 BINDIR=$HOME/bin
@@ -46,15 +46,15 @@ echo "Building Flotilla Root Folders for all Arches"
 cd $BINDIR/
 
 echo "Building Flotilla For AMD64"
-./NodeLauncher CreateRoot -p $AMD64/Flotilla -a amd64 -l false
+./NodeLauncher CreateRoot -p $AMD64/Flotilla -a=amd64 -l=true
 check_retval $? "Could not create Flotilla for AMD64"
 
 echo "Building Flotilla For ARM64"
-./NodeLauncher CreateRoot -p $ARM64/Flotilla -a arm64 -l false
+./NodeLauncher CreateRoot -p $ARM64/Flotilla -a=arm64 -l=true -m=true
 check_retval $? "Could not create Flotilla for AMD64"
 
 echo "Building Flotilla For ARM"
-./NodeLauncher CreateRoot -p $ARM/Flotilla -a arm -l false
+./NodeLauncher CreateRoot -p $ARM/Flotilla -a=arm -l=true -m=true
 check_retval $? "Could not create Flotilla for AMD64"
 
 
