@@ -2,7 +2,7 @@
 * @Author: Ximidar
 * @Date:   2019-01-13 15:38:04
 * @Last Modified by:   Ximidar
-* @Last Modified time: 2019-02-27 17:11:03
+* @Last Modified time: 2019-03-01 23:30:25
  */
 
 // FlotillaSystemTest is a test package to test multiple nodes together.
@@ -26,8 +26,8 @@ import (
 	"github.com/nats-io/gnatsd/test"
 	nats "github.com/nats-io/go-nats"
 	"github.com/ximidar/Flotilla/BuildResources/Test/CommonTestTools"
+	"github.com/ximidar/Flotilla/BuildResources/Test/FakeSerialDevice/Printer"
 	FakeSerialDevice "github.com/ximidar/Flotilla/BuildResources/Test/FakeSerialDevice/SerialDevice"
-	"github.com/ximidar/Flotilla/CommonTools/NatsConnect"
 	DS "github.com/ximidar/Flotilla/DataStructures"
 	FS "github.com/ximidar/Flotilla/DataStructures/FileStructures"
 	"github.com/ximidar/Flotilla/DataStructures/StatusStructures/PlayStructures"
@@ -45,7 +45,7 @@ func StartTestFlotilla() (chan bool, error) {
 
 	// Figure out if we need to start a nats server
 	var nserver *server.Server
-	_, err := NatsConnect.DefaultConn(nats.DefaultURL, "testcon")
+	_, err := nats.Connect(nats.DefaultURL)
 	if err != nil {
 		nserver = test.RunDefaultServer()
 		// wait for server startup to happen
@@ -125,30 +125,6 @@ func CreateProcess(FolderName string, ExeName string, args ...string) (*exec.Cmd
 
 }
 
-func run(serial *FakeSerialDevice.FakeSerial, exitChan chan bool) {
-	var buffer []byte
-	ok := "ok\n"
-	for {
-		select {
-		case buf := <-serial.ReceiveStream:
-			buffer = append(buffer, buf)
-			if buf == 10 { // if we detect a newline
-				//fmt.Print(string(buffer))
-				buffer = []byte{}
-
-				okb := []byte(ok)
-				<-time.After(50 * time.Microsecond) // Pretend to process command
-				serial.SendBytes(okb)
-
-			}
-		case <-time.After(100 * time.Millisecond):
-			serial.SendBytes([]byte("wait\n"))
-		case <-exitChan:
-			return
-		}
-	}
-}
-
 func TestFlotillaPrinting(t *testing.T) {
 	exitChan, err := StartTestFlotilla()
 	CommonTestTools.CheckErr(t, "Could not start Flotilla test", err)
@@ -175,8 +151,9 @@ func TestFlotillaPrinting(t *testing.T) {
 	// Create a Fake Serial Device
 	os.RemoveAll("/tmp/fakeprinter")
 	serial := FakeSerialDevice.NewFakeSerial()
+	printer, _ := Printer.NewPrinter()
 	go serial.ReadMaster()
-	go run(serial, exitChan)
+	go printer.Run(serial, exitChan)
 
 	// Connect to the Fake Serial Device
 	err = FI.CommSetConnectionOptions(FakeSerialDevice.SerialName, 115200)

@@ -2,7 +2,7 @@
 * @Author: Ximidar
 * @Date:   2018-12-12 14:33:07
 * @Last Modified by:   Ximidar
-* @Last Modified time: 2018-12-12 16:33:21
+* @Last Modified time: 2019-03-01 14:31:30
  */
 
 package FakeSerialDevice
@@ -34,6 +34,7 @@ type FakeSerial struct {
 
 // NewFakeSerial will construct a new fake serial device
 func NewFakeSerial() *FakeSerial {
+	os.RemoveAll(SerialName)
 	fs := new(FakeSerial)
 	var err error
 	fs.ptyMaster, fs.ptySlave, err = termios.Pty()
@@ -43,10 +44,6 @@ func NewFakeSerial() *FakeSerial {
 	fmt.Println("Master: ", fs.ptyMaster.Name())
 	fmt.Println("Slave: ", fs.ptySlave.Name())
 
-	// Change the file mods
-	if _, err := os.Stat(SerialName); !os.IsNotExist(err) {
-		os.RemoveAll(SerialName)
-	}
 	err = os.Chmod(fs.ptySlave.Name(), 0660)
 	if err != nil {
 		panic(err)
@@ -65,8 +62,8 @@ func NewFakeSerial() *FakeSerial {
 	fmt.Println(fs.ptySettings.Ospeed)
 
 	// make streams
-	fs.ReceiveStream = make(chan byte)
-	fs.SendStream = make(chan byte)
+	fs.ReceiveStream = make(chan byte, 1000)
+	fs.SendStream = make(chan byte, 1000)
 
 	return fs
 }
