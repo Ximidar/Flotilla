@@ -2,7 +2,7 @@
 * @Author: Ximidar
 * @Date:   2018-12-12 14:33:07
 * @Last Modified by:   Ximidar
-* @Last Modified time: 2019-03-01 14:31:30
+* @Last Modified time: 2019-04-02 16:03:20
  */
 
 package FakeSerialDevice
@@ -30,12 +30,18 @@ type FakeSerial struct {
 	// Streams
 	ReceiveStream chan byte
 	SendStream    chan byte
+
+	// Address
+	Address string
 }
 
 // NewFakeSerial will construct a new fake serial device
 func NewFakeSerial() *FakeSerial {
 	os.RemoveAll(SerialName)
 	fs := new(FakeSerial)
+
+	fs.Address = SerialName
+
 	var err error
 	fs.ptyMaster, fs.ptySlave, err = termios.Pty()
 	if err != nil {
@@ -48,7 +54,7 @@ func NewFakeSerial() *FakeSerial {
 	if err != nil {
 		panic(err)
 	}
-	err = os.Symlink(fs.ptySlave.Name(), SerialName)
+	err = os.Symlink(fs.ptySlave.Name(), fs.Address)
 	if err != nil {
 		panic(err)
 	}
@@ -66,6 +72,12 @@ func NewFakeSerial() *FakeSerial {
 	fs.SendStream = make(chan byte, 1000)
 
 	return fs
+}
+
+func (fs *FakeSerial) Close() {
+	os.RemoveAll(SerialName)
+	fs.ptyMaster.Close()
+	fs.ptySlave.Close()
 }
 
 func setNonBlock(fd *os.File) {
