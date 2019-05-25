@@ -1,0 +1,44 @@
+syntax = "proto3";
+package FileStructures;
+
+
+// FileAction is an object to convey what action you want
+// the File system to take
+message FileAction{
+
+	enum Option{
+		// SelectFile will Select a file
+		SelectFile = 0;
+		// GetFileStructure will get the JSON representation of the current file structure
+		GetFileStructure = 1;
+		// AddFile will add a file to the file structure
+		AddFile = 2;
+		// MoveFile will move a file from one place to another
+		MoveFile = 3;
+		// DeleteFile will delete a file
+		DeleteFile = 4;
+
+	}
+	Option Action = 1;
+	string Path = 2;
+}
+
+message FileProg{
+	string FileName = 1;
+	uint64 Size = 2 ;
+	uint64 BytesRead = 3;
+	uint64 CurrentLine = 4;
+	float Progress = 5;
+}
+
+message File{
+	string PreviousPath = 1 ; 
+	string Name = 2 ;               
+	string Path = 3 ;               
+	string FileType = 4 ;           
+	uint64 Size = 5 ;                      
+	bool IsDir = 6 ;
+	int64 UnixTime = 7;
+	repeated File Contents = 8;                
+
+}

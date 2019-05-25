@@ -1,0 +1,18 @@
+syntax = "proto3";
+package CommRelayStructures;
+
+// Line will define a raw GCODE line with a number attached
+message Line{
+	string Line =1 ;
+	uint64 LineNumber = 2 ;
+	bool KnownNumber = 3 ;
+}
+
+message RequestLines{
+	int32 Amount = 1 ;
+}
+
+message ReturnLines{
+	repeated Line Lines = 1 ;
+	bool EOF = 2;
+}

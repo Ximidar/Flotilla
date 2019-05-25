@@ -1,0 +1,36 @@
+# Reference: https://www.switch.ch/pki/manage/request/csr-openssl/
+# Reference#2: https://help.ubuntu.com/community/OpenSSL
+# OpenSSL configuration file for creating a CSR for a server certificate
+# Adapt at least the FQDN and ORGNAME lines, and then run 
+# openssl req -new -x509 -newkey rsa:2048 -config config.cnf -keyout flotilla.key -out flotilla.pem -outform PEM
+# on the command line.
+
+# the fully qualified server (or service) name
+FQDN = www.flotilla.com
+
+# the name of your organization
+# (see also https://www.switch.ch/pki/participants/)
+ORGNAME = Flotilla
+
+# subjectAltName entries: to add DNS aliases to the CSR, delete
+# the '#' character in the ALTNAMES line, and change the subsequent
+# 'DNS:' entries accordingly. Please note: all DNS names must
+# resolve to the same IP address as the FQDN.
+ALTNAMES = DNS:$FQDN
+
+# --- no modifications required below ---
+[ req ]
+default_bits = 2048
+default_md = sha256
+prompt = no
+encrypt_key = no
+distinguished_name = dn
+req_extensions = req_ext
+
+[ dn ]
+C = US
+O = $ORGNAME
+CN = $FQDN
+
+[ req_ext ]
+subjectAltName = $ALTNAMES

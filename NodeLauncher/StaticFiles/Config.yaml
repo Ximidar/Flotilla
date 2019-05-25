@@ -1,0 +1,25 @@
+# Default Flotilla Config File
+# This is not a final version and is subject to change at will
+
+# Commango Options
+commango:
+  extra_comms: ["/tmp/fakeprinter"]
+  extra_bauds: []
+
+# Flotilla File Manager
+file_manager:
+  # Not implemented
+  file_streamer:
+    port: 5071
+
+# Flotilla Status
+status:
+  gcode_scripts: "/workspace/gcodeScripts/"
+
+# NATS Server
+nats_server:
+  http_server: true
+  http_port: 5070
+  # tls is not implemented yet
+  tls: false
+  tls_cert: "/workspace/certs/flotilla.cert"

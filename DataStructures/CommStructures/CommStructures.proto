@@ -1,0 +1,35 @@
+syntax = "proto3";
+package CommStructures;
+
+// CommStatus is a representation of the comm
+message CommStatus {
+  string port = 1;
+  int32 baud = 2;  
+  bool connected = 3;
+}
+
+// InitComm will be used to initialize the serial comm
+message InitComm {
+  string port = 1;
+  int32 baud = 2;
+}
+
+// CommMessage is just a string message it could be a written message or a received message
+message CommMessage {
+  string message = 1;
+}
+
+// WrittenBytes is a receipt for what was written to the comm
+message WrittenBytes {
+  int32 bytes = 1;
+}
+
+// Port is a serial port address
+message Port {
+  string address = 1;
+}
+
+// Ports is a list of serial Ports
+message Ports{
+  repeated Port ports = 1;
+}
