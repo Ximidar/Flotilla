@@ -10,4 +10,4 @@ if [[ ! -f $NodeLauncher ]]; then
 fi
 
 # Launch Node Launcher
-$NodeLauncher Start -p $PWD --tls
+$NodeLauncher Start -p $PWD

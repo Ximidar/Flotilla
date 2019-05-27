@@ -133,7 +133,7 @@ var certFile = "# Reference: https://www.switch.ch/pki/manage/request/csr-openss
 	"# on the command line." + "\n" +
 	"" + "\n" +
 	"# the fully qualified server (or service) name" + "\n" +
-	"FQDN = www.flotilla.com" + "\n" +
+	"FQDN = flotilla.printer/nats" + "\n" +
 	"" + "\n" +
 	"# the name of your organization" + "\n" +
 	"# (see also https://www.switch.ch/pki/participants/)" + "\n" +

@@ -6,7 +6,7 @@
 # on the command line.
 
 # the fully qualified server (or service) name
-FQDN = www.flotilla.com
+FQDN = flotilla.printer/nats
 
 # the name of your organization
 # (see also https://www.switch.ch/pki/participants/)
