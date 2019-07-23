@@ -87,7 +87,7 @@ func (CR *CommRelay) StartEventHandler() {
 
 func (CR *CommRelay) makechannels() {
 	CR.IncomingLines = make(chan FormattedLine, 100)
-	CR.WriteToComm = make(chan FormattedLine, 100)
+	CR.WriteToComm = make(chan FormattedLine, 1000)
 	CR.OKEvent = make(chan bool, 100)
 	CR.WaitEvent = make(chan bool, 100)
 	CR.ResendEvent = make(chan int, 100)
@@ -118,7 +118,7 @@ func (CR *CommRelay) ResetLines() {
 	fmt.Println("Reseting Comm Relay")
 	CR.Offset = 0
 	CR.CurrentLine = 0
-	CR.FinalLineBuffer = NewRollingFormattedLine(2000)
+	CR.FinalLineBuffer = NewRollingFormattedLine(10000)
 	CR.CurrentReadLine = 0
 	CR.SkipNextOK = false
 	CR.Playing = false
@@ -194,7 +194,7 @@ func (CR *CommRelay) CommInputHandler() {
 			// Check if we can consume lines or if we need to request more lines
 			_, err := CR.FinalLineBuffer.GetLine(CR.CurrentReadLine)
 			if err != nil {
-				CR.AskForLine(1000)
+				CR.AskForLine(10)
 			}
 			// Consume Block as OK comes in
 			if err := CR.ConsumeLine(); err != nil {
