@@ -4,4 +4,4 @@ bin
 
 # GCODE
 .gcode 
-
+*.gcode
