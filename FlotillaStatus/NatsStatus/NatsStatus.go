@@ -164,6 +164,9 @@ func (ns *NatsStatus) SendComm(command string) error {
 
 // AskForLine will ask for more lines
 func (ns *NatsStatus) AskForLine(numOfLines int) {
+	if !ns.CommRelay.Playing {
+		return
+	}
 	rl := new(CommRelayStructures.RequestLines)
 	rl.Amount = int32(numOfLines)
 	brl, err := proto.Marshal(rl)

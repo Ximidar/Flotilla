@@ -83,11 +83,12 @@ func (CR *CommRelay) StartEventHandler() {
 	fmt.Println("Starting event handler")
 	go CR.EventHandler()
 	go CR.CommInputHandler()
+	go CR.fillBuffer()
 }
 
 func (CR *CommRelay) makechannels() {
-	CR.IncomingLines = make(chan FormattedLine, 100)
-	CR.WriteToComm = make(chan FormattedLine, 1000)
+	CR.IncomingLines = make(chan FormattedLine, 10000)
+	CR.WriteToComm = make(chan FormattedLine, 10000)
 	CR.OKEvent = make(chan bool, 100)
 	CR.WaitEvent = make(chan bool, 100)
 	CR.ResendEvent = make(chan int, 100)
@@ -186,23 +187,28 @@ func (CR *CommRelay) NotifyWhenEmpty() {
 	CR.NotifyWhenFinished = true
 }
 
+func (CR *CommRelay) fillBuffer() {
+	for {
+		if !CR.FinalLineBuffer.Filled() {
+			CR.AskForLine(1)
+		} else {
+			fmt.Println("Incomming line buffer is full!")
+		}
+	}
+}
+
 //CommInputHandler will handle signals like OK, WAIT, and RESEND
 func (CR *CommRelay) CommInputHandler() {
 	for {
 		select {
 		case <-CR.OKEvent:
-			// Check if we can consume lines or if we need to request more lines
-			_, err := CR.FinalLineBuffer.GetLine(CR.CurrentReadLine)
-			if err != nil {
-				CR.AskForLine(10)
-			}
-			// Consume Block as OK comes in
+			// Consume Line as OK comes in
 			if err := CR.ConsumeLine(); err != nil {
-				// If we have no lines to consume ask for the next 10 lines
 				fmt.Println("Could not consume line", err)
 			}
 		case <-CR.WaitEvent:
 			CR.OKEvent <- false
+			// CR.debugChannels()
 		case resendLineNumber := <-CR.ResendEvent:
 			fmt.Println("Resend Event")
 			CR.CurrentReadLine = uint64(resendLineNumber)
@@ -226,4 +232,19 @@ func (CR *CommRelay) EventHandler() {
 
 		}
 	}
+}
+
+// Debug the channels to see what is filling up
+func (CR *CommRelay) debugChannels() {
+	// CR.IncomingLines = make(chan FormattedLine, 10000)
+	// CR.WriteToComm = make(chan FormattedLine, 10000)
+	// CR.OKEvent = make(chan bool, 100)
+	// CR.WaitEvent = make(chan bool, 100)
+	// CR.ResendEvent = make(chan int, 100)
+	fmt.Printf("IncomingLines CAP %v LEN %v\n", cap(CR.IncomingLines), len(CR.IncomingLines))
+	fmt.Printf("CR.WriteToComm CAP %v LEN %v\n", cap(CR.WriteToComm), len(CR.WriteToComm))
+	fmt.Printf("CR.OKEvent CAP %v LEN %v\n", cap(CR.OKEvent), len(CR.OKEvent))
+	fmt.Printf("CR.WaitEvent CAP %v LEN %v\n", cap(CR.WaitEvent), len(CR.WaitEvent))
+	fmt.Printf("CR.ResendEvent CAP %v LEN %v\n", cap(CR.ResendEvent), len(CR.ResendEvent))
+
 }

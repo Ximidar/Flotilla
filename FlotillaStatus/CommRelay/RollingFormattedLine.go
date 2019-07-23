@@ -82,3 +82,8 @@ func (rs *RollingFormattedLine) GetMostRecentLine() (FormattedLine, error) {
 	mrl, err := rs.GetLine(rs.CurrentRead - 1)
 	return mrl, err
 }
+
+// Filled will return a boolean that signifies if the slice is full
+func (rs *RollingFormattedLine) Filled() bool {
+	return len(rs.Slice) == int(rs.MaxSize)
+}

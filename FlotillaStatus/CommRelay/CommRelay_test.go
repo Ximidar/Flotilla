@@ -22,7 +22,8 @@ func lineCaller(line string) error {
 }
 
 func askforLine(lineAmount int) {
-	fmt.Println(lineAmount, "Lines Were Asked For")
+	//fmt.Println(lineAmount, "Lines Were Asked For")
+	return
 }
 
 func finished() {

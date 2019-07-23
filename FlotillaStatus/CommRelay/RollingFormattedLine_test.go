@@ -45,6 +45,25 @@ func TestRollingFormattedLine(t *testing.T) {
 	fmt.Println(rofl.Slice)
 }
 
+func TestRollingFormattedLineFilled(t *testing.T) {
+	expectedSize := 200
+	rfl := NewRollingFormattedLine(uint64(expectedSize))
+
+	if rfl.Filled() {
+		t.Fatal("Filled returned True")
+	}
+
+	lines := makeLines(expectedSize)
+	for _, line := range lines {
+		rfl.AppendLine(line)
+	}
+
+	if !rfl.Filled() {
+		t.Fatal("Filled returned False")
+	}
+
+}
+
 func TestRollingFormattedLine150kLines(t *testing.T) {
 	expectedSize := 200
 	rofl := NewRollingFormattedLine(uint64(expectedSize))
