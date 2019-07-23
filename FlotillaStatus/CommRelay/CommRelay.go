@@ -189,7 +189,7 @@ func (CR *CommRelay) NotifyWhenEmpty() {
 
 func (CR *CommRelay) fillBuffer() {
 	for {
-		if !CR.FinalLineBuffer.Filled() {
+		if !CR.FinalLineBuffer.Filled75() {
 			CR.AskForLine(1)
 		} else {
 			fmt.Println("Incomming line buffer is full!")

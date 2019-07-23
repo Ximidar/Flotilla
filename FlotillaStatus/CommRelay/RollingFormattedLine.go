@@ -87,3 +87,8 @@ func (rs *RollingFormattedLine) GetMostRecentLine() (FormattedLine, error) {
 func (rs *RollingFormattedLine) Filled() bool {
 	return len(rs.Slice) == int(rs.MaxSize)
 }
+
+// Filled75 will return a boolean that signifies if the buffer is at least 75% full
+func (rs *RollingFormattedLine) Filled75() bool {
+	return float64(len(rs.Slice)) >= float64(rs.MaxSize)*0.75
+}
