@@ -69,7 +69,9 @@ func (rs *RollingFormattedLine) GetLine(lineNum uint64) (FormattedLine, error) {
 
 	for x := len(rs.Slice) - 1; x >= 0; x-- {
 		if rs.Slice[x].LineNumber == lineNum {
-			return rs.Slice[x], nil
+			temp := rs.Slice[x]
+			rs.Slice = append(rs.Slice[:x], rs.Slice[x+1:]...)
+			return temp, nil
 		}
 	}
 	fmt.Println("Could not find line", lineNum)
@@ -83,12 +85,14 @@ func (rs *RollingFormattedLine) GetMostRecentLine() (FormattedLine, error) {
 	return mrl, err
 }
 
-// Filled will return a boolean that signifies if the slice is full
-func (rs *RollingFormattedLine) Filled() bool {
-	return len(rs.Slice) == int(rs.MaxSize)
+// Filled will return a percentage that the slice is full to
+func (rs *RollingFormattedLine) Filled() int {
+	fmt.Println(float64(len(rs.Slice)), " / ", float64(rs.MaxSize), " * 100.00")
+
+	return int((float64(len(rs.Slice)) / float64(rs.MaxSize)) * 100.00)
 }
 
-// Filled75 will return a boolean that signifies if the buffer is at least 75% full
-func (rs *RollingFormattedLine) Filled75() bool {
-	return float64(len(rs.Slice)) >= float64(rs.MaxSize)*0.75
+// FilledTo will return a boolean that signifies if the buffer is at least N% full
+func (rs *RollingFormattedLine) FilledTo(filledpercent int) bool {
+	return float64(len(rs.Slice)) >= float64(rs.MaxSize)*(float64(filledpercent)/100.00)
 }

@@ -5,3 +5,6 @@ bin
 # GCODE
 .gcode 
 *.gcode
+
+# zero file
+*0

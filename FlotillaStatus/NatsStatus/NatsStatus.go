@@ -39,6 +39,8 @@ type NatsStatus struct {
 	CommRelay      *CommRelay.CommRelay
 	PlayStatusNats *PlayStatus.PlayStatusNats
 	RNode          *PlayStructures.RegisteredNode
+
+	fillLock bool
 }
 
 // NewNatsStatus will construct a NatsStatus object
@@ -52,11 +54,12 @@ func NewNatsStatus() (*NatsStatus, error) {
 	}
 
 	var err error
+	ns.fillLock = false
 	// Construct the different objects
 	ns.StatusMonitor, err = StatusMonitor.NewStatusMonitor(ns.PublishTemperature)
 	checkErr(err)
 
-	ns.CommRelay, err = CommRelay.NewCommRelay(ns.SendComm, ns.AskForLine, ns.FinishedStream)
+	ns.CommRelay, err = CommRelay.NewCommRelay(ns.SendComm, ns.FillBuffer, ns.FinishedStream)
 	checkErr(err)
 	ns.CommRelay.StartEventHandler()
 
@@ -160,6 +163,33 @@ func (ns *NatsStatus) SendComm(command string) error {
 	}
 
 	return nil
+}
+
+// FillBuffer will fill the comm buffer relay
+func (ns *NatsStatus) FillBuffer() {
+	fmt.Println("Asked to Fill")
+	if ns.fillLock {
+		fmt.Println("Lock is on", ns.fillLock)
+		return
+	}
+
+	if !ns.CommRelay.Playing {
+		fmt.Println("Not Playing")
+		return
+	}
+	filled := ns.CommRelay.FinalLineBuffer.FilledTo(70)
+	if filled {
+		fmt.Println("Already filled to 70%", len(ns.CommRelay.FinalLineBuffer.Slice))
+		return
+	}
+	ns.fillLock = true
+	fmt.Println("Filling ######################################################")
+	for !filled {
+		ns.AskForLine(100)
+		filled = ns.CommRelay.FinalLineBuffer.FilledTo(70)
+	}
+	fmt.Println("Done Filling !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+	ns.fillLock = false
 }
 
 // AskForLine will ask for more lines

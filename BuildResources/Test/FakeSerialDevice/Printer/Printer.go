@@ -76,6 +76,7 @@ func (printer *Printer) CollectSerialInfo() {
 				fmt.Println("RECV:", string(buffer[:len(buffer)-1]))
 				printer.lineIn <- buffer
 				buffer = []byte{}
+				<-time.After(10 * time.Millisecond)
 			}
 		case response := <-printer.responseOut:
 			fmt.Println("SENT:", string(response))

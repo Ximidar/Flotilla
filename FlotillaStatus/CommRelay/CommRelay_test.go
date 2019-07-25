@@ -21,7 +21,7 @@ func lineCaller(line string) error {
 	return nil
 }
 
-func askforLine(lineAmount int) {
+func fillBuffer() {
 	//fmt.Println(lineAmount, "Lines Were Asked For")
 	return
 }
@@ -32,7 +32,7 @@ func finished() {
 
 func TestCommRelayEvents(t *testing.T) {
 
-	comm, err := NewCommRelay(lineCaller, askforLine, finished)
+	comm, err := NewCommRelay(lineCaller, fillBuffer, finished)
 	CommonTestTools.CheckErr(t, "Could not create Comm Relay", err)
 
 	comm.Playing = true
@@ -146,13 +146,12 @@ func TestCommRelaySetup(t *testing.T) {
 		fmt.Println(line)
 		return nil
 	}
-	askforline := func(lineAmount int) {
-		fmt.Println("Asked for", lineAmount, "Lines")
+	fillBuffer := func() {
 	}
 	finishcall := func() {
 		fmt.Println("Got Finish")
 	}
-	_, err := NewCommRelay(callback, askforline, finishcall)
+	_, err := NewCommRelay(callback, fillBuffer, finishcall)
 	CommonTestTools.CheckErr(t, "TestCommRelay setup failed", err)
 }
 
@@ -164,14 +163,14 @@ func TestCommRelayLines(t *testing.T) {
 		return nil
 	}
 
-	askforline := func(lineAmount int) {
-		fmt.Println("Asked for", lineAmount, "Lines")
+	fillBuffer := func() {
+		fmt.Println("Asked for filling")
 	}
 	finishcall := func() {
 		fmt.Println("Got Finish")
 	}
 
-	commRelay, err := NewCommRelay(callback, askforline, finishcall)
+	commRelay, err := NewCommRelay(callback, fillBuffer, finishcall)
 	CommonTestTools.CheckErr(t, "TestCommRelayLines setup failed", err)
 	<-time.After(75 * time.Millisecond)
 

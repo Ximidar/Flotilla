@@ -49,16 +49,31 @@ func TestRollingFormattedLineFilled(t *testing.T) {
 	expectedSize := 200
 	rfl := NewRollingFormattedLine(uint64(expectedSize))
 
-	if rfl.Filled() {
+	if rfl.FilledTo(100) {
 		t.Fatal("Filled returned True")
 	}
 
-	lines := makeLines(expectedSize)
-	for _, line := range lines {
-		rfl.AppendLine(line)
+	if !rfl.FilledTo(0) {
+		t.Fatal("Filled returned False")
 	}
 
-	if !rfl.Filled() {
+	lines := makeLines(expectedSize)
+	for index, line := range lines {
+		rfl.AppendLine(line)
+
+		if index == 99 {
+			filled := rfl.Filled()
+			if filled != 50 {
+				t.Fatal("Not 50 percent ", filled)
+			}
+			if !rfl.FilledTo(50) {
+				t.Fatal("Not 50 percent filled to!")
+			}
+		}
+
+	}
+
+	if !rfl.FilledTo(100) {
 		t.Fatal("Filled returned False")
 	}
 

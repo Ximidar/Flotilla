@@ -10,6 +10,7 @@ package CommRelay
 import (
 	"fmt"
 	"strings"
+	"sync"
 
 	CRS "github.com/ximidar/Flotilla/DataStructures/StatusStructures/CommRelayStructures"
 )
@@ -17,8 +18,8 @@ import (
 // LineCallback is a function that other packages provide to CommRelay
 type LineCallback func(line string) error
 
-// AskForLine is a function to send an ok signal
-type AskForLine func(numOfLines int)
+// FillBuffer will ask to fill the buffer
+type FillBuffer func()
 
 // FinishedStreamCallback is for telling the upper division that we have received the last
 // line of the stream
@@ -34,9 +35,11 @@ type CommRelay struct {
 	CurrentReadLine uint64
 
 	LineCallback LineCallback
-	AskForLine   AskForLine
+	FillBuffer   FillBuffer
 	SkipNextOK   bool
 	LineParser   *LineParser
+	SaveLines    map[uint64]FormattedLine
+	mux          sync.Mutex
 
 	Playing            bool
 	NotifyWhenFinished bool
@@ -54,7 +57,7 @@ type CommRelay struct {
 
 // NewCommRelay will return a new Comm Object
 func NewCommRelay(lineCallbackFunction LineCallback,
-	askforline AskForLine,
+	fillbuffer FillBuffer,
 	finishedStreamCallback FinishedStreamCallback) (*CommRelay, error) {
 
 	comm := new(CommRelay)
@@ -64,7 +67,7 @@ func NewCommRelay(lineCallbackFunction LineCallback,
 
 	// Assign Callbacks
 	comm.LineCallback = lineCallbackFunction
-	comm.AskForLine = askforline
+	comm.FillBuffer = fillbuffer
 	comm.FinishedStream = finishedStreamCallback
 
 	// Make the line parser
@@ -83,12 +86,11 @@ func (CR *CommRelay) StartEventHandler() {
 	fmt.Println("Starting event handler")
 	go CR.EventHandler()
 	go CR.CommInputHandler()
-	go CR.fillBuffer()
 }
 
 func (CR *CommRelay) makechannels() {
-	CR.IncomingLines = make(chan FormattedLine, 10000)
-	CR.WriteToComm = make(chan FormattedLine, 10000)
+	CR.IncomingLines = make(chan FormattedLine, 1000)
+	CR.WriteToComm = make(chan FormattedLine, 1000)
 	CR.OKEvent = make(chan bool, 100)
 	CR.WaitEvent = make(chan bool, 100)
 	CR.ResendEvent = make(chan int, 100)
@@ -119,12 +121,13 @@ func (CR *CommRelay) ResetLines() {
 	fmt.Println("Reseting Comm Relay")
 	CR.Offset = 0
 	CR.CurrentLine = 0
-	CR.FinalLineBuffer = NewRollingFormattedLine(10000)
+	CR.FinalLineBuffer = NewRollingFormattedLine(1000)
 	CR.CurrentReadLine = 0
 	CR.SkipNextOK = false
 	CR.Playing = false
 	CR.NotifyWhenFinished = false
 	CR.Finished = false
+	CR.SaveLines = make(map[uint64]FormattedLine)
 }
 
 // ConsumeLine will send the next line when an OK signal is received
@@ -145,7 +148,16 @@ func (CR *CommRelay) ConsumeLine() error {
 			CR.FinishedStream()
 			return nil
 		}
-		return err
+
+		// try to look for the line in the save lines dictionary
+		CR.mux.Lock()
+		line, ok := CR.SaveLines[CR.CurrentReadLine]
+		CR.mux.Unlock()
+		if !ok {
+			return err
+		}
+		CR.WriteToComm <- line
+		return nil
 
 	}
 	CR.WriteToComm <- line
@@ -181,20 +193,34 @@ func (CR *CommRelay) RecieveComm(line string) {
 
 }
 
+// SaveLine will save lines to a buffer to look up when communication goes wrong
+func (CR *CommRelay) SaveLine(line FormattedLine, lineNum uint64) {
+	CR.mux.Lock()
+	CR.SaveLines[lineNum] = line
+	CR.mux.Unlock()
+	go CR.cleanSaveLines(lineNum)
+}
+
+func (CR *CommRelay) cleanSaveLines(lineNum uint64) {
+	lineNum += 1000
+
+	for {
+		_, ok := CR.SaveLines[lineNum]
+		if ok {
+			CR.mux.Lock()
+			delete(CR.SaveLines, lineNum)
+			CR.mux.Unlock()
+			lineNum++
+		} else {
+			break
+		}
+	}
+}
+
 // NotifyWhenEmpty will set a condition to callback to FinishedStream when
 // The buffer empties
 func (CR *CommRelay) NotifyWhenEmpty() {
 	CR.NotifyWhenFinished = true
-}
-
-func (CR *CommRelay) fillBuffer() {
-	for {
-		if !CR.FinalLineBuffer.Filled75() {
-			CR.AskForLine(1)
-		} else {
-			fmt.Println("Incomming line buffer is full!")
-		}
-	}
 }
 
 //CommInputHandler will handle signals like OK, WAIT, and RESEND
@@ -205,6 +231,12 @@ func (CR *CommRelay) CommInputHandler() {
 			// Consume Line as OK comes in
 			if err := CR.ConsumeLine(); err != nil {
 				fmt.Println("Could not consume line", err)
+
+			}
+
+			if CR.FinalLineBuffer.Filled() < 25 {
+				fmt.Println("Under 25%", CR.FinalLineBuffer.Filled())
+				go CR.FillBuffer()
 			}
 		case <-CR.WaitEvent:
 			CR.OKEvent <- false
@@ -228,6 +260,11 @@ func (CR *CommRelay) EventHandler() {
 		case line := <-CR.WriteToComm:
 			sendLine := line.GetFormattedLine(0)
 			CR.sendLine(sendLine)
+
+			//save line for later lookup
+			go CR.SaveLine(line, CR.CurrentReadLine)
+
+			// up latest line to read
 			CR.CurrentReadLine++
 
 		}
