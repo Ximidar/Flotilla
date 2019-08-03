@@ -167,28 +167,27 @@ func (ns *NatsStatus) SendComm(command string) error {
 
 // FillBuffer will fill the comm buffer relay
 func (ns *NatsStatus) FillBuffer() {
-	fmt.Println("Asked to Fill")
+	// fmt.Println("Asked to Fill")
 	if ns.fillLock {
-		fmt.Println("Lock is on", ns.fillLock)
+		// fmt.Println("Lock is on", ns.fillLock)
 		return
 	}
 
 	if !ns.CommRelay.Playing {
-		fmt.Println("Not Playing")
 		return
 	}
 	filled := ns.CommRelay.FinalLineBuffer.FilledTo(70)
 	if filled {
-		fmt.Println("Already filled to 70%", len(ns.CommRelay.FinalLineBuffer.Slice))
+		// fmt.Println("Already filled to 70%", len(ns.CommRelay.FinalLineBuffer.Slice))
 		return
 	}
 	ns.fillLock = true
-	fmt.Println("Filling ######################################################")
+	// fmt.Println("Filling ######################################################")
 	for !filled {
 		ns.AskForLine(100)
 		filled = ns.CommRelay.FinalLineBuffer.FilledTo(70)
 	}
-	fmt.Println("Done Filling !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+	// fmt.Println("Done Filling !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
 	ns.fillLock = false
 }
 

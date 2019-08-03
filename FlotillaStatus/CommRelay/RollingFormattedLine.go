@@ -87,8 +87,7 @@ func (rs *RollingFormattedLine) GetMostRecentLine() (FormattedLine, error) {
 
 // Filled will return a percentage that the slice is full to
 func (rs *RollingFormattedLine) Filled() int {
-	fmt.Println(float64(len(rs.Slice)), " / ", float64(rs.MaxSize), " * 100.00")
-
+	// fmt.Println(float64(len(rs.Slice)), " / ", float64(rs.MaxSize), " * 100.00")
 	return int((float64(len(rs.Slice)) / float64(rs.MaxSize)) * 100.00)
 }
 
