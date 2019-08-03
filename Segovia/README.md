@@ -1,0 +1,5 @@
+# Segovia
+
+## What is this?
+
+Segovia is the touch interface for Flotilla. It is made with gotk3.
