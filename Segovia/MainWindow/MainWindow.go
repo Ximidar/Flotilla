@@ -48,6 +48,7 @@ func (mw *MainWindow) createFiles() error {
 	Grid.Add(label)
 
 	tabLabel, _ := gtk.LabelNew("Files")
+	tabLabel.SetSizeRequest(800/3, 50)
 
 	mw.Notebook.AppendPage(Grid, tabLabel)
 
@@ -68,6 +69,7 @@ func (mw *MainWindow) createStatus() error {
 	Grid.Add(label)
 
 	tabLabel, _ := gtk.LabelNew("Status")
+	tabLabel.SetSizeRequest(800/3, 50)
 
 	mw.Notebook.AppendPage(Grid, tabLabel)
 
@@ -88,6 +90,7 @@ func (mw *MainWindow) createUtil() error {
 	Grid.Add(label)
 
 	tabLabel, _ := gtk.LabelNew("Util")
+	tabLabel.SetSizeRequest(800/3, 50)
 
 	mw.Notebook.AppendPage(Grid, tabLabel)
 
@@ -103,7 +106,16 @@ func (mw *MainWindow) createNotebook() error {
 		return err
 	}
 
+	csspro, _ := gtk.CssProviderNew()
+	if err := csspro.LoadFromPath("MainWindow/MainWindow.css"); err != nil {
+		return err
+	}
+
+	context, _ := mw.Notebook.GetStyleContext()
+	context.AddProvider(csspro, gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
+	context.AddClass("mainNotebook")
 	mw.Notebook.SetHExpand(true)
+	mw.Notebook.SetVExpand(true)
 
 	return nil
 
