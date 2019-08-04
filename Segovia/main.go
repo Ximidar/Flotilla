@@ -34,7 +34,7 @@ func main() {
 	win.Add(mw.Notebook)
 
 	// Set the default window size.
-	win.SetDefaultSize(800, 600)
+	win.SetDefaultSize(800, 480)
 
 	// Recursively show all widgets contained in this window.
 	win.ShowAll()
