@@ -35,4 +35,6 @@ public/
 
 # Astilectron
 *resources/app
+*app
 *output
+*bind*.go
