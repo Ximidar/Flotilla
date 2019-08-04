@@ -2,4 +2,4 @@
 
 ## What is this?
 
-Segovia is the touch interface for Flotilla. It is made with gotk3.
+Segovia is the touch interface for Flotilla. It is made with atilectron (go + electron) and vue
