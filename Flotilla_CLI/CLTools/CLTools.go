@@ -11,6 +11,8 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/ximidar/Flotilla/Flotilla_CLI/ui/ContentBox"
+
 	"github.com/spf13/cobra"
 	"github.com/ximidar/Flotilla/Flotilla_CLI/UserInterface"
 	"github.com/ximidar/Flotilla/Flotilla_CLI/ui"
@@ -69,6 +71,8 @@ var tcellInterface = &cobra.Command{
 			panic(err)
 		}
 		tgui.AddQuitKey("q")
+		ContentBox.NewContentBox(tgui.Screen, "MainBox!", 10, 10, 20, 20)
+
 		tgui.Run()
 	},
 }
