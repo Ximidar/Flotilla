@@ -12,7 +12,7 @@ go get github.com/nats-io/go-nats
 echo "Getting Cobra"
 go get github.com/spf13/cobra
 echo "Getting Gocui"
-go get github.com/ximidar/gocui
+go get github.com/jroimartin/gocui
 echo "Getting go-humanize"
 go get github.com/dustin/go-humanize
 

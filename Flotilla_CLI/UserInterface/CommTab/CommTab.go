@@ -17,11 +17,11 @@ import (
 	"sync"
 
 	"github.com/golang/protobuf/proto"
+	"github.com/jroimartin/gocui"
 	"github.com/nats-io/go-nats"
 	CS "github.com/ximidar/Flotilla/DataStructures/CommStructures"
 	"github.com/ximidar/Flotilla/Flotilla_CLI/FlotillaInterface"
 	"github.com/ximidar/Flotilla/Flotilla_CLI/UserInterface/CommonBlocks"
-	"github.com/ximidar/gocui"
 )
 
 const (

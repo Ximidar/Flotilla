@@ -13,7 +13,7 @@ import (
 	FS "github.com/ximidar/Flotilla/DataStructures/FileStructures"
 	"github.com/ximidar/Flotilla/Flotilla_CLI/FlotillaInterface"
 	"github.com/ximidar/Flotilla/Flotilla_CLI/UserInterface/CommonBlocks"
-	"github.com/ximidar/gocui"
+	"github.com/jroimartin/gocui"
 )
 
 const (

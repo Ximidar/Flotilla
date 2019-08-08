@@ -12,7 +12,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/ximidar/gocui"
+	"github.com/jroimartin/gocui"
 )
 
 // MonitorInterface is an adapter for the constructor of Monitor to return. It allows control

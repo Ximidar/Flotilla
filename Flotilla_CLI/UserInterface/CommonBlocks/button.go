@@ -11,7 +11,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/ximidar/gocui"
+	"github.com/jroimartin/gocui"
 )
 
 // Button is a object to create a button

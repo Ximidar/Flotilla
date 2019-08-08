@@ -13,7 +13,7 @@ import (
 	"github.com/ximidar/Flotilla/Flotilla_CLI/UserInterface/CommTab"
 	"github.com/ximidar/Flotilla/Flotilla_CLI/UserInterface/CommonBlocks"
 	"github.com/ximidar/Flotilla/Flotilla_CLI/UserInterface/FileSystemTab"
-	"github.com/ximidar/gocui"
+	"github.com/jroimartin/gocui"
 )
 
 // CliGui is an object that will instantiate the ui

@@ -9,7 +9,7 @@ package commtab
 import (
 	"fmt"
 
-	"github.com/ximidar/gocui"
+	"github.com/jroimartin/gocui"
 )
 
 // SendBar is a gui object for sending strings

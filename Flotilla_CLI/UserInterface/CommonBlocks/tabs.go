@@ -12,7 +12,7 @@ import (
 	"fmt"
 	"math"
 
-	"github.com/ximidar/gocui"
+	"github.com/jroimartin/gocui"
 )
 
 // TabsAdapter is an interface for the Tab Class to tell the Tabs class it is selected
