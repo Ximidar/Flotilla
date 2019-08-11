@@ -1,34 +1,18 @@
 <template>
   <div class="layout">
-    <TopBar class="fixedTop"/>
-    <div class="remainingArea">
-      <WidgetArea />
-    </div>
-    
-    <!-- <transition-group name="fade">
-    <div class="widgetArea" v-bind:key="widget" v-for="widget in activeWidgets">
-      <div class="fader">
-        <BaseWidget :Name="widget">
-          {{widget}}
-        </BaseWidget>
-      </div>			
-    </div>
-  </transition-group> -->
+    <FlotillaSideBar class="fixedTop"/>
+
   </div>
   
 </template>
 
 <script>
-import TopBar from '@/components/TopBar'
-//import BaseWidget from '@/components/widgets/BaseWidget'
-import WidgetArea from '@/components/widgets/WidgetArea'
+import FlotillaSideBar from '@/components/FlotillaSideBar'
 
 export default {
   name: 'FlotillaMain',
   components: {
-    TopBar,
-    //BaseWidget,
-    WidgetArea,
+    FlotillaSideBar,
   },
   computed: {
     activeWidgets: function(){
