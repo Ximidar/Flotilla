@@ -1,12 +1,18 @@
 <template>
   <div id="app">
-    <router-view/>
-    <!-- <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-    </div> -->
+    <MainView/>
   </div>
 </template>
+
+<script>
+import MainView from "@/views/Main"
+export default {
+  components:{
+    MainView
+  }
+  
+}
+</script>
 
 <style>
 #app {

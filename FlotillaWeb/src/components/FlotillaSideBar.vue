@@ -15,7 +15,7 @@
         </li>
         <li>
           <Hamburger :ButtonStyle="HamburgerStyle" 
-                     v-bind:Action="EmptyAction"
+                     v-bind:Action="RouterFiles"
                      :collapseButton="showMenu"
                      :buttonText="ButtonTexts.file">
             <FilesIcon class="iconsize"/>
@@ -23,7 +23,7 @@
         </li>
         <li>
           <Hamburger :ButtonStyle="HamburgerStyle" 
-                     v-bind:Action="EmptyAction"
+                     v-bind:Action="RouterStats"
                      :collapseButton="showMenu"
                      :buttonText="ButtonTexts.status">
             <StatsIcon class="iconsize"/>
@@ -31,7 +31,7 @@
         </li>
         <li>
           <Hamburger :ButtonStyle="HamburgerStyle" 
-                     v-bind:Action="EmptyAction"
+                     v-bind:Action="RouterUtil"
                      :collapseButton="showMenu"
                      :buttonText="ButtonTexts.util">
             <UtilIcon class="iconsize"/>
@@ -98,6 +98,16 @@
     },
     EmptyAction (){
       console.log("Clicked!")
+    },
+    RouterFiles (){
+      this.$router.push("files")
+    },
+    RouterStats (){
+      this.$router.push("status")
+    },
+    RouterUtil (){
+      this.$router.push("util")
+
     }
   }
 }

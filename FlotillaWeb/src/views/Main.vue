@@ -1,6 +1,7 @@
 <template>
   <div class="layout">
     <FlotillaSideBar class="fixedTop"/>
+    <router-view style="{display: inline-block;}"></router-view>
 
   </div>
   
@@ -31,11 +32,12 @@ export default {
 
 .fixedTop{
   /* height: 40px; */
+  float: left;
+  padding-right: 10px;
 }
 
 .layout{
-  display: flex;
-  flex-flow: column;
+  overflow: auto;
   height: inherit;
 }
 
