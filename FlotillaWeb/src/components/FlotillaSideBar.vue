@@ -7,7 +7,34 @@
           <Hamburger :ButtonStyle="HamburgerStyle" 
                      v-bind:Action="MenuAction"
                      :collapseButton="showMenu"
-                     :buttonText="ButtonTexts.hamburgerText">
+                     :buttonText="ButtonTexts.hamburger">
+            
+              <Bars class="iconsize"/>
+           
+          </Hamburger>
+        </li>
+        <li>
+          <Hamburger :ButtonStyle="HamburgerStyle" 
+                     v-bind:Action="EmptyAction"
+                     :collapseButton="showMenu"
+                     :buttonText="ButtonTexts.file">
+            <FilesIcon class="iconsize"/>
+          </Hamburger>
+        </li>
+        <li>
+          <Hamburger :ButtonStyle="HamburgerStyle" 
+                     v-bind:Action="EmptyAction"
+                     :collapseButton="showMenu"
+                     :buttonText="ButtonTexts.status">
+            <StatsIcon class="iconsize"/>
+          </Hamburger>
+        </li>
+        <li>
+          <Hamburger :ButtonStyle="HamburgerStyle" 
+                     v-bind:Action="EmptyAction"
+                     :collapseButton="showMenu"
+                     :buttonText="ButtonTexts.util">
+            <UtilIcon class="iconsize"/>
           </Hamburger>
         </li>
       </ul>
@@ -16,6 +43,10 @@
 </template>
 
 <script>
+  import Bars from "@/assets/svg/solid/bars.svg"
+  import StatsIcon from "@/assets/svg/solid/chart-line.svg"
+  import FilesIcon from "@/assets/svg/solid/hdd.svg"
+  import UtilIcon from "@/assets/svg/solid/hat-wizard.svg"
   // import TextButton from "@/components/common/TextButton"
   import Hamburger from "@/components/common/Hamburger"
   import TextButton from "./common/TextButton"
@@ -26,7 +57,11 @@
   components: {
     TextButton,
     Hamburger,
-    Slide
+    Slide,
+    Bars,
+    StatsIcon,
+    FilesIcon,
+    UtilIcon
   },
   data () {
    return {
@@ -38,13 +73,17 @@
        width: '75px'
      },
      HamburgerStyle:{
-       backgroundColor: '#2FA4F2', 
+       backgroundColor: 'transparent', 
        color:'white',
        width: '100%',
        height: '100%'
      },
      ButtonTexts: {
-       hamburgerText: 'Menu'
+       hamburger: 'Menu',
+       file: "Files",
+       status: "Status",
+       util: "Util"
+
      }
    }
   },
@@ -57,6 +96,9 @@
         Vue.set(this.SideBarStyle, 'width', this.collapsed_width + 'px')
       }
     },
+    EmptyAction (){
+      console.log("Clicked!")
+    }
   }
 }
 
@@ -72,7 +114,8 @@
 .sidebar-container{
   width: inherit;
   height: 100%;
-  outline: 2px dashed blue;
+  /* outline: 2px dashed blue; */
+  border-right: 2px solid white;
 }
 
 ul{
@@ -85,8 +128,7 @@ li{
   min-height: 50px;
   max-height: 50px;
   width: 100%;
-  /* display: inline-block; */
-  outline: 2px dashed rgb(56, 216, 90);
+  margin: 0 0 25px 0;
 }
 
 .buttonrow{
@@ -94,6 +136,12 @@ li{
   display: inline-block;
 
   
+}
+
+.iconsize{
+  width: 45px;
+  height: 45px;
+  fill:white;
 }
 
 

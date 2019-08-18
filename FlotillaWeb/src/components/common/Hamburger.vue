@@ -15,11 +15,15 @@
         
         <div v-if="collapseButton" class="centerbutton">
           <!-- Icon -->
-          <Bars v-bind:style="IconStyle"/>
+          <slot>
+            <Bars class="iconsize"/>
+          </slot>
         </div>
         <div v-else class="centerbuttoncollapsed">
           <!-- Icon -->
-          <Bars v-bind:style="IconStyle"/>
+          <slot>
+            <Bars class="iconsize"/>
+          </slot>
         </div>
 
         </div>
@@ -45,17 +49,13 @@ export default {
     buttonText: {
       default: "None!",
       type: String
-    }
+    },
   },
   components: {
     Bars
   },
   data () {
     return {
-      IconStyle: {
-        width: '50px',
-        height: '50px',
-      },
     }
   },
   methods: {
@@ -93,10 +93,9 @@ export default {
   transition-duration: 0.2s;
 }
 
-.icon{
+.iconsize{
     width: 45px;
     height: 45px;
-    display:inline-block;
 }
 
 .buttonalign {
@@ -116,7 +115,7 @@ export default {
 
 .righttext{
   position:relative;
-  left: 10px;
+  left: 0px;
   right:30px;
   top: 10px;
   display: inline-block;
@@ -139,6 +138,6 @@ export default {
   height: 50px;
   max-height: 50px;
   width:100%;
-  outline: 2px dashed rgb(231, 24, 24);
+  /* outline: 2px dashed rgb(231, 24, 24); */
 }
 </style>
