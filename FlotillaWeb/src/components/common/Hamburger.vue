@@ -1,28 +1,32 @@
 <template>
-  <div style="width: 100%; height: 100%;">
+  <div class="hamburger"
+       
+  >
     <button
       type="submit"
       v-on:click="Action"
       class="flotilla-button"
-      v-bind:style="{backgroundColor: ButtonColor, color: TextColor}"
+      v-bind:style="ButtonStyle"
     >
-        <!-- Icon -->
-        <img class="img-icon" src="@/assets/svg/solid/bars.svg">
+      <div class="centerbutton">
+         <!-- Icon -->
+        <Bars class="icon"/>
+      </div>
+      
+       
+       
     </button>
   </div>
 </template>
 
 <script> 
+import Bars from "@/assets/svg/solid/bars.svg"
 export default {
   name: "Hamburger",
   props: {
-    ButtonColor: {
-      default: "#73AD21",
-      type: String
-    },
-    TextColor: {
-      default: "white",
-      type: String
+    ButtonStyle: {
+      backgroundColor: "#73AD21",
+      color: "white",
     },
     Action: {
       default: function(){},
@@ -30,7 +34,7 @@ export default {
     },
   },
   components: {
-
+    Bars
   },
   methods: {}
 };
@@ -38,8 +42,6 @@ export default {
 
 <style scoped>
 .flotilla-button {
-  width: inherit;
-  height: inherit;
   border-radius: 6px;
   border: none;
   color: white;
@@ -47,13 +49,12 @@ export default {
 
   -webkit-transition-duration: 0.4s;
   transition-duration: 0.4s;
+
+  
 }
 
 .flotilla-button:hover {
   opacity: 0.75;
-  box-shadow: 0 12px 16px 0 rgba(0, 0, 0, 0.24),
-    0 17px 50px 0 rgba(0, 0, 0, 0.19);
-  /*transform: translateY(2px);*/
 }
 
 .flotilla-button:focus {
@@ -68,8 +69,21 @@ export default {
   transition-duration: 0.2s;
 }
 
-.img-icon{
-    width:100%;
-    height: 100%;
+.icon{
+    width: 50px;
+    height: 50px;
+    float: right;
+}
+
+.centerbutton{
+  height: 100%;
+  width: 100%;
+}
+
+.hamburger{
+  /* width: 100%; */
+  height: inherit;
+  width:100%;
+  outline: 2px dashed rgb(231, 24, 24);
 }
 </style>

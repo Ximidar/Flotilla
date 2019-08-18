@@ -2,11 +2,13 @@
   <div id="FlotillaSideBar" v-bind:style="SideBarStyle">
     <!-- Side Bar -->
     <div class="sidebar-container" >
-      <div class="hamburger">
-        <Hamburger ButtonColor="#2FA4F2" 
-                   v-bind:Action="MenuAction">
-        </Hamburger>
-      </div>
+      <ul>
+        <li>
+          <Hamburger :ButtonStyle="HamburgerStyle" 
+                     v-bind:Action="MenuAction">
+          </Hamburger>
+        </li>
+      </ul>
     </div>
   </div>
 </template>
@@ -32,6 +34,12 @@
      SideBarStyle: {
        height: '100%',
        width: '75px'
+     },
+     HamburgerStyle:{
+       backgroundColor: '#2FA4F2', 
+       color:'white',
+       width: '100%',
+       height: '100%'
      }
    }
   },
@@ -56,17 +64,31 @@
   /* width: 75px; */
 }
 
-.buttonStyle{
-  width: inherit;
-  height: inherit;
-}
-
 .sidebar-container{
   width: inherit;
   height: 100%;
-  display: flex;
-  flex-direction: row;
   outline: 2px dashed blue;
+}
+
+ul{
+  width: 100%;
+  margin:0;
+padding:0;
+}
+
+li{
+  min-height: 50px;
+  max-height: 50px;
+  width: 100%;
+  /* display: inline-block; */
+  outline: 2px dashed rgb(56, 216, 90);
+}
+
+.buttonrow{
+  
+  display: inline-block;
+
+  
 }
 
 
