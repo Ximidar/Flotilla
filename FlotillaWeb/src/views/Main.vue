@@ -30,7 +30,7 @@ export default {
 }
 
 .fixedTop{
-  height: 40px;
+  /* height: 40px; */
 }
 
 .layout{

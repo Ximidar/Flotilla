@@ -8,13 +8,22 @@
       class="flotilla-button"
       v-bind:style="ButtonStyle"
     >
-      <div class="centerbutton">
-         <!-- Icon -->
-        <Bars class="icon"/>
-      </div>
+      <div class="butonalign">
+        <div v-show="collapseButton" class="righttext">
+          <div v-show="collapseButton" class="btext">{{ buttonText }}</div>
+        </div>
+        
+        <div v-if="collapseButton" class="centerbutton">
+          <!-- Icon -->
+          <Bars v-bind:style="IconStyle"/>
+        </div>
+        <div v-else class="centerbuttoncollapsed">
+          <!-- Icon -->
+          <Bars v-bind:style="IconStyle"/>
+        </div>
+
+        </div>
       
-       
-       
     </button>
   </div>
 </template>
@@ -32,11 +41,25 @@ export default {
       default: function(){},
       type: Function
     },
+    collapseButton: false,
+    buttonText: {
+      default: "None!",
+      type: String
+    }
   },
   components: {
     Bars
   },
-  methods: {}
+  data () {
+    return {
+      IconStyle: {
+        width: '50px',
+        height: '50px',
+      },
+    }
+  },
+  methods: {
+  }
 };
 </script>
 
@@ -49,7 +72,8 @@ export default {
 
   -webkit-transition-duration: 0.4s;
   transition-duration: 0.4s;
-
+  
+  
   
 }
 
@@ -70,19 +94,50 @@ export default {
 }
 
 .icon{
-    width: 50px;
-    height: 50px;
-    float: right;
+    width: 45px;
+    height: 45px;
+    display:inline-block;
+}
+
+.buttonalign {
+  text-align: 'center';
+  overflow:auto;
 }
 
 .centerbutton{
-  height: 100%;
+  float:right;
+  
+}
+
+.centerbuttoncollapsed {
+  display:inline-block;
+  
+}
+
+.righttext{
+  position:relative;
+  left: 10px;
+  right:30px;
+  top: 10px;
+  display: inline-block;
+  
+}
+
+.btext{
   width: 100%;
+  height: 100%;
+  color: whitesmoke;
+  font-size: 25px;
+  overflow: hidden;
+  white-space: nowrap;
+  
+  
 }
 
 .hamburger{
   /* width: 100%; */
-  height: inherit;
+  height: 50px;
+  max-height: 50px;
   width:100%;
   outline: 2px dashed rgb(231, 24, 24);
 }

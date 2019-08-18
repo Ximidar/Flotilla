@@ -5,7 +5,9 @@
       <ul>
         <li>
           <Hamburger :ButtonStyle="HamburgerStyle" 
-                     v-bind:Action="MenuAction">
+                     v-bind:Action="MenuAction"
+                     :collapseButton="showMenu"
+                     :buttonText="ButtonTexts.hamburgerText">
           </Hamburger>
         </li>
       </ul>
@@ -40,6 +42,9 @@
        color:'white',
        width: '100%',
        height: '100%'
+     },
+     ButtonTexts: {
+       hamburgerText: 'Menu'
      }
    }
   },
@@ -73,7 +78,7 @@
 ul{
   width: 100%;
   margin:0;
-padding:0;
+  padding:0;
 }
 
 li{
