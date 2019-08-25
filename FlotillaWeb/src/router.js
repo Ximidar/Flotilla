@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import About from '@/views/About.vue'
-import FilesVue from '@/views/Files.vue'
+import FilesVue from '@/views/Files/Files.vue'
 import Status from '@/views/Status.vue'
 import Util from '@/views/Util.vue'
 
