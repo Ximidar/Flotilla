@@ -4,10 +4,14 @@
       PATH
     </div>
     <div class="file-items">
-      <ul>
-        <li v-for="file in Contents">
-          {{file}}
-        </li>
+      <ul v-for="file in Contents" v-bind:key="file.Path">
+        <FileItem :FileName="file.Name"
+                  :Path="file.Path"
+                  :PreviousPath="file.PreviousPath"
+                  :FileType="file.FileType"
+                  :Size="file.Size"
+                  :UnixTime="file.UnixTime">
+        </FileItem>
       </ul>  
     </div>
   </div>
@@ -15,10 +19,14 @@
 
 <script>
 var proto_file = require('./js_proto/FileStructures_pb')
+import FileItem from '@/views/Files/FileItem'
 export default {
+  name: 'FlotillaFiles',
+  components:{
+    FileItem
+  },
   data(){
     return{
-      name: 'FlotillaFiles',
       FileList: {},
       Contents: [],
       TestFileList: {
@@ -57,7 +65,6 @@ export default {
   
   methods:{
     Get_Files: function(){
-      console.log("Getting Files")
       var root = new proto_file.File()
       for (var key in this.TestFileList){
         if (key == "Path"){
@@ -90,10 +97,8 @@ export default {
       this.FileList = root
     },
   ProcessFileList: function(){
-    console.log("processing files")
     for (var file in this.FileList.Contents){
-      console.log(this.FileList.Contents[file].Name)
-      this.Contents.push(this.FileList.Contents[file].Name)
+      this.Contents.push(this.FileList.Contents[file])
     }
   }
 },
@@ -127,5 +132,11 @@ created(){
   overflow: hidden;
   padding-top: 10px;
 
+}
+
+ul{
+  width: 100%;
+  margin:0;
+  padding:0;
 }
 </style>
