@@ -18,7 +18,9 @@
 </template>
 
 <script>
-var proto_file = require('./js_proto/FileStructures_pb')
+const axios = require('axios')
+var protobuf = require("protobufjs")
+import {FileStructures} from './js_proto/FileStructures.js'
 import FileItem from '@/views/Files/FileItem'
 export default {
   name: 'FlotillaFiles',
@@ -65,45 +67,88 @@ export default {
   
   methods:{
     Get_Files: function(){
-      var root = new proto_file.File()
-      for (var key in this.TestFileList){
-        if (key == "Path"){
-          root.Path = this.TestFileList[key]
-        }
-        if (key == "FileType"){
-          root.FileType = this.TestFileList[key]
-        }
-        if (key == "Contents"){
-          for (var item in this.TestFileList["Contents"]){
-            var tempFile = new proto_file.File()
-            tempFile.Path = this.TestFileList["Contents"][item]["Path"]
-            tempFile.PreviousPath = this.TestFileList["Contents"][item]["PreviousPath"]
-            tempFile.Name = this.TestFileList["Contents"][item]["Name"]
-            tempFile.UnixTime = this.TestFileList["Contents"][item]["UnixTime"]
-            tempFile.Size = this.TestFileList["Contents"][item]["Size"]
-            tempFile.FileType = this.TestFileList["Contents"][item]["FileType"]
-            if (tempFile.FileType == "folder"){
-              tempFile.IsDir = this.TestFileList["Contents"][item]["IsDir"]
-            } else {
-              tempFile.IsDir = false
-            }
-            if (!root.Contents){
-              root.Contents = []
-            }
-            root.Contents.push(tempFile)
-          }
-        }
-      }
-      this.FileList = root
+      // var root = new FileStructures.File()
+      // for (var key in this.TestFileList){
+      //   if (key == "Path"){
+      //     root.Path = this.TestFileList[key]
+      //   }
+      //   if (key == "FileType"){
+      //     root.FileType = this.TestFileList[key]
+      //   }
+      //   if (key == "Contents"){
+      //     for (var item in this.TestFileList["Contents"]){
+      //       var tempFile = new FileStructures.File()
+      //       tempFile.Path = this.TestFileList["Contents"][item]["Path"]
+      //       tempFile.PreviousPath = this.TestFileList["Contents"][item]["PreviousPath"]
+      //       tempFile.Name = this.TestFileList["Contents"][item]["Name"]
+      //       tempFile.UnixTime = this.TestFileList["Contents"][item]["UnixTime"]
+      //       tempFile.Size = this.TestFileList["Contents"][item]["Size"]
+      //       tempFile.FileType = this.TestFileList["Contents"][item]["FileType"]
+      //       if (tempFile.FileType == "folder"){
+      //         tempFile.IsDir = this.TestFileList["Contents"][item]["IsDir"]
+      //       } else {
+      //         tempFile.IsDir = false
+      //       }
+      //       if (!root.Contents){
+      //         root.Contents = []
+      //       }
+      //       root.Contents.push(tempFile)
+      //     }
+      //   }
+      // }
+      // this.FileList = root
     },
   ProcessFileList: function(){
     for (var file in this.FileList.Contents){
       this.Contents.push(this.FileList.Contents[file])
     }
+  },
+  RequestFiles: function(){
+
+  //   const flotilla_api = axios.create({
+  //     baseUSE: 'http://127.0.0.1:5000/api/',
+  //     transformResponse:[
+  //       (data) =>{
+          
+  //         let file = FileStructures.File.decode(data)
+  //         return file
+  //       }
+  //     ]
+  //   }).get('http://127.0.0.1:5000/api/getfiles')
+  //   .then(function (response){
+      
+  //     console.log(response)
+  //   })
+  // }
+  axios.request({
+    responseType: 'blob',
+    url: 'http://127.0.0.1:5000/api/getfiles',
+    method: 'get'
+    
+  }).then(
+    (response) => {
+      response.data.arrayBuffer().then(
+        (buf) => {
+          let transbuf = new Uint8Array(buf)
+          let file = FileStructures.File.decode(transbuf)
+          this.FileList = file
+        }
+      )
+      
+    }
+  )
+  }
+},
+watch:{
+  FileList: function(newval, oldval){
+    console.log("New files!")
+    console.log(newval)
+    this.ProcessFileList()
   }
 },
 created(){
   this.Get_Files()
+  this.RequestFiles()
   this.ProcessFileList()
 }
 
