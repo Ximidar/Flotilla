@@ -1,10 +1,10 @@
 <template>
-    <li>
+    <li v-on:click="ClickEvent">
         
-        <FileIcon class="iconsize" v-if="FileType == 'file'"/>
-        <FolderIcon class="iconsize" v-if="FileType == 'folder'"/>
+        <FileIcon class="iconsize" v-if="File.Type == 'file'"/>
+        <FolderIcon class="iconsize" v-if="File.Type == 'folder'"/>
         <div class="file-details">
-            <div class="file-details name"><b>{{FileName}}</b></div>
+            <div class="file-details name"><b>{{File.Name}}</b></div>
             <div class="file-details size">{{ ReadableSize }}</div> 
             <div class="file-details date">{{ FileDate }}</div>
         </div>
@@ -22,35 +22,15 @@ export default {
         FolderIcon
     },
     props:{
-        FileName:{
-            default: 'Error',
-            type: String
-        },
-        Path:{
-            default: 'Error',
-            type: String
-        },
-        FileType:{
-            default: 'Error',
-            type: String
-        },
-        Size:{
-            default: -1,
-            type: Number
-        },
-        UnixTime:{
-            default: 0,
-            type: Number
-        },
-        PreviousPath:{
-            default: 'Error',
-            type: String
+        File:{
+            type: Object,
+            default: {}
         }
     },
     data: function() {
         return {
-            ReadableSize: this.HumanReadable(this.Size),
-            FileDate: this.ConvertUnixTimestamp(this.UnixTime)
+            ReadableSize: this.HumanReadable(this.File.Size),
+            FileDate: this.ConvertUnixTimestamp(this.File.UnixTime)
         }
     },
     methods:{
@@ -75,11 +55,15 @@ export default {
             var date = a.getDate()
             var time = date + ' ' + month + ' ' + year 
             return time
+        },
+        ClickEvent: function() {
+            this.$emit('clicked', this.File)
         }
     },
     watch: {
-        Size: function(newval, oldval){
-            this.ReadableSize = HumanReadable(newval)
+        File: function(newval, oldval){
+            this.ReadableSize = this.HumanReadable(newval.Size)
+            this.FileDate = this.ConvertUnixTimestamp(this.File.UnixTime)
             console.log(this.ReadableSize)
         }
     }

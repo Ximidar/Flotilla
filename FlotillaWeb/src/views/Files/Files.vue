@@ -1,16 +1,13 @@
 <template>
   <div class="files">
     <div class="path-bar">
-      PATH
+      <ArrowLeft v-on:click="GoPrevious" class="iconsize" />
+      {{ FileList.CurrentFL.Path }}
     </div>
     <div class="file-items">
       <ul v-for="file in Contents" v-bind:key="file.Path">
-        <FileItem :FileName="file.Name"
-                  :Path="file.Path"
-                  :PreviousPath="file.PreviousPath"
-                  :FileType="file.FileType"
-                  :Size="file.Size"
-                  :UnixTime="file.UnixTime">
+        <FileItem :File=file
+                  @clicked="ClickFile">
         </FileItem>
       </ul>  
     </div>
@@ -22,134 +19,85 @@ const axios = require('axios')
 var protobuf = require("protobufjs")
 import {FileStructures} from './js_proto/FileStructures.js'
 import FileItem from '@/views/Files/FileItem'
+import ArrowLeft from '@/assets/svg/solid/arrow-left.svg'
+import Vue from 'vue'
+import { isNullOrUndefined } from 'util';
+
 export default {
   name: 'FlotillaFiles',
   components:{
-    FileItem
+    FileItem,
+    ArrowLeft
   },
   data(){
     return{
-      FileList: {},
-      Contents: [],
-      TestFileList: {
-        "Path": "/tmp/testing/FileManager",
-        "FileType": "folder",
-        "Contents": [
-            {
-                "PreviousPath": "/tmp/testing/FileManager",
-                "Name": "3D_Benchy.gcode",
-                "Path": "/tmp/testing/FileManager/3D_Benchy.gcode",
-                "FileType": "file",
-                "Size": 4878333,
-                "UnixTime": 1566708663
-            },
-            {
-                "PreviousPath": "/tmp/testing/FileManager",
-                "Name": "3D_Relative_Benchy.gcode",
-                "Path": "/tmp/testing/FileManager/3D_Relative_Benchy.gcode",
-                "FileType": "file",
-                "Size": 4878333,
-                "UnixTime": 1566708663
-            },
-            {
-                "PreviousPath": "/tmp/testing/FileManager",
-                "Name": "test",
-                "Path": "/tmp/testing/FileManager/test",
-                "FileType": "folder",
-                "Size": 4096,
-                "IsDir": true,
-                "UnixTime": 1566708663
-            }
-        ]
+      RootFS: {},
+      FileList: {
+        CurrentFL: {},
+        PreviousFL: {},
       },
+      Contents: [],
     }
   },
   
   methods:{
-    Get_Files: function(){
-      // var root = new FileStructures.File()
-      // for (var key in this.TestFileList){
-      //   if (key == "Path"){
-      //     root.Path = this.TestFileList[key]
-      //   }
-      //   if (key == "FileType"){
-      //     root.FileType = this.TestFileList[key]
-      //   }
-      //   if (key == "Contents"){
-      //     for (var item in this.TestFileList["Contents"]){
-      //       var tempFile = new FileStructures.File()
-      //       tempFile.Path = this.TestFileList["Contents"][item]["Path"]
-      //       tempFile.PreviousPath = this.TestFileList["Contents"][item]["PreviousPath"]
-      //       tempFile.Name = this.TestFileList["Contents"][item]["Name"]
-      //       tempFile.UnixTime = this.TestFileList["Contents"][item]["UnixTime"]
-      //       tempFile.Size = this.TestFileList["Contents"][item]["Size"]
-      //       tempFile.FileType = this.TestFileList["Contents"][item]["FileType"]
-      //       if (tempFile.FileType == "folder"){
-      //         tempFile.IsDir = this.TestFileList["Contents"][item]["IsDir"]
-      //       } else {
-      //         tempFile.IsDir = false
-      //       }
-      //       if (!root.Contents){
-      //         root.Contents = []
-      //       }
-      //       root.Contents.push(tempFile)
-      //     }
-      //   }
-      // }
-      // this.FileList = root
-    },
-  ProcessFileList: function(){
-    for (var file in this.FileList.Contents){
-      this.Contents.push(this.FileList.Contents[file])
+  ClickFile: function(file){
+    if (file.IsDir){
+      console.log("Switching to ", file.Name)
+      this.SwitchTo(file)
+    } else {
+      console.log(file.Name)
     }
   },
   RequestFiles: function(){
-
-  //   const flotilla_api = axios.create({
-  //     baseUSE: 'http://127.0.0.1:5000/api/',
-  //     transformResponse:[
-  //       (data) =>{
-          
-  //         let file = FileStructures.File.decode(data)
-  //         return file
-  //       }
-  //     ]
-  //   }).get('http://127.0.0.1:5000/api/getfiles')
-  //   .then(function (response){
-      
-  //     console.log(response)
-  //   })
-  // }
   axios.request({
     responseType: 'blob',
     url: 'http://127.0.0.1:5000/api/getfiles',
     method: 'get'
     
-  }).then(
-    (response) => {
-      response.data.arrayBuffer().then(
-        (buf) => {
-          let transbuf = new Uint8Array(buf)
-          let file = FileStructures.File.decode(transbuf)
-          this.FileList = file
-        }
-      )
-      
+    }).then(
+      (response) => {
+        response.data.arrayBuffer().then(
+          (buf) => {
+            let transbuf = new Uint8Array(buf)
+            let file = FileStructures.File.decode(transbuf)
+            this.RootFS = file
+            this.SwitchTo(this.RootFS)
+          }
+        )
+        
+      }
+    )
+  },
+  GoPrevious: function(){
+    if (!isNullOrUndefined(this.FileList.PreviousFL)){
+      console.log("Defined Previous", this.FileList.PreviousFL)
+      this.FileList = this.FileList.PreviousFL
+      this.ProcessCurrentFL()
+    } else {
+      this.SwitchTo(this.RootFS)
     }
-  )
-  }
-},
-watch:{
-  FileList: function(newval, oldval){
-    console.log("New files!")
-    console.log(newval)
-    this.ProcessFileList()
+  },
+  SwitchTo: function(file){
+    this.Contents = []
+    console.log("Switching to", file.Path)
+    if (file.Path != this.RootFS.Path){
+      this.FileList.PreviousFL = JSON.parse(JSON.stringify(this.FileList))
+    } else {
+      this.FileList.PreviousFL = {}
+    }
+    this.FileList.CurrentFL = file
+    this.ProcessCurrentFL()
+  },
+  ProcessCurrentFL: function(){
+    this.Contents = []
+    for (var file in this.FileList.CurrentFL.Contents){
+      this.Contents.push(this.FileList.CurrentFL.Contents[file])
+    }
   }
 },
 created(){
-  this.Get_Files()
   this.RequestFiles()
-  this.ProcessFileList()
 }
 
 }
@@ -184,4 +132,11 @@ ul{
   margin:0;
   padding:0;
 }
+
+.iconsize{
+  width: 30px;
+  height: 30px;
+  fill:white;
+} 
+
 </style>
