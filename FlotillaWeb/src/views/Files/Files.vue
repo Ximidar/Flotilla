@@ -34,7 +34,7 @@ export default {
       RootFS: {},
       FileList: {
         CurrentFL: {},
-        PreviousFL: {},
+        PreviousFL: null,
       },
       Contents: [],
     }
@@ -70,7 +70,7 @@ export default {
     )
   },
   GoPrevious: function(){
-    if (!isNullOrUndefined(this.FileList.PreviousFL)){
+    if (!isNullOrUndefined(this.FileList.PreviousFL) && this.FileList.PreviousFL != {}){
       console.log("Defined Previous", this.FileList.PreviousFL)
       this.FileList = this.FileList.PreviousFL
       this.ProcessCurrentFL()
@@ -84,7 +84,7 @@ export default {
     if (file.Path != this.RootFS.Path){
       this.FileList.PreviousFL = JSON.parse(JSON.stringify(this.FileList))
     } else {
-      this.FileList.PreviousFL = {}
+      this.FileList.PreviousFL = null
     }
     this.FileList.CurrentFL = file
     this.ProcessCurrentFL()
