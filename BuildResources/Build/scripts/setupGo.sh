@@ -13,6 +13,8 @@ echo "Getting Cobra"
 go get github.com/spf13/cobra
 echo "Getting Gocui"
 go get github.com/jroimartin/gocui
+echo "Getting TCell"
+go get github.com/gdamore/tcell
 echo "Getting go-humanize"
 go get github.com/dustin/go-humanize
 

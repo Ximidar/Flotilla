@@ -1,4 +1,4 @@
-FROM golang:1.11.1-stretch
+FROM golang:stretch
 
 # Install Resources
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -16,7 +16,8 @@ ENV HOME=/home/flotilla
 
 # Setup scripts and variables for setup
 ENV NATS_LOC=/nats
-RUN mkdir -p $HOME/scripts && mkdir -p $NATS_LOC
+RUN mkdir -p $HOME/scripts
+RUN mkdir -p $NATS_LOC
 COPY ./BuildResources/Build/scripts/* $HOME/scripts/
 
 # Download NATS
