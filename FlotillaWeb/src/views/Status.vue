@@ -7,7 +7,26 @@
 
 <script>
 export default {
-  name: 'FlotillaStatus'
+  name: 'FlotillaStatus',
+  methods: {
+    Hello () {
+      console.log(Go)
+      var go = new Go()
+      console.log(go)
+      var hellowasm = require("@/wasm_test/hellowasm.wasm")
+      WebAssembly.instantiateStreaming(fetch(hellowasm), go.importObject).then((result) => {
+        console.log("Result!!!")
+        console.log(result)
+        
+        go.run(result.instance)
+      })
+      
+      
+    }
+  },
+  created(){
+    this.Hello()
+  }
 }
 </script>
 
