@@ -11,8 +11,8 @@ import (
 	"fmt"
 
 	nats "github.com/nats-io/go-nats"
-	"github.com/ximidar/Flotilla/DataStructures"
-	"github.com/ximidar/Flotilla/DataStructures/StatusStructures/PlayStructures"
+	"github.com/Ximidar/Flotilla/DataStructures"
+	"github.com/Ximidar/Flotilla/DataStructures/StatusStructures/PlayStructures"
 )
 
 // PlayStatusNats will act as the Nats connection for setting the play status.

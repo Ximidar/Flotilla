@@ -14,7 +14,7 @@ import (
 	"os"
 	ospath "path"
 
-	FS "github.com/ximidar/Flotilla/DataStructures/FileStructures"
+	FS "github.com/Ximidar/Flotilla/DataStructures/FileStructures"
 )
 
 // NewFile is a constructor for FS.File

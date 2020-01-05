@@ -11,11 +11,11 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/ximidar/Flotilla/Flotilla_CLI/ui/ContentBox"
+	"github.com/Ximidar/Flotilla/Flotilla_CLI/ui/ContentBox"
 
 	"github.com/spf13/cobra"
-	"github.com/ximidar/Flotilla/Flotilla_CLI/UserInterface"
-	"github.com/ximidar/Flotilla/Flotilla_CLI/ui"
+	"github.com/Ximidar/Flotilla/Flotilla_CLI/UserInterface"
+	"github.com/Ximidar/Flotilla/Flotilla_CLI/ui"
 )
 
 var rootCmd = &cobra.Command{

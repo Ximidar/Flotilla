@@ -14,7 +14,7 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/ximidar/Flotilla/CommonTools/flags"
+	"github.com/Ximidar/Flotilla/CommonTools/flags"
 )
 
 // Errorf works like it does in fmt except it checks a debug variable

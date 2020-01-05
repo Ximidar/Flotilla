@@ -14,7 +14,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ximidar/Flotilla/BuildResources/Test/CommonTestTools"
+	"github.com/Ximidar/Flotilla/BuildResources/Test/CommonTestTools"
 )
 
 func TestPlayStructures(t *testing.T) {

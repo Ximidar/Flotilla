@@ -15,14 +15,14 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	"github.com/nats-io/go-nats"
-	"github.com/ximidar/Flotilla/CommonTools/NatsConnect"
-	version "github.com/ximidar/Flotilla/CommonTools/versioning"
-	DS "github.com/ximidar/Flotilla/DataStructures"
-	FS "github.com/ximidar/Flotilla/DataStructures/FileStructures"
-	CRS "github.com/ximidar/Flotilla/DataStructures/StatusStructures/CommRelayStructures"
-	PS "github.com/ximidar/Flotilla/DataStructures/StatusStructures/PlayStructures"
-	FM "github.com/ximidar/Flotilla/Flotilla_File_Manager/FileManager"
-	"github.com/ximidar/Flotilla/Flotilla_File_Manager/FileStreamer"
+	"github.com/Ximidar/Flotilla/CommonTools/NatsConnect"
+	version "github.com/Ximidar/Flotilla/CommonTools/versioning"
+	DS "github.com/Ximidar/Flotilla/DataStructures"
+	FS "github.com/Ximidar/Flotilla/DataStructures/FileStructures"
+	CRS "github.com/Ximidar/Flotilla/DataStructures/StatusStructures/CommRelayStructures"
+	PS "github.com/Ximidar/Flotilla/DataStructures/StatusStructures/PlayStructures"
+	FM "github.com/Ximidar/Flotilla/Flotilla_File_Manager/FileManager"
+	"github.com/Ximidar/Flotilla/Flotilla_File_Manager/FileStreamer"
 )
 
 // NatsFile will broadcast file system services to the NATS server.

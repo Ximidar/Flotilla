@@ -12,7 +12,7 @@ DATE=`date '+%d %b %y at %H:%M:%S %p'`
 AUTHOR=Matt Pedler
 COMMIT_HASH=`git rev-parse HEAD`
 
-VERSION_PATH=github.com/ximidar/Flotilla/CommonTools/versioning
+VERSION_PATH=github.com/Ximidar/Flotilla/CommonTools/versioning
 
 # Sources 
 SOURCE_DIR=./

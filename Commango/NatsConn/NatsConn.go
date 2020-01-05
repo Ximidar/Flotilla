@@ -17,10 +17,10 @@ import (
 
 	proto "github.com/golang/protobuf/proto"
 	"github.com/nats-io/go-nats"
-	"github.com/ximidar/Flotilla/Commango/comm"
-	"github.com/ximidar/Flotilla/CommonTools/NatsConnect"
-	DS "github.com/ximidar/Flotilla/DataStructures"
-	CS "github.com/ximidar/Flotilla/DataStructures/CommStructures"
+	"github.com/Ximidar/Flotilla/Commango/comm"
+	"github.com/Ximidar/Flotilla/CommonTools/NatsConnect"
+	DS "github.com/Ximidar/Flotilla/DataStructures"
+	CS "github.com/Ximidar/Flotilla/DataStructures/CommStructures"
 )
 
 // TermChannel will monitor for an exit signal

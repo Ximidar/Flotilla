@@ -14,8 +14,8 @@ import (
 
 	"github.com/nats-io/gnatsd/test"
 	nats "github.com/nats-io/go-nats"
-	"github.com/ximidar/Flotilla/BuildResources/Test/CommonTestTools"
-	"github.com/ximidar/Flotilla/DataStructures/StatusStructures/PlayStructures"
+	"github.com/Ximidar/Flotilla/BuildResources/Test/CommonTestTools"
+	"github.com/Ximidar/Flotilla/DataStructures/StatusStructures/PlayStructures"
 )
 
 // Before running this test package you will need a nats server up

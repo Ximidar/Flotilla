@@ -13,7 +13,7 @@ import (
 	"time"
 
 	readable "github.com/dustin/go-humanize"
-	FS "github.com/ximidar/Flotilla/DataStructures/FileStructures"
+	FS "github.com/Ximidar/Flotilla/DataStructures/FileStructures"
 	"github.com/jroimartin/gocui"
 )
 

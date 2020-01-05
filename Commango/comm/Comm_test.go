@@ -10,9 +10,9 @@ package commango
 import (
 	"testing"
 
-	"github.com/ximidar/Flotilla/BuildResources/Test/CommonTestTools"
-	"github.com/ximidar/Flotilla/BuildResources/Test/FakeSerialDevice/BasicSerial"
-	CS "github.com/ximidar/Flotilla/DataStructures/CommStructures"
+	"github.com/Ximidar/Flotilla/BuildResources/Test/CommonTestTools"
+	"github.com/Ximidar/Flotilla/BuildResources/Test/FakeSerialDevice/BasicSerial"
+	CS "github.com/Ximidar/Flotilla/DataStructures/CommStructures"
 )
 
 type TestAdaptor struct {

@@ -17,13 +17,13 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	"github.com/nats-io/go-nats"
-	"github.com/ximidar/Flotilla/CommonTools/NatsConnect"
-	DS "github.com/ximidar/Flotilla/DataStructures"
-	CS "github.com/ximidar/Flotilla/DataStructures/CommStructures"
-	FS "github.com/ximidar/Flotilla/DataStructures/FileStructures"
+	"github.com/Ximidar/Flotilla/CommonTools/NatsConnect"
+	DS "github.com/Ximidar/Flotilla/DataStructures"
+	CS "github.com/Ximidar/Flotilla/DataStructures/CommStructures"
+	FS "github.com/Ximidar/Flotilla/DataStructures/FileStructures"
 
-	CRS "github.com/ximidar/Flotilla/DataStructures/StatusStructures/CommRelayStructures"
-	"github.com/ximidar/Flotilla/DataStructures/StatusStructures/PlayStructures"
+	CRS "github.com/Ximidar/Flotilla/DataStructures/StatusStructures/CommRelayStructures"
+	"github.com/Ximidar/Flotilla/DataStructures/StatusStructures/PlayStructures"
 )
 
 // EMPTY []byte for giving an empty payload

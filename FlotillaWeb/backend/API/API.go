@@ -7,11 +7,11 @@ import (
 	"strings"
 	"time"
 
-	FS "github.com/ximidar/Flotilla/DataStructures/FileStructures"
+	FS "github.com/Ximidar/Flotilla/DataStructures/FileStructures"
 
 	"github.com/gorilla/mux"
 	"github.com/nats-io/go-nats"
-	"github.com/ximidar/Flotilla/CommonTools/NatsConnect"
+	"github.com/Ximidar/Flotilla/CommonTools/NatsConnect"
 )
 
 // FileSystem custom file system handler

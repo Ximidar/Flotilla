@@ -25,14 +25,14 @@ import (
 	"github.com/nats-io/gnatsd/server"
 	"github.com/nats-io/gnatsd/test"
 	nats "github.com/nats-io/go-nats"
-	"github.com/ximidar/Flotilla/BuildResources/Test/CommonTestTools"
-	"github.com/ximidar/Flotilla/BuildResources/Test/FakeSerialDevice/Printer"
-	FakeSerialDevice "github.com/ximidar/Flotilla/BuildResources/Test/FakeSerialDevice/SerialDevice"
-	DS "github.com/ximidar/Flotilla/DataStructures"
-	FS "github.com/ximidar/Flotilla/DataStructures/FileStructures"
-	"github.com/ximidar/Flotilla/DataStructures/StatusStructures/PlayStructures"
-	"github.com/ximidar/Flotilla/Flotilla_CLI/FlotillaInterface"
-	"github.com/ximidar/Flotilla/Flotilla_File_Manager/FileManager"
+	"github.com/Ximidar/Flotilla/BuildResources/Test/CommonTestTools"
+	"github.com/Ximidar/Flotilla/BuildResources/Test/FakeSerialDevice/Printer"
+	FakeSerialDevice "github.com/Ximidar/Flotilla/BuildResources/Test/FakeSerialDevice/SerialDevice"
+	DS "github.com/Ximidar/Flotilla/DataStructures"
+	FS "github.com/Ximidar/Flotilla/DataStructures/FileStructures"
+	"github.com/Ximidar/Flotilla/DataStructures/StatusStructures/PlayStructures"
+	"github.com/Ximidar/Flotilla/Flotilla_CLI/FlotillaInterface"
+	"github.com/Ximidar/Flotilla/Flotilla_File_Manager/FileManager"
 )
 
 var TestLocation = "/tmp/FlotillaSystem/Test/Flotilla"
@@ -214,7 +214,7 @@ func PrintStatus(nc *nats.Conn) {
 
 func setupTestFiles() error {
 	gopath := os.Getenv("GOPATH")
-	testPrintDir := path.Clean(gopath + "/src/github.com/ximidar/Flotilla/BuildResources/Test/FlotillaSystemTests/staticfiles")
+	testPrintDir := path.Clean(gopath + "/src/github.com/Ximidar/Flotilla/BuildResources/Test/FlotillaSystemTests/staticfiles")
 
 	if _, err := os.Stat(testPrintDir); os.IsNotExist(err) {
 		fmt.Println("Directory does not exist", testPrintDir)

@@ -10,8 +10,8 @@ package FileSystemTab
 import (
 	"errors"
 
-	FS "github.com/ximidar/Flotilla/DataStructures/FileStructures"
-	"github.com/ximidar/Flotilla/Flotilla_File_Manager/FileManager"
+	FS "github.com/Ximidar/Flotilla/DataStructures/FileStructures"
+	"github.com/Ximidar/Flotilla/Flotilla_File_Manager/FileManager"
 )
 
 var (

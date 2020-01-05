@@ -10,9 +10,9 @@ package UserInterface
 import (
 	"fmt"
 
-	"github.com/ximidar/Flotilla/Flotilla_CLI/UserInterface/CommTab"
-	"github.com/ximidar/Flotilla/Flotilla_CLI/UserInterface/CommonBlocks"
-	"github.com/ximidar/Flotilla/Flotilla_CLI/UserInterface/FileSystemTab"
+	"github.com/Ximidar/Flotilla/Flotilla_CLI/UserInterface/CommTab"
+	"github.com/Ximidar/Flotilla/Flotilla_CLI/UserInterface/CommonBlocks"
+	"github.com/Ximidar/Flotilla/Flotilla_CLI/UserInterface/FileSystemTab"
 	"github.com/jroimartin/gocui"
 )
 

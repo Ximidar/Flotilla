@@ -19,7 +19,7 @@ import (
 	"sync"
 
 	"github.com/fsnotify/fsnotify"
-	FS "github.com/ximidar/Flotilla/DataStructures/FileStructures"
+	FS "github.com/Ximidar/Flotilla/DataStructures/FileStructures"
 )
 
 // ErrFileDoesNotExist is an error for the file system

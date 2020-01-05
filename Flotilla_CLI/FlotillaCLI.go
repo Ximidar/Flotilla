@@ -11,7 +11,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/ximidar/Flotilla/Flotilla_CLI/CLTools"
+	"github.com/Ximidar/Flotilla/Flotilla_CLI/CLTools"
 )
 
 func main() {

@@ -14,7 +14,7 @@ import (
 	"strings"
 	"time"
 
-	CS "github.com/ximidar/Flotilla/DataStructures/CommStructures"
+	CS "github.com/Ximidar/Flotilla/DataStructures/CommStructures"
 	"go.bug.st/serial.v1" //https://godoc.org/go.bug.st/serial.v1
 )
 

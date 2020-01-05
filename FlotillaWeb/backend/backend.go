@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
-	"github.com/ximidar/Flotilla/FlotillaWeb/backend/API"
+	"github.com/Ximidar/Flotilla/FlotillaWeb/backend/API"
 )
 
 var rootCmd = &cobra.Command{

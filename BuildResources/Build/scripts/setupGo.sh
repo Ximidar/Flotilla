@@ -46,6 +46,10 @@ go get github.com/nats-io/go-nats
 echo "Getting nats server"
 go get github.com/nats-io/gnatsd
 
+# Flotilla Web
+echo "Gettong Gorilla Mux"
+go get github.com/gorilla/mux
+
 
 # Setup Protobuffer
 # wget https://github.com/protocolbuffers/protobuf/releases/download/v3.6.1/protobuf-cpp-3.6.1.zip

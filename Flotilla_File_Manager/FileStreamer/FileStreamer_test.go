@@ -15,10 +15,10 @@ import (
 	"runtime"
 	"testing"
 
-	"github.com/ximidar/Flotilla/BuildResources/Test/CommonTestTools"
-	FS "github.com/ximidar/Flotilla/DataStructures/FileStructures"
-	"github.com/ximidar/Flotilla/DataStructures/StatusStructures/CommRelayStructures"
-	"github.com/ximidar/Flotilla/Flotilla_File_Manager/FileManager"
+	"github.com/Ximidar/Flotilla/BuildResources/Test/CommonTestTools"
+	FS "github.com/Ximidar/Flotilla/DataStructures/FileStructures"
+	"github.com/Ximidar/Flotilla/DataStructures/StatusStructures/CommRelayStructures"
+	"github.com/Ximidar/Flotilla/Flotilla_File_Manager/FileManager"
 )
 
 type fileStreamerAdapter struct {

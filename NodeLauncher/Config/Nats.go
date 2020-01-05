@@ -12,7 +12,7 @@ import (
 	"fmt"
 
 	nats "github.com/nats-io/go-nats"
-	"github.com/ximidar/Flotilla/DataStructures/ConfigStructures"
+	"github.com/Ximidar/Flotilla/DataStructures/ConfigStructures"
 )
 
 // Nats will handle the nats interface for the config

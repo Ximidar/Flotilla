@@ -17,8 +17,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ximidar/Flotilla/BuildResources/Test/CommonTestTools"
-	FS "github.com/ximidar/Flotilla/DataStructures/FileStructures"
+	"github.com/Ximidar/Flotilla/BuildResources/Test/CommonTestTools"
+	FS "github.com/Ximidar/Flotilla/DataStructures/FileStructures"
 )
 
 var TestLocation = "/tmp/testing/FileManager"

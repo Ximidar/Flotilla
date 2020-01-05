@@ -17,16 +17,16 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	nats "github.com/nats-io/go-nats"
-	"github.com/ximidar/Flotilla/DataStructures"
-	CS "github.com/ximidar/Flotilla/DataStructures/CommStructures"
-	"github.com/ximidar/Flotilla/DataStructures/FileStructures"
-	"github.com/ximidar/Flotilla/DataStructures/StatusStructures/CommRelayStructures"
-	"github.com/ximidar/Flotilla/DataStructures/StatusStructures/PlayStructures"
-	PS "github.com/ximidar/Flotilla/DataStructures/StatusStructures/PlayStructures"
-	TS "github.com/ximidar/Flotilla/DataStructures/StatusStructures/TemperatureStructures"
-	"github.com/ximidar/Flotilla/FlotillaStatus/CommRelay"
-	"github.com/ximidar/Flotilla/FlotillaStatus/PlayStatus"
-	"github.com/ximidar/Flotilla/FlotillaStatus/StatusMonitor"
+	"github.com/Ximidar/Flotilla/DataStructures"
+	CS "github.com/Ximidar/Flotilla/DataStructures/CommStructures"
+	"github.com/Ximidar/Flotilla/DataStructures/FileStructures"
+	"github.com/Ximidar/Flotilla/DataStructures/StatusStructures/CommRelayStructures"
+	"github.com/Ximidar/Flotilla/DataStructures/StatusStructures/PlayStructures"
+	PS "github.com/Ximidar/Flotilla/DataStructures/StatusStructures/PlayStructures"
+	TS "github.com/Ximidar/Flotilla/DataStructures/StatusStructures/TemperatureStructures"
+	"github.com/Ximidar/Flotilla/FlotillaStatus/CommRelay"
+	"github.com/Ximidar/Flotilla/FlotillaStatus/PlayStatus"
+	"github.com/Ximidar/Flotilla/FlotillaStatus/StatusMonitor"
 )
 
 // TermChannel will monitor for an exit signal

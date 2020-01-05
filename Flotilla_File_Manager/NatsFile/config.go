@@ -11,7 +11,7 @@ import (
 	"encoding/json"
 
 	nats "github.com/nats-io/go-nats"
-	"github.com/ximidar/Flotilla/DataStructures/ConfigStructures"
+	"github.com/Ximidar/Flotilla/DataStructures/ConfigStructures"
 )
 
 // Config will query for the settings it needs and store them in a struct

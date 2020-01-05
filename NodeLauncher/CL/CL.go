@@ -12,8 +12,8 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
-	"github.com/ximidar/Flotilla/NodeLauncher/FlotillaInstance"
-	"github.com/ximidar/Flotilla/NodeLauncher/RootFolder"
+	"github.com/Ximidar/Flotilla/NodeLauncher/FlotillaInstance"
+	"github.com/Ximidar/Flotilla/NodeLauncher/RootFolder"
 )
 
 var rootCmd = &cobra.Command{

@@ -83,7 +83,7 @@ func (pf *PopulateFolder) evaluateMuster() {
 
 func (pf *PopulateFolder) evaluateFlotillaPath() error {
 	// Evaluate Flotilla Path
-	FlotillaRelPath := "/src/github.com/ximidar/Flotilla/"
+	FlotillaRelPath := "/src/github.com/Ximidar/Flotilla/"
 
 	pf.FlotillaPath = path.Clean(pf.GOPATH + FlotillaRelPath)
 

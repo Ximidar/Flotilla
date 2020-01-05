@@ -27,7 +27,7 @@ RUN bash $HOME/scripts/setupNats.sh
 RUN bash $HOME/scripts/setupGo.sh
 
 # Define, make, and populate the Flotilla Directory
-ENV FLOTILLA_DIR=$GOPATH/src/github.com/ximidar/Flotilla/
+ENV FLOTILLA_DIR=$GOPATH/src/github.com/Ximidar/Flotilla/
 RUN mkdir -p $FLOTILLA_DIR
 COPY . $FLOTILLA_DIR
 

@@ -63,7 +63,7 @@ func FindFlotillaBinFolder(progname string) (string, error) {
 	}
 
 	// Evaluate Flotilla Path
-	FlotillaRelPath := "/src/github.com/ximidar/Flotilla/"
+	FlotillaRelPath := "/src/github.com/Ximidar/Flotilla/"
 
 	FlotillaPath := path.Clean(GoPath + FlotillaRelPath)
 

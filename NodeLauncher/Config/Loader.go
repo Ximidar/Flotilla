@@ -19,8 +19,8 @@ import (
 
 	"github.com/fsnotify/fsnotify"
 	"github.com/spf13/viper"
-	"github.com/ximidar/Flotilla/DataStructures/ConfigStructures"
-	"github.com/ximidar/Flotilla/NodeLauncher/RootFolder"
+	"github.com/Ximidar/Flotilla/DataStructures/ConfigStructures"
+	"github.com/Ximidar/Flotilla/NodeLauncher/RootFolder"
 )
 
 // Loader will use variables from the RootFolder to then

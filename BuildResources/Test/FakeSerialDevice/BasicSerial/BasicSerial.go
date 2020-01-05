@@ -10,7 +10,7 @@ package BasicSerial
 import (
 	"fmt"
 
-	FakeSerialDevice "github.com/ximidar/Flotilla/BuildResources/Test/FakeSerialDevice/SerialDevice"
+	FakeSerialDevice "github.com/Ximidar/Flotilla/BuildResources/Test/FakeSerialDevice/SerialDevice"
 )
 
 // MakeBasicSerial will set up an echo serial device
