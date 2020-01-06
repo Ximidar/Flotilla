@@ -4,7 +4,6 @@ import router from './router'
 import store from './store'
 import Go from "@/wasm_test/go_wasm_exec"
 
-
 Vue.config.productionTip = false
 
 new Vue({
