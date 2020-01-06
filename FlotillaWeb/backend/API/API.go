@@ -5,13 +5,9 @@ import (
 	"log"
 	"net/http"
 	"strings"
-	"time"
-
-	FS "github.com/Ximidar/Flotilla/DataStructures/FileStructures"
 
 	"github.com/gorilla/mux"
 	"github.com/nats-io/go-nats"
-	"github.com/Ximidar/Flotilla/CommonTools/NatsConnect"
 )
 
 // FileSystem custom file system handler
@@ -44,11 +40,11 @@ var Nats *nats.Conn
 
 //Serve will serve the api
 func Serve(port int, directory string) {
-	var err error
-	Nats, err = NatsConnect.DefaultConn(nats.DefaultURL, "flotillaInterface")
-	if err != nil {
-		log.Fatal(err)
-	}
+	// var err error
+	// Nats, err = NatsConnect.DefaultConn(nats.DefaultURL, "flotillaInterface")
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
 
 	// Create Mux
 	mux := mux.NewRouter()
@@ -95,20 +91,21 @@ func WriteBasicHeaders(rw http.ResponseWriter) {
 // GetFiles will get the files from Nats and return them
 func GetFiles(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Gettin Files!")
-	fileRequest, err := FS.NewFileAction(FS.FileAction_GetFileStructure, "")
-	if err != nil {
-		w.Write([]byte("Error"))
-		fmt.Printf("Error: %v\n", err)
-		return
-	}
+	// fileRequest, err := FS.NewFileAction(FS.FileAction_GetFileStructure, "")
+	// if err != nil {
+	// 	w.Write([]byte("Error"))
+	// 	fmt.Printf("Error: %v\n", err)
+	// 	return
+	// }
 
-	msg, err := FS.SendAction(Nats, 5*time.Second, fileRequest)
-	if err != nil {
-		w.Write([]byte("Error"))
-		fmt.Printf("Error: %v\n", err)
-		return
-	}
+	// msg, err := FS.SendAction(Nats, 5*time.Second, fileRequest)
+	// if err != nil {
+	// 	w.Write([]byte("Error"))
+	// 	fmt.Printf("Error: %v\n", err)
+	// 	return
+	// }
 
 	WriteBasicHeaders(w)
-	w.Write(msg.Data)
+	// w.Write(msg.Data)
+	w.Write([]byte("Hello"))
 }
