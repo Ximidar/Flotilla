@@ -15,6 +15,10 @@ bin
 *.dll
 *.so
 *.dylib
+*.wasm
+FlotillaWeb/FlotillaWeb
+Flotilla_CLI/Flotilla_CLI
+
 
 # Test binary, build with `go test -c`
 *.test

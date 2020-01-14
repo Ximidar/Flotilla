@@ -15,12 +15,12 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/golang/protobuf/proto"
-	"github.com/nats-io/go-nats"
 	"github.com/Ximidar/Flotilla/CommonTools/NatsConnect"
 	DS "github.com/Ximidar/Flotilla/DataStructures"
 	CS "github.com/Ximidar/Flotilla/DataStructures/CommStructures"
 	FS "github.com/Ximidar/Flotilla/DataStructures/FileStructures"
+	"github.com/golang/protobuf/proto"
+	"github.com/nats-io/go-nats"
 
 	CRS "github.com/Ximidar/Flotilla/DataStructures/StatusStructures/CommRelayStructures"
 	"github.com/Ximidar/Flotilla/DataStructures/StatusStructures/PlayStructures"
@@ -41,7 +41,7 @@ type FlotillaInterface struct {
 func NewFlotillaInterface() (*FlotillaInterface, error) {
 	fi := new(FlotillaInterface)
 	var err error
-	fi.NC, err = NatsConnect.DefaultConn(nats.DefaultURL, "flotillaInterface")
+	fi.NC, err = NatsConnect.DefaultConn(NatsConnect.LocalNATS, "flotillaInterface")
 	fi.Timeout = nats.DefaultTimeout
 
 	if err != nil {

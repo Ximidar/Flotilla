@@ -15,8 +15,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/golang/protobuf/proto"
-	nats "github.com/nats-io/go-nats"
+	"github.com/Ximidar/Flotilla/CommonTools/NatsConnect"
 	"github.com/Ximidar/Flotilla/DataStructures"
 	CS "github.com/Ximidar/Flotilla/DataStructures/CommStructures"
 	"github.com/Ximidar/Flotilla/DataStructures/FileStructures"
@@ -27,6 +26,8 @@ import (
 	"github.com/Ximidar/Flotilla/FlotillaStatus/CommRelay"
 	"github.com/Ximidar/Flotilla/FlotillaStatus/PlayStatus"
 	"github.com/Ximidar/Flotilla/FlotillaStatus/StatusMonitor"
+	"github.com/golang/protobuf/proto"
+	nats "github.com/nats-io/go-nats"
 )
 
 // TermChannel will monitor for an exit signal
@@ -64,7 +65,7 @@ func NewNatsStatus() (*NatsStatus, error) {
 	ns.CommRelay.StartEventHandler()
 
 	// Make the connection to NATS
-	ns.NC, err = nats.Connect(nats.DefaultURL)
+	ns.NC, err = NatsConnect.DefaultConn(NatsConnect.DockerNATS, "Flotilla_Status")
 	if err != nil {
 		// TODO reconnect
 		panic(err)

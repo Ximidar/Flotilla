@@ -19,13 +19,13 @@ import (
 	"syscall"
 	"time"
 
-	nats "github.com/nats-io/go-nats"
 	"github.com/Ximidar/Flotilla/CommonTools/NatsConnect"
 	version "github.com/Ximidar/Flotilla/CommonTools/versioning"
 	"github.com/Ximidar/Flotilla/DataStructures/ConfigStructures"
 	"github.com/Ximidar/Flotilla/NodeLauncher/Config"
 	"github.com/Ximidar/Flotilla/NodeLauncher/Monitor"
 	"github.com/Ximidar/Flotilla/NodeLauncher/RootFolder"
+	nats "github.com/nats-io/go-nats"
 	lumberjack "gopkg.in/natefinch/lumberjack.v2"
 )
 
@@ -212,7 +212,7 @@ func (flotilla *FlotillaInstance) findNamePos(files []os.FileInfo, suffix string
 
 func (flotilla *FlotillaInstance) startConfigNats() error {
 	var err error
-	flotilla.nc, err = NatsConnect.DefaultConn(nats.DefaultURL, ConfigStructures.Name)
+	flotilla.nc, err = NatsConnect.DefaultConn(NatsConnect.DockerNATS, ConfigStructures.Name)
 	if err != nil {
 		return err
 	}

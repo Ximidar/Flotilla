@@ -11,10 +11,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"os"
 	"path"
 
-	"github.com/golang/protobuf/proto"
-	"github.com/nats-io/go-nats"
 	"github.com/Ximidar/Flotilla/CommonTools/NatsConnect"
 	version "github.com/Ximidar/Flotilla/CommonTools/versioning"
 	DS "github.com/Ximidar/Flotilla/DataStructures"
@@ -23,6 +22,8 @@ import (
 	PS "github.com/Ximidar/Flotilla/DataStructures/StatusStructures/PlayStructures"
 	FM "github.com/Ximidar/Flotilla/Flotilla_File_Manager/FileManager"
 	"github.com/Ximidar/Flotilla/Flotilla_File_Manager/FileStreamer"
+	"github.com/golang/protobuf/proto"
+	"github.com/nats-io/go-nats"
 )
 
 // NatsFile will broadcast file system services to the NATS server.
@@ -42,7 +43,7 @@ func NewNatsFile() (nf *NatsFile, err error) {
 	nf = new(NatsFile)
 
 	// Make Nats Connection
-	nf.NC, err = NatsConnect.DefaultConn(nats.DefaultURL, FS.Name)
+	nf.NC, err = NatsConnect.DefaultConn(NatsConnect.DockerNATS, FS.Name)
 	if err != nil {
 		fmt.Printf("Can't connect: %v\n", err)
 		return nil, err
@@ -70,19 +71,21 @@ func NewNatsFile() (nf *NatsFile, err error) {
 	}
 
 	// Get the Config
-	nf.config, err = newConfig(nf.NC)
-	if err != nil {
-		fmt.Println("Could not create config object", err)
-		return nil, err
-	}
-	err = nf.config.GetConfig()
-	if err != nil {
-		fmt.Println("Could not get config vars", err)
-		return nil, err
-	}
+	// nf.config, err = newConfig(nf.NC)
+	// if err != nil {
+	// 	fmt.Println("Could not create config object", err)
+	// 	return nil, err
+	// }
+	// err = nf.config.GetConfig()
+	// if err != nil {
+	// 	fmt.Println("Could not get config vars", err)
+	// 	return nil, err
+	// }
 
 	// Create File manager
-	nf.FileManager, err = FM.NewFileManager(nf.config.GcodePath)
+	home := os.Getenv("HOME")
+	defaultPath := path.Clean(home + "/gcode")
+	nf.FileManager, err = FM.NewFileManager(defaultPath)
 	nf.FileStreamer, err = FileStreamer.NewFileStreamer(nf)
 
 	// Setup RNode Observers

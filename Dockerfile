@@ -21,7 +21,7 @@ RUN mkdir -p $NATS_LOC
 COPY ./BuildResources/Build/scripts/* $HOME/scripts/
 
 # Download NATS
-RUN bash $HOME/scripts/setupNats.sh
+# RUN bash $HOME/scripts/setupNats.sh
 
 # Download Go packages
 RUN bash $HOME/scripts/setupGo.sh
@@ -36,7 +36,5 @@ COPY . $FLOTILLA_DIR
 
 # Build
 WORKDIR $HOME/
-RUN bash $FLOTILLA_DIR/BuildResources/Build/scripts/buildFlotilla.sh
-
-CMD bash $FLOTILLA_DIR/BuildResources/Build/scripts/buildFlotilla.sh
+RUN exit
 

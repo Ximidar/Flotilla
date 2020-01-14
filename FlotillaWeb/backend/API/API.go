@@ -41,7 +41,7 @@ var Nats *nats.Conn
 //Serve will serve the api
 func Serve(port int, directory string) {
 	// var err error
-	// Nats, err = NatsConnect.DefaultConn(nats.DefaultURL, "flotillaInterface")
+	// Nats, err = NatsConnect.DefaultConn(NatsConnect.DockerNATS, "flotillaInterface")
 	// if err != nil {
 	// 	log.Fatal(err)
 	// }
