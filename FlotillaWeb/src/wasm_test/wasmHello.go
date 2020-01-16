@@ -5,6 +5,9 @@ import (
 	"io/ioutil"
 	"net/http"
 	"syscall/js" // build with GOOS=js GOARCH=wasm
+
+	FS "github.com/Ximidar/Flotilla/DataStructures/FileStructures"
+	"github.com/golang/protobuf/proto"
 )
 
 func main() {
@@ -43,8 +46,16 @@ func GetFiles(this js.Value, args []js.Value) interface{} {
 		if err != nil {
 			fmt.Println(err)
 		}
-		fmt.Println(body)
-		callback.Invoke(string(body))
+
+		files := new(FS.File)
+		err = proto.Unmarshal(body, files)
+		if err != nil {
+			fmt.Println("Could not unmarshal the returned data", err)
+			return
+		}
+
+		fmt.Println(files)
+
 	}()
 	return nil
 }

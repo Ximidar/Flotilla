@@ -1,0 +1,8 @@
+FROM flotilla_root:latest
+
+WORKDIR $FLOTILLA_DIR/BuildResources/Test/FakeSerialDevice
+COPY . .
+RUN go build -ldflags "-X 'github.com/Ximidar/Flotilla/CommonTools/versioning.Version=0.0.1' -X 'github.com/Ximidar/Flotilla/CommonTools/versioning.CompiledBy=Matt Pedler' -X 'github.com/Ximidar/Flotilla/CommonTools/versioning.CompiledDate=`date '+%d %b %y at %H:%M:%S %p'`'" -o FakePrinter
+
+
+CMD ./FakePrinter

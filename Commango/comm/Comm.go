@@ -117,8 +117,10 @@ func (comm *Comm) GetAvailablePorts() (*CS.Ports, error) {
 	if err != nil {
 		return nil, err
 	}
-	// Append Custom Ports
-	portlist = append(portlist, "/tmp/fakeprinter")
+	// insert fake printer into spot 0
+	portlist = append(portlist, "")
+	copy(portlist[0+1:], portlist[0:])
+	portlist[0] = "/dev/fakeprinter"
 
 	for _, p := range portlist {
 		port := new(CS.Port)

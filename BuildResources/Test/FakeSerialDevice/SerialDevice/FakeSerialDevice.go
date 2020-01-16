@@ -18,7 +18,7 @@ import (
 
 const (
 	// SerialName is the name we are going to assign to our fake serial device
-	SerialName = "/tmp/fakeprinter"
+	SerialName = "/dev/fakeprinter"
 )
 
 // FakeSerial is an object that will emulate a serial device

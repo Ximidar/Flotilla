@@ -39,6 +39,8 @@ services:
             - "nats"
         networks:
             - flotilla-bridge
+        volumes:
+            - ~/gcode:/home/flotilla/gcode
     
     comm:
         container_name: Flotilla-Commango
@@ -52,5 +54,18 @@ services:
         networks:
             - flotilla-bridge
         volumes: 
+            - /dev:/dev
+    
+    fake_printer:
+        container_name: Fake-Printer
+        build:
+            context: ./BuildResources/Test/FakeSerialDevice
+            dockerfile: dockerfile
+        image: flotilla-fake-printer:latest
+        depends_on: 
+            - "comm"
+        networks: 
+            - flotilla-bridge
+        volumes:
             - /dev:/dev
 

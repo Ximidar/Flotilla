@@ -158,7 +158,7 @@ func (ns *NatsStatus) SendComm(command string) error {
 		return err
 	}
 
-	if expectedBytes+1 != int(commReceipt.GetBytes()) {
+	if expectedBytes != int(commReceipt.GetBytes()) {
 		fmt.Println(fmt.Sprintf("Expected %v != Written %v", expectedBytes, int(commReceipt.GetBytes())))
 		return fmt.Errorf("Expected %v != Written %v", expectedBytes, int(commReceipt.GetBytes()))
 	}
