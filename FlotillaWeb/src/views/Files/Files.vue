@@ -15,9 +15,6 @@
 </template>
 
 <script>
-const axios = require('axios')
-var protobuf = require("protobufjs")
-import {FileStructures} from './js_proto/FileStructures.js'
 import FileItem from '@/views/Files/FileItem'
 import ArrowLeft from '@/assets/svg/solid/arrow-left.svg'
 import Vue from 'vue'
