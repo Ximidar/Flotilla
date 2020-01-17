@@ -50,24 +50,13 @@ export default {
     }
   },
   RequestFiles: function(){
-  axios.request({
-    responseType: 'blob',
-    url: 'http://127.0.0.1:5000/api/getfiles',
-    method: 'get'
-    
-    }).then(
-      (response) => {
-        response.data.arrayBuffer().then(
-          (buf) => {
-            let transbuf = new Uint8Array(buf)
-            let file = FileStructures.File.decode(transbuf)
-            this.RootFS = file
-            this.SwitchTo(this.RootFS)
-          }
-        )
-        
-      }
-    )
+    var current = this
+
+    function set_files(json_list){
+      current.RootFS = JSON.parse(json_list)
+      current.SwitchTo(current.RootFS)
+    }
+    flot_get_files(set_files)
   },
   GoPrevious: function(){
     if (!isNullOrUndefined(this.FileList.PreviousFL) && this.FileList.PreviousFL != {}){

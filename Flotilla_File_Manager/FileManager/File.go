@@ -49,6 +49,9 @@ func UpdateInfo(CurrentFile *FS.File) {
 // Indexfs will index all subdirectories if the file is a folder
 func Indexfs(CurrentFile *FS.File) {
 
+	//clear contents
+	CurrentFile.Contents = make([]*FS.File, 0)
+
 	// read dir
 	files, err := ioutil.ReadDir(CurrentFile.Path)
 	if err != nil {

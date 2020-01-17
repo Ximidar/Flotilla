@@ -187,7 +187,7 @@ func (nf *NatsFile) runFileAction(msg *nats.Msg) {
 		}
 		nf.PackageResponse(true, "file selected", msg.Reply)
 	case FS.FileAction_GetFileStructure:
-		structure := nf.FileManager.Structure
+		structure := nf.FileManager.GetStructure()
 		sb, err := proto.Marshal(structure)
 		if err != nil {
 			fmt.Println("Could not send file structure")

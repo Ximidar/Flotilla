@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -8,6 +9,10 @@ import (
 
 	FS "github.com/Ximidar/Flotilla/DataStructures/FileStructures"
 	"github.com/golang/protobuf/proto"
+)
+
+const (
+	urlBase = "http://127.0.0.1:5000"
 )
 
 func main() {
@@ -35,27 +40,37 @@ func GetFiles(this js.Value, args []js.Value) interface{} {
 		fmt.Println("args", args)
 		callback := args[len(args)-1:][0]
 
-		url := "http://127.0.0.1:5000/api/getfiles"
+		url := urlBase + "/api/getfiles"
 		result, err := http.Get(url)
 		if err != nil {
-			fmt.Println(err)
+			printErr(err)
 		}
 
 		body, err := ioutil.ReadAll(result.Body)
 		result.Body.Close()
 		if err != nil {
-			fmt.Println(err)
+			printErr(err)
 		}
 
 		files := new(FS.File)
 		err = proto.Unmarshal(body, files)
 		if err != nil {
-			fmt.Println("Could not unmarshal the returned data", err)
+			printErr(err)
 			return
 		}
 
-		fmt.Println(files)
+		jsonFiles, err := json.Marshal(files)
+		if err != nil {
+			printErr(err)
+			return
+		}
+
+		callback.Invoke(string(jsonFiles))
 
 	}()
 	return nil
+}
+
+func printErr(err error) {
+	fmt.Println("Error!", err)
 }
