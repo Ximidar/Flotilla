@@ -33,6 +33,8 @@ go get github.com/creack/goselect
 # Fake Serial Device
 echo "Getting termios"
 go get github.com/pkg/term/termios
+echo "Getting fsevents"
+go get github.com/tywkeene/go-fsevents
 
 # NodeLauncher
 echo "Getting lumberjack"

@@ -11,7 +11,6 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
-	"strings"
 	"syscall"
 	"time"
 
@@ -40,20 +39,15 @@ func run(serial *FakeSerialDevice.FakeSerial) {
 			buffer = append(buffer, buf)
 			if buf == 10 { // if we detect a newline
 				// fmt.Print(string(buffer))
-				line := string(buffer)
+				//line := string(buffer)
 				buffer = []byte{}
-
-				if strings.Contains(line, "start") {
-					startb := []byte("start\n")
-					<-time.After(10 * time.Millisecond) // Pretend to process command
-					serial.SendBytes(startb)
-				} else {
-					okb := []byte(ok)
-					<-time.After(10 * time.Millisecond) // Pretend to process command
-					serial.SendBytes(okb)
-				}
-
+				okb := []byte(ok)
+				<-time.After(10 * time.Millisecond) // Pretend to process command
+				serial.SendBytes(okb)
 			}
+		case <-serial.SlaveOpenChan:
+			startb := []byte("start\n")
+			serial.SendBytes(startb)
 		case <-time.After(10 * time.Second):
 			waitb := []byte("wait\n")
 			serial.SendBytes(waitb)

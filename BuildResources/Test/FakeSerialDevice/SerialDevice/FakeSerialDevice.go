@@ -14,7 +14,14 @@ import (
 	"syscall"
 
 	"github.com/pkg/term/termios"
+	fsEvents "github.com/tywkeene/go-fsevents"
 )
+
+// SerialState is an interface that can be passed to a register function for state events
+type SerialState interface {
+	SerialOpened()
+	SerialClosed()
+}
 
 const (
 	// SerialName is the name we are going to assign to our fake serial device
@@ -33,6 +40,11 @@ type FakeSerial struct {
 
 	// Address
 	Address string
+
+	// Watcher
+	watcher       *fsEvents.Watcher
+	SlaveOpen     bool
+	SlaveOpenChan chan bool
 }
 
 // NewFakeSerial will construct a new fake serial device
@@ -64,16 +76,98 @@ func NewFakeSerial() *FakeSerial {
 	fs.ptySettings = new(syscall.Termios)
 	termios.Tcgetattr(fs.ptyMaster.Fd(), fs.ptySettings)
 	termios.Tcsetattr(fs.ptyMaster.Fd(), termios.TCSADRAIN, fs.ptySettings)
-	fmt.Println(fs.ptySettings.Ispeed)
-	fmt.Println(fs.ptySettings.Ospeed)
 
 	// make streams
 	fs.ReceiveStream = make(chan byte, 1000)
 	fs.SendStream = make(chan byte, 1000)
+	fs.SlaveOpenChan = make(chan bool, 10)
+
+	// Add watcher to slave so we know when it is opened
+	fmt.Println("Setting up watcher for slave")
+	fs.watcher, err = fsEvents.NewWatcher()
+	if err != nil {
+		fmt.Println("Error could not make a new watcher ", err)
+	}
+	_, err = fs.watcher.AddDescriptor(fs.ptySlave.Name(), fsEvents.AllEvents)
+	if err != nil {
+		fmt.Println("Error could not Add a Descriptor ", err)
+	}
+	_, err = fs.watcher.AddDescriptor(SerialName, fsEvents.AllEvents)
+	if err != nil {
+		fmt.Println("Error could not Add a Descriptor ", err)
+	}
+	err = fs.watcher.RegisterEventHandler(fs)
+	if err != nil {
+		fmt.Println("Error could not register event handler ", err)
+	}
+	fmt.Println("Descriptors Added")
+	fmt.Println(fs.watcher.ListDescriptors())
+	go fs.watcher.WatchAndHandle()
+	err = fs.watcher.StartAll()
+	if err != nil {
+		fmt.Println("Could not start watcher: ", err)
+	}
+	fs.SlaveOpen = false
 
 	return fs
 }
 
+// Handle is a interface to fsEvents
+func (fs *FakeSerial) Handle(w *fsEvents.Watcher, event *fsEvents.FsEvent) error {
+	switch mask := event.RawEvent.Mask; mask {
+	case fsEvents.Accessed:
+	case fsEvents.Open:
+		fmt.Println("Slave was Opened")
+		fs.SlaveOpen = true
+		fs.SlaveOpenChan <- fs.SlaveOpen
+		return nil
+	case fsEvents.CloseWrite:
+	case fsEvents.CloseRead:
+		fmt.Println("Disconnect from Slave")
+		fs.SlaveOpen = false
+		fs.SlaveOpenChan <- fs.SlaveOpen
+		return nil
+	case fsEvents.Modified:
+		// someone sent a line to the serial device
+		return nil
+	default:
+		eventids := make(map[string]uint32)
+		eventids["Accessed"] = fsEvents.Accessed
+		eventids["Modified"] = fsEvents.Modified
+		eventids["AttrChange"] = fsEvents.AttrChange
+		eventids["CloseWrite"] = fsEvents.CloseWrite
+		eventids["CloseRead"] = fsEvents.CloseRead
+		eventids["Open"] = fsEvents.Open
+		eventids["MovedFrom"] = fsEvents.MovedFrom
+		eventids["MovedTo"] = fsEvents.MovedTo
+		eventids["Move"] = fsEvents.Move
+		eventids["Create"] = fsEvents.Create
+		eventids["Delete"] = fsEvents.Delete
+		eventids["RootDelete"] = fsEvents.RootDelete
+		eventids["RootMove"] = fsEvents.RootMove
+		eventids["IsDir"] = fsEvents.IsDir
+		fmt.Println("Slave had something else happen to it")
+		for ev, id := range eventids {
+			if mask == id {
+				fmt.Println("Event was ", ev)
+			}
+		}
+	}
+
+	return nil
+}
+
+// Check is a interface to fsEvents
+func (fs *FakeSerial) Check(event *fsEvents.FsEvent) bool {
+	return true
+}
+
+// GetMask is a interface to fsEvents
+func (fs *FakeSerial) GetMask() uint32 {
+	return fsEvents.AllEvents
+}
+
+// Close will close the pty connection
 func (fs *FakeSerial) Close() {
 	os.RemoveAll(SerialName)
 	fs.ptyMaster.Close()
@@ -101,6 +195,10 @@ func (fs *FakeSerial) ReadMaster() {
 }
 
 func (fs *FakeSerial) SendBytes(buf []byte) {
+	// if the slave isn't open then don't send anything
+	if !fs.SlaveOpen {
+		return
+	}
 	_, err := fs.ptyMaster.Write(buf)
 	if err != nil {
 		fmt.Println(err.Error())
@@ -109,6 +207,10 @@ func (fs *FakeSerial) SendBytes(buf []byte) {
 
 // SendMaster will send any bytes that come over the stream
 func (fs *FakeSerial) SendMaster() {
+	// if the slave isn't open then don't send anything
+	if !fs.SlaveOpen {
+		return
+	}
 	for {
 		select {
 		case buf := <-fs.SendStream:
