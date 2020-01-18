@@ -7,7 +7,7 @@
 
 package main
 
-import "github.com/ximidar/Flotilla/NodeLauncher/CL"
+import "github.com/Ximidar/Flotilla/NodeLauncher/CL"
 
 func main() {
 	CL.Execute()

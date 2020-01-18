@@ -13,8 +13,8 @@ import (
 	"time"
 
 	readable "github.com/dustin/go-humanize"
-	FS "github.com/ximidar/Flotilla/DataStructures/FileStructures"
-	"github.com/ximidar/gocui"
+	FS "github.com/Ximidar/Flotilla/DataStructures/FileStructures"
+	"github.com/jroimartin/gocui"
 )
 
 // FileInfo will show the current info about the selected file

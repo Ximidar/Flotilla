@@ -10,7 +10,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/ximidar/Flotilla/FlotillaStatus/NatsStatus"
+	"github.com/Ximidar/Flotilla/FlotillaStatus/NatsStatus"
 )
 
 func main() {

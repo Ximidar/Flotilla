@@ -9,10 +9,13 @@ package main
 
 import (
 	"fmt"
+	"os"
+	"os/signal"
 	"strings"
+	"syscall"
 	"time"
 
-	FakeSerialDevice "github.com/ximidar/Flotilla/BuildResources/Test/FakeSerialDevice/SerialDevice"
+	FakeSerialDevice "github.com/Ximidar/Flotilla/BuildResources/Test/FakeSerialDevice/SerialDevice"
 )
 
 func main() {
@@ -27,12 +30,16 @@ func main() {
 func run(serial *FakeSerialDevice.FakeSerial) {
 	var buffer []byte
 	ok := "ok\n"
+
+	// shutdown signal
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGTERM)
 	for {
 		select {
 		case buf := <-serial.ReceiveStream:
 			buffer = append(buffer, buf)
 			if buf == 10 { // if we detect a newline
-				fmt.Print(string(buffer))
+				// fmt.Print(string(buffer))
 				line := string(buffer)
 				buffer = []byte{}
 
@@ -47,6 +54,13 @@ func run(serial *FakeSerialDevice.FakeSerial) {
 				}
 
 			}
+		case <-time.After(10 * time.Second):
+			waitb := []byte("wait\n")
+			serial.SendBytes(waitb)
+		case <-quit:
+			fmt.Println("Got Quit Signal")
+			os.Exit(0)
 		}
+
 	}
 }

@@ -11,7 +11,7 @@ import (
 	"encoding/json"
 
 	nats "github.com/nats-io/go-nats"
-	"github.com/ximidar/Flotilla/FlotillaStatus/StatusMonitor"
+	"github.com/Ximidar/Flotilla/FlotillaStatus/StatusMonitor"
 )
 
 const (

@@ -10,10 +10,10 @@ package FileSystemTab
 import (
 	"fmt"
 
-	FS "github.com/ximidar/Flotilla/DataStructures/FileStructures"
-	"github.com/ximidar/Flotilla/Flotilla_CLI/FlotillaInterface"
-	"github.com/ximidar/Flotilla/Flotilla_CLI/UserInterface/CommonBlocks"
-	"github.com/ximidar/gocui"
+	FS "github.com/Ximidar/Flotilla/DataStructures/FileStructures"
+	"github.com/Ximidar/Flotilla/Flotilla_CLI/FlotillaInterface"
+	"github.com/Ximidar/Flotilla/Flotilla_CLI/UserInterface/CommonBlocks"
+	"github.com/jroimartin/gocui"
 )
 
 const (

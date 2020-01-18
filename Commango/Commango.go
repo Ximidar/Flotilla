@@ -10,7 +10,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/ximidar/Flotilla/Commango/NatsConn"
+	"github.com/Ximidar/Flotilla/Commango/NatsConn"
 )
 
 func main() {

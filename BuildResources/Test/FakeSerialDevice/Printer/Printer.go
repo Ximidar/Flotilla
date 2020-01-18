@@ -14,7 +14,7 @@ import (
 	"strconv"
 	"time"
 
-	FakeSerialDevice "github.com/ximidar/Flotilla/BuildResources/Test/FakeSerialDevice/SerialDevice"
+	FakeSerialDevice "github.com/Ximidar/Flotilla/BuildResources/Test/FakeSerialDevice/SerialDevice"
 )
 
 var OK = "ok\n"

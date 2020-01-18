@@ -13,9 +13,9 @@ import (
 
 	"github.com/nats-io/gnatsd/test"
 	nats "github.com/nats-io/go-nats"
-	"github.com/ximidar/Flotilla/BuildResources/Test/CommonTestTools"
-	"github.com/ximidar/Flotilla/CommonTools/NatsConnect"
-	"github.com/ximidar/Flotilla/DataStructures/ConfigStructures"
+	"github.com/Ximidar/Flotilla/BuildResources/Test/CommonTestTools"
+	"github.com/Ximidar/Flotilla/CommonTools/NatsConnect"
+	"github.com/Ximidar/Flotilla/DataStructures/ConfigStructures"
 )
 
 func checkConn() bool {

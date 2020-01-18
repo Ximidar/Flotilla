@@ -13,8 +13,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ximidar/Flotilla/BuildResources/Test/CommonTestTools"
-	"github.com/ximidar/Flotilla/DataStructures/StatusStructures/PlayStructures"
+	"github.com/Ximidar/Flotilla/BuildResources/Test/CommonTestTools"
+	"github.com/Ximidar/Flotilla/DataStructures/StatusStructures/PlayStructures"
 )
 
 func TestPlayStatusSetup(t *testing.T) {

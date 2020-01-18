@@ -15,8 +15,8 @@ import (
 	"os"
 	"strings"
 
-	FS "github.com/ximidar/Flotilla/DataStructures/FileStructures"
-	"github.com/ximidar/Flotilla/DataStructures/StatusStructures/CommRelayStructures"
+	FS "github.com/Ximidar/Flotilla/DataStructures/FileStructures"
+	"github.com/Ximidar/Flotilla/DataStructures/StatusStructures/CommRelayStructures"
 )
 
 // Adapter is an interface for other classes to be read files

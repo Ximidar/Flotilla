@@ -12,7 +12,7 @@ import (
 	"os/signal"
 	"syscall"
 
-	NI "github.com/ximidar/Flotilla/Flotilla_File_Manager/NatsFile"
+	NI "github.com/Ximidar/Flotilla/Flotilla_File_Manager/NatsFile"
 )
 
 // TermChannel will monitor for an exit signal

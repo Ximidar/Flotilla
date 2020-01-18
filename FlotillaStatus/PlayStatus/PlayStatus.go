@@ -13,7 +13,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/ximidar/Flotilla/DataStructures/StatusStructures/PlayStructures"
+	"github.com/Ximidar/Flotilla/DataStructures/StatusStructures/PlayStructures"
 )
 
 //Errors

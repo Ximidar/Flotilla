@@ -1,4 +1,4 @@
-FROM golang:1.11.1-stretch
+FROM golang:stretch
 
 # Install Resources
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -16,17 +16,18 @@ ENV HOME=/home/flotilla
 
 # Setup scripts and variables for setup
 ENV NATS_LOC=/nats
-RUN mkdir -p $HOME/scripts && mkdir -p $NATS_LOC
+RUN mkdir -p $HOME/scripts
+RUN mkdir -p $NATS_LOC
 COPY ./BuildResources/Build/scripts/* $HOME/scripts/
 
 # Download NATS
-RUN bash $HOME/scripts/setupNats.sh
+# RUN bash $HOME/scripts/setupNats.sh
 
 # Download Go packages
 RUN bash $HOME/scripts/setupGo.sh
 
 # Define, make, and populate the Flotilla Directory
-ENV FLOTILLA_DIR=$GOPATH/src/github.com/ximidar/Flotilla/
+ENV FLOTILLA_DIR=$GOPATH/src/github.com/Ximidar/Flotilla/
 RUN mkdir -p $FLOTILLA_DIR
 COPY . $FLOTILLA_DIR
 
@@ -35,7 +36,5 @@ COPY . $FLOTILLA_DIR
 
 # Build
 WORKDIR $HOME/
-RUN bash $FLOTILLA_DIR/BuildResources/Build/scripts/buildFlotilla.sh
-
-CMD bash $FLOTILLA_DIR/BuildResources/Build/scripts/buildFlotilla.sh
+RUN exit
 

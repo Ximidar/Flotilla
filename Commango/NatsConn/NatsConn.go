@@ -15,12 +15,12 @@ import (
 	"os/signal"
 	"syscall"
 
+	commango "github.com/Ximidar/Flotilla/Commango/comm"
+	"github.com/Ximidar/Flotilla/CommonTools/NatsConnect"
+	DS "github.com/Ximidar/Flotilla/DataStructures"
+	CS "github.com/Ximidar/Flotilla/DataStructures/CommStructures"
 	proto "github.com/golang/protobuf/proto"
 	"github.com/nats-io/go-nats"
-	"github.com/ximidar/Flotilla/Commango/comm"
-	"github.com/ximidar/Flotilla/CommonTools/NatsConnect"
-	DS "github.com/ximidar/Flotilla/DataStructures"
-	CS "github.com/ximidar/Flotilla/DataStructures/CommStructures"
 )
 
 // TermChannel will monitor for an exit signal
@@ -39,7 +39,7 @@ func NewNatsConn() *NatsConn {
 
 	gnats := new(NatsConn)
 	var err error
-	gnats.NC, err = NatsConnect.DefaultConn(nats.DefaultURL, CS.Name)
+	gnats.NC, err = NatsConnect.DefaultConn(NatsConnect.DockerNATS, CS.Name)
 
 	if err != nil {
 		log.Fatalf("Can't connect: %v\n", err)

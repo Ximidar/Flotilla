@@ -1,40 +1,38 @@
 <template>
   <div class="layout">
-    <TopBar class="fixedTop"/>
-    <div class="remainingArea">
-      <WidgetArea />
-    </div>
-    
-    <!-- <transition-group name="fade">
-    <div class="widgetArea" v-bind:key="widget" v-for="widget in activeWidgets">
-      <div class="fader">
-        <BaseWidget :Name="widget">
-          {{widget}}
-        </BaseWidget>
-      </div>			
-    </div>
-  </transition-group> -->
+    <FlotillaSideBar class="fixedTop"/>
+    <router-view style="{display: inline-block;}"></router-view>
+
   </div>
   
 </template>
 
 <script>
-import TopBar from '@/components/TopBar'
-//import BaseWidget from '@/components/widgets/BaseWidget'
-import WidgetArea from '@/components/widgets/WidgetArea'
+import FlotillaSideBar from '@/components/FlotillaSideBar'
 
 export default {
   name: 'FlotillaMain',
   components: {
-    TopBar,
-    //BaseWidget,
-    WidgetArea,
+    FlotillaSideBar,
   },
   computed: {
     activeWidgets: function(){
         return this.$store.state.activeWidgets
     },
   },
+  methods: {
+    StartWasm () {
+      // Run WASM app
+      var go = new Go()
+      var hellowasm = require("@/wasm_test/hellowasm.wasm")
+      WebAssembly.instantiateStreaming(fetch(hellowasm), go.importObject).then((result) => {
+        go.run(result.instance)
+      })
+    }
+  },
+  created () {
+    this.StartWasm()
+  }
 }
 </script>
 
@@ -46,12 +44,13 @@ export default {
 }
 
 .fixedTop{
-  height: 40px;
+  /* height: 40px; */
+  float: left;
+  padding-right: 10px;
 }
 
 .layout{
-  display: flex;
-  flex-flow: column;
+  overflow: auto;
   height: inherit;
 }
 

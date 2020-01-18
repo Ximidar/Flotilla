@@ -18,8 +18,8 @@ import (
 	"strings"
 	"sync"
 
+	FS "github.com/Ximidar/Flotilla/DataStructures/FileStructures"
 	"github.com/fsnotify/fsnotify"
-	FS "github.com/ximidar/Flotilla/DataStructures/FileStructures"
 )
 
 // ErrFileDoesNotExist is an error for the file system
@@ -92,6 +92,7 @@ func (fm *FileManager) PrintEventDetails(event fsnotify.Event) {
 
 // HandleWrite will handle all write events
 func (fm *FileManager) HandleWrite(event fsnotify.Event) {
+	fmt.Println("Write Happened on", event.Name)
 	file, err := fm.GetFileByPath(event.Name)
 	if err != nil {
 		// File is not in the structure yet
@@ -100,10 +101,12 @@ func (fm *FileManager) HandleWrite(event fsnotify.Event) {
 	if _, err := os.Stat(event.Name); !os.IsNotExist(err) {
 		UpdateInfo(file)
 	}
+	fm.PrintStructure()
 }
 
 // HandleDelete will handle all Rename and Delete events
 func (fm *FileManager) HandleDelete(event fsnotify.Event) {
+	fmt.Println("Delete Happened on", event.Name)
 	err := fm.RemoveFileFromStructure(event.Name)
 	if err != nil {
 		if err != ErrFileDoesNotExist {
@@ -114,10 +117,12 @@ func (fm *FileManager) HandleDelete(event fsnotify.Event) {
 
 		return
 	}
+	fm.PrintStructure()
 }
 
 // HandleCreate will handle all creation events
 func (fm *FileManager) HandleCreate(event fsnotify.Event) {
+	fmt.Println("Create Happened on", event.Name)
 	err := fm.AddFileToStructure(event.Name)
 	if err != nil {
 		if err != ErrFileAlreadyExistsInStructure {
@@ -128,6 +133,7 @@ func (fm *FileManager) HandleCreate(event fsnotify.Event) {
 
 		return
 	}
+	fm.PrintStructure()
 
 }
 
@@ -292,12 +298,19 @@ func (fm *FileManager) indexfs() {
 	})
 
 	fm.mux.Lock()
-	rootStructure := NewFile(fm.RootFolderPath, "folder", "")
-	Indexfs(rootStructure)
-	fm.Structure = rootStructure
+	fm.Structure = NewFile(fm.RootFolderPath, "folder", "")
+	Indexfs(fm.Structure)
 	fm.mux.Unlock()
 
 	fm.PrintStructure()
+}
+
+// GetStructure will return the structure safely
+func (fm *FileManager) GetStructure() *FS.File {
+	fm.mux.Lock()
+	defer fm.mux.Unlock()
+	copyStructure := fm.Structure
+	return copyStructure
 }
 
 // PrintStructure will dump the Structure object to the console

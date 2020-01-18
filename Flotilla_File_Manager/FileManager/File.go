@@ -14,7 +14,7 @@ import (
 	"os"
 	ospath "path"
 
-	FS "github.com/ximidar/Flotilla/DataStructures/FileStructures"
+	FS "github.com/Ximidar/Flotilla/DataStructures/FileStructures"
 )
 
 // NewFile is a constructor for FS.File
@@ -48,6 +48,9 @@ func UpdateInfo(CurrentFile *FS.File) {
 
 // Indexfs will index all subdirectories if the file is a folder
 func Indexfs(CurrentFile *FS.File) {
+
+	//clear contents
+	CurrentFile.Contents = make([]*FS.File, 0)
 
 	// read dir
 	files, err := ioutil.ReadDir(CurrentFile.Path)

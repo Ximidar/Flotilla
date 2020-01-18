@@ -23,6 +23,9 @@ DL=$HOME/downloads
 TEMP_LOC=$HOME/tmp
 mkdir -p $DL
 mkdir -p $TEMP_LOC
+mkdir -p $NATS_LOC/AMD64/
+mkdir -p $NATS_LOC/ARM6/
+mkdir -p $NATS_LOC/ARM64/
 
 # wget all files
 wget $AMD64 -O $DL/AMD64.zip

@@ -16,6 +16,14 @@ import (
 	nats "github.com/nats-io/go-nats"
 )
 
+const (
+	// DockerNATS is used by background tasks
+	DockerNATS = "nats:4222"
+
+	// LocalNATS is used by programs that are not within docker
+	LocalNATS = "nats://0.0.0.0:4222"
+)
+
 // DefaultConn will Create a NatsConnect object and not modify past the server URL and
 // a name for the connection. This function will return a nats.Conn and an error
 func DefaultConn(natsAddress string, name string) (*nats.Conn, error) {
@@ -26,6 +34,7 @@ func DefaultConn(natsAddress string, name string) (*nats.Conn, error) {
 	attemptConn.Options.Url = natsAddress
 	attemptConn.Options.Name = strings.ToLower(strings.Replace(name, ".", "", -1))
 
+	fmt.Println("Attempting to connect to NATS on ", attemptConn.Options.Url, " with name ", attemptConn.Options.Name)
 	nc, err := attemptConn.Connect()
 	if err != nil {
 		return nil, err
@@ -37,6 +46,14 @@ func DefaultConn(natsAddress string, name string) (*nats.Conn, error) {
 type NatsConnect struct {
 	NC      *nats.Conn
 	Options nats.Options
+}
+
+// GetAvailableServers will list out the available servers
+func (nc *NatsConnect) GetAvailableServers() {
+	servers := nc.NC.Servers()
+	for s := range servers {
+		fmt.Println("Server Available at: ", s)
+	}
 }
 
 // NewNatsConnect will create a NatsConnect Object

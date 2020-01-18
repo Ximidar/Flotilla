@@ -10,7 +10,7 @@ package FileSystemTab
 import (
 	"fmt"
 
-	"github.com/ximidar/gocui"
+	"github.com/jroimartin/gocui"
 )
 
 // FileViewInterface will be returned when a FileView object is created.

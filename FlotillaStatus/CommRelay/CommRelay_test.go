@@ -12,8 +12,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ximidar/Flotilla/BuildResources/Test/CommonTestTools"
-	"github.com/ximidar/Flotilla/DataStructures/StatusStructures/CommRelayStructures"
+	"github.com/Ximidar/Flotilla/BuildResources/Test/CommonTestTools"
+	"github.com/Ximidar/Flotilla/DataStructures/StatusStructures/CommRelayStructures"
 )
 
 func lineCaller(line string) error {

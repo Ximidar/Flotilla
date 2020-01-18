@@ -12,7 +12,7 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/ximidar/Flotilla/DataStructures/StatusStructures/PlayStructures"
+	"github.com/Ximidar/Flotilla/DataStructures/StatusStructures/PlayStructures"
 )
 
 // RollCall will accept a call from every node out there. When a state change is issued by

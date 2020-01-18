@@ -11,8 +11,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/ximidar/Flotilla/Flotilla_CLI/FlotillaInterface"
-	"github.com/ximidar/gocui"
+	"github.com/jroimartin/gocui"
+	"github.com/Ximidar/Flotilla/Flotilla_CLI/FlotillaInterface"
 )
 
 // Label is an object for displaying a temporary message on the screen

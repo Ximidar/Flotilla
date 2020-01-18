@@ -13,9 +13,9 @@ import (
 	"os"
 	"testing"
 
-	"github.com/ximidar/Flotilla/BuildResources/Test/CommonTestTools"
-	"github.com/ximidar/Flotilla/DataStructures/ConfigStructures"
-	"github.com/ximidar/Flotilla/NodeLauncher/RootFolder"
+	"github.com/Ximidar/Flotilla/BuildResources/Test/CommonTestTools"
+	"github.com/Ximidar/Flotilla/DataStructures/ConfigStructures"
+	"github.com/Ximidar/Flotilla/NodeLauncher/RootFolder"
 )
 
 var TestLocation = "/tmp/LoaderTest"

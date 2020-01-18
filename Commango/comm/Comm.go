@@ -14,7 +14,7 @@ import (
 	"strings"
 	"time"
 
-	CS "github.com/ximidar/Flotilla/DataStructures/CommStructures"
+	CS "github.com/Ximidar/Flotilla/DataStructures/CommStructures"
 	"go.bug.st/serial.v1" //https://godoc.org/go.bug.st/serial.v1
 )
 
@@ -117,8 +117,10 @@ func (comm *Comm) GetAvailablePorts() (*CS.Ports, error) {
 	if err != nil {
 		return nil, err
 	}
-	// Append Custom Ports
-	portlist = append(portlist, "/tmp/fakeprinter")
+	// insert fake printer into spot 0
+	portlist = append(portlist, "")
+	copy(portlist[0+1:], portlist[0:])
+	portlist[0] = "/dev/fakeprinter"
 
 	for _, p := range portlist {
 		port := new(CS.Port)

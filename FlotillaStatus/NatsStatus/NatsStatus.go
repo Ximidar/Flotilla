@@ -15,18 +15,19 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/Ximidar/Flotilla/CommonTools/NatsConnect"
+	"github.com/Ximidar/Flotilla/DataStructures"
+	CS "github.com/Ximidar/Flotilla/DataStructures/CommStructures"
+	"github.com/Ximidar/Flotilla/DataStructures/FileStructures"
+	"github.com/Ximidar/Flotilla/DataStructures/StatusStructures/CommRelayStructures"
+	"github.com/Ximidar/Flotilla/DataStructures/StatusStructures/PlayStructures"
+	PS "github.com/Ximidar/Flotilla/DataStructures/StatusStructures/PlayStructures"
+	TS "github.com/Ximidar/Flotilla/DataStructures/StatusStructures/TemperatureStructures"
+	"github.com/Ximidar/Flotilla/FlotillaStatus/CommRelay"
+	"github.com/Ximidar/Flotilla/FlotillaStatus/PlayStatus"
+	"github.com/Ximidar/Flotilla/FlotillaStatus/StatusMonitor"
 	"github.com/golang/protobuf/proto"
 	nats "github.com/nats-io/go-nats"
-	"github.com/ximidar/Flotilla/DataStructures"
-	CS "github.com/ximidar/Flotilla/DataStructures/CommStructures"
-	"github.com/ximidar/Flotilla/DataStructures/FileStructures"
-	"github.com/ximidar/Flotilla/DataStructures/StatusStructures/CommRelayStructures"
-	"github.com/ximidar/Flotilla/DataStructures/StatusStructures/PlayStructures"
-	PS "github.com/ximidar/Flotilla/DataStructures/StatusStructures/PlayStructures"
-	TS "github.com/ximidar/Flotilla/DataStructures/StatusStructures/TemperatureStructures"
-	"github.com/ximidar/Flotilla/FlotillaStatus/CommRelay"
-	"github.com/ximidar/Flotilla/FlotillaStatus/PlayStatus"
-	"github.com/ximidar/Flotilla/FlotillaStatus/StatusMonitor"
 )
 
 // TermChannel will monitor for an exit signal
@@ -64,7 +65,7 @@ func NewNatsStatus() (*NatsStatus, error) {
 	ns.CommRelay.StartEventHandler()
 
 	// Make the connection to NATS
-	ns.NC, err = nats.Connect(nats.DefaultURL)
+	ns.NC, err = NatsConnect.DefaultConn(NatsConnect.DockerNATS, "Flotilla_Status")
 	if err != nil {
 		// TODO reconnect
 		panic(err)
@@ -157,7 +158,7 @@ func (ns *NatsStatus) SendComm(command string) error {
 		return err
 	}
 
-	if expectedBytes+1 != int(commReceipt.GetBytes()) {
+	if expectedBytes != int(commReceipt.GetBytes()) {
 		fmt.Println(fmt.Sprintf("Expected %v != Written %v", expectedBytes, int(commReceipt.GetBytes())))
 		return fmt.Errorf("Expected %v != Written %v", expectedBytes, int(commReceipt.GetBytes()))
 	}

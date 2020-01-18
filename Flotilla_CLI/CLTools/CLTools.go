@@ -11,8 +11,11 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/Ximidar/Flotilla/Flotilla_CLI/ui/ContentBox"
+
 	"github.com/spf13/cobra"
-	"github.com/ximidar/Flotilla/Flotilla_CLI/UserInterface"
+	"github.com/Ximidar/Flotilla/Flotilla_CLI/UserInterface"
+	"github.com/Ximidar/Flotilla/Flotilla_CLI/ui"
 )
 
 var rootCmd = &cobra.Command{
@@ -42,6 +45,7 @@ func Execute() {
 
 func init() {
 	rootCmd.AddCommand(printerface)
+	rootCmd.AddCommand(tcellInterface)
 }
 
 var printerface = &cobra.Command{
@@ -54,5 +58,21 @@ var printerface = &cobra.Command{
 			panic(err)
 		}
 		cligui.ScreenInit()
+	},
+}
+
+var tcellInterface = &cobra.Command{
+	Use:   "tui",
+	Short: "Show the cli UI for Flotilla",
+	Long:  `This will open the cli UI for Flotilla. This has tools for monitoring the command line and starting prints (or it will in the future)`,
+	Run: func(cmd *cobra.Command, args []string) {
+		tgui, err := ui.NewMainScreen()
+		if err != nil {
+			panic(err)
+		}
+		tgui.AddQuitKey("q")
+		ContentBox.NewContentBox(tgui.Screen, "MainBox!", 10, 10, 20, 20)
+
+		tgui.Run()
 	},
 }

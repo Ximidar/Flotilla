@@ -12,7 +12,7 @@ import (
 	"strings"
 	"sync"
 
-	CRS "github.com/ximidar/Flotilla/DataStructures/StatusStructures/CommRelayStructures"
+	CRS "github.com/Ximidar/Flotilla/DataStructures/StatusStructures/CommRelayStructures"
 )
 
 // LineCallback is a function that other packages provide to CommRelay

@@ -11,10 +11,10 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/jroimartin/gocui"
 	nats "github.com/nats-io/go-nats"
-	CS "github.com/ximidar/Flotilla/DataStructures/CommStructures"
-	"github.com/ximidar/Flotilla/Flotilla_CLI/FlotillaInterface"
-	"github.com/ximidar/gocui"
+	CS "github.com/Ximidar/Flotilla/DataStructures/CommStructures"
+	"github.com/Ximidar/Flotilla/Flotilla_CLI/FlotillaInterface"
 )
 
 // ConnectionInfo will monitor the NATS system for the current connection status

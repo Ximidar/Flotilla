@@ -11,9 +11,9 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/ximidar/Flotilla/BuildResources/Test/CommonTestTools"
-	FS "github.com/ximidar/Flotilla/DataStructures/FileStructures"
-	"github.com/ximidar/Flotilla/Flotilla_CLI/FlotillaInterface"
+	"github.com/Ximidar/Flotilla/BuildResources/Test/CommonTestTools"
+	FS "github.com/Ximidar/Flotilla/DataStructures/FileStructures"
+	"github.com/Ximidar/Flotilla/Flotilla_CLI/FlotillaInterface"
 )
 
 func TestGetAvailablePorts(t *testing.T) {

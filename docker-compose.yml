@@ -1,0 +1,71 @@
+version: "3"
+
+networks:
+    flotilla-bridge:
+        driver: bridge
+
+services:
+    nats:
+        container_name: Flotilla-NATS
+        image: 'nats:latest'
+        ports:
+            - 4222:4222
+            - 6222:6222
+            - 8222:8222
+        networks:
+            - flotilla-bridge
+    
+    status:
+        container_name: Flotilla-Status
+        build:
+            context: ./FlotillaStatus/
+            dockerfile: dockerfile
+        image: flotilla-status:latest
+        depends_on: 
+            - "nats"
+        networks: 
+            - flotilla-bridge
+        volumes:
+            - /dev:/dev
+
+    file_manager:
+        container_name: Flotilla-File-Manager
+        build: 
+            context: ./Flotilla_File_Manager/
+            dockerfile: dockerfile
+        image: flotilla-file-manager:latest
+        depends_on:
+            - "status"
+            - "nats"
+        networks:
+            - flotilla-bridge
+        volumes:
+            - ~/gcode:/home/flotilla/gcode
+    
+    comm:
+        container_name: Flotilla-Commango
+        build:
+            context: ./Commango
+            dockerfile: dockerfile
+        image: flotilla-commango:latest
+        depends_on: 
+            - "status"
+            - "nats"
+        networks:
+            - flotilla-bridge
+        volumes: 
+            - /dev:/dev
+    
+    fake_printer:
+        container_name: Fake-Printer
+        build:
+            context: ./BuildResources/Test/FakeSerialDevice
+            dockerfile: dockerfile
+        image: flotilla-fake-printer:latest
+        depends_on: 
+            - "comm"
+        networks: 
+            - flotilla-bridge
+        volumes:
+            - /dev:/dev
+

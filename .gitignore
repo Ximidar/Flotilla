@@ -1,6 +1,6 @@
 # binary
+*/bin/
 bin
-
 
 # GCODE
 .gcode 
@@ -8,3 +8,37 @@ bin
 
 # zero file
 *0
+
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.wasm
+FlotillaWeb/FlotillaWeb
+Flotilla_CLI/Flotilla_CLI
+
+
+# Test binary, build with `go test -c`
+*.test
+
+# Output of the go coverage tool, specifically when used with LiteIDE
+*.out
+
+# Node Modules
+*.DS_Store
+*Thumbs.db
+*db.json
+*.log
+*node_modules/
+public/
+*.deploy*/
+*src/_drafts
+*package-lock.json
+
+# Astilectron
+*resources/app
+*app
+*output
+*bind*.go

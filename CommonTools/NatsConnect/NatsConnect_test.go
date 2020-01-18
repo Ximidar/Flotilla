@@ -10,7 +10,7 @@ import (
 
 	"github.com/nats-io/go-nats"
 
-	"github.com/ximidar/Flotilla/BuildResources/Test/CommonTestTools"
+	"github.com/Ximidar/Flotilla/BuildResources/Test/CommonTestTools"
 
 	"github.com/nats-io/gnatsd/server"
 	"github.com/nats-io/gnatsd/test"
