@@ -1,1 +1,2 @@
 Flotilla_File_Manager/Resources/* linguist-vendored
+*.gcode linguist-detectable=false
