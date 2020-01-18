@@ -36,8 +36,6 @@ func Hello(value js.Value, args []js.Value) interface{} {
 // GetFiles will eventually attempt to get some files
 func GetFiles(this js.Value, args []js.Value) interface{} {
 	go func() {
-		fmt.Println("this ", this)
-		fmt.Println("args", args)
 		callback := args[len(args)-1:][0]
 
 		url := urlBase + "/api/getfiles"
