@@ -46,6 +46,7 @@ func run(serial *FakeSerialDevice.FakeSerial) {
 				serial.SendBytes(okb)
 			}
 		case <-serial.SlaveOpenChan:
+			buffer = []byte{}
 			startb := []byte("start\n")
 			serial.SendBytes(startb)
 		case <-time.After(10 * time.Second):

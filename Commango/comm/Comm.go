@@ -15,7 +15,7 @@ import (
 	"time"
 
 	CS "github.com/Ximidar/Flotilla/DataStructures/CommStructures"
-	"go.bug.st/serial.v1" //https://godoc.org/go.bug.st/serial.v1
+	"go.bug.st/serial" //https://godoc.org/go.bug.st/serial
 )
 
 // NatsAdapter adapter will be used by other packages when they need to emit statuses

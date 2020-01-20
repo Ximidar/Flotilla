@@ -27,7 +27,19 @@ export default {
       }
       flot_get_files(status)
     }
-  }
+  },
+  // created(){
+  //   var Socket = new WebSocket("ws://127.0.0.1:5000/api/ws")
+  //   Socket.onopen = function(){
+  //     console.log("Socket Opened!")
+  //   }
+
+  //   Socket.onmessage = function(evt){
+  //     var mess = evt.data
+  //     console.log(mess)
+  //     console.log(evt)
+  //   }
+  // }
 }
 </script>
 

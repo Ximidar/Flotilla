@@ -10,6 +10,7 @@ import (
 	"github.com/Ximidar/Flotilla/CommonTools/NatsConnect"
 	FS "github.com/Ximidar/Flotilla/DataStructures/FileStructures"
 	"github.com/gorilla/mux"
+	"github.com/gorilla/websocket"
 	"github.com/nats-io/go-nats"
 )
 
@@ -43,35 +44,80 @@ var Nats *nats.Conn
 
 //Serve will serve the api
 func Serve(port int, directory string) {
-	var err error
-	Nats, err = NatsConnect.DefaultConn(NatsConnect.LocalNATS, "flotillaInterface")
-	if err != nil {
-		log.Fatal(err)
-	}
 
-	// Create Mux
-	mux := mux.NewRouter()
+	FlotillaWeb := NewFlotillaWeb(port, directory)
 
-	// UI serve
-	fileServer := http.FileServer(FileSystem{http.Dir(directory)})
-	mux.Handle("/", http.StripPrefix(strings.TrimRight("/", "/"), fileServer)).Methods("GET")
-
-	// API Endpoints
-	mux.HandleFunc("/api/getfiles", GetFiles).Methods("GET")
-
-	// make main router
-	http.Handle("/", &FlotillaWeb{mux})
+	http.Handle("/", FlotillaWeb)
+	http.HandleFunc("/api/ws", FlotillaWeb.websocketHandler)
 
 	log.Printf("Serving %s on HTTP port: %v\n", directory, port)
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%v", port), nil))
 }
 
-// FlotillaWeb will be the main handler for incoming requests
-type FlotillaWeb struct {
-	r *mux.Router
+// NewFlotillaWeb will create a new flotilla webserver
+func NewFlotillaWeb(port int, directory string) *FlotillaWeb {
+
+	fw := new(FlotillaWeb)
+	var err error
+
+	// setup nats
+	fw.Nats, err = NatsConnect.DefaultConn(NatsConnect.LocalNATS, "flotillaInterface")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fw.setupRouter()
+	fw.setupFileServer(directory)
+	fw.setupWebSocket()
+
+	return fw
+
 }
 
-func (s *FlotillaWeb) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
+// FlotillaWeb will be the main handler for incoming requests
+type FlotillaWeb struct {
+	// webserver
+	fs http.Handler
+	r  *mux.Router
+
+	//websocket
+	websocket *websocket.Conn
+	upgrader  websocket.Upgrader
+	wsWrite   chan []byte
+	wsRead    chan []byte
+
+	// nats
+	Nats *nats.Conn
+}
+
+func (fw *FlotillaWeb) setupFileServer(directory string) {
+	fw.fs = http.FileServer(FileSystem{http.Dir(directory)})
+	fw.r.Handle("/", http.StripPrefix(strings.TrimRight("/", "/"), fw.fs)).Methods("GET")
+
+}
+
+func (fw *FlotillaWeb) setupRouter() {
+	fw.r = mux.NewRouter()
+	fw.r.HandleFunc("/api/getfiles", fw.GetFiles).Methods("GET")
+	//fw.r.HandleFunc("/api/ws", fw.websocketHandler)
+
+}
+
+func (fw *FlotillaWeb) setupWebSocket() {
+	// variable for websocket
+	fw.upgrader = websocket.Upgrader{
+		ReadBufferSize:  1024,
+		WriteBufferSize: 1024,
+		CheckOrigin:     func(r *http.Request) bool { return true },
+	}
+
+	// make read and write chans
+	fw.wsRead = make(chan []byte, 1000)
+	fw.wsWrite = make(chan []byte, 1000)
+
+}
+
+func (fw *FlotillaWeb) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	fmt.Println("root command!")
 	if origin := req.Header.Get("Origin"); origin != "" {
 		rw.Header().Set("Access-Control-Allow-Origin", "*")
@@ -81,10 +127,10 @@ func (s *FlotillaWeb) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	}
 
 	// Lets Gorilla work
-	s.r.ServeHTTP(rw, req)
+	fw.r.ServeHTTP(rw, req)
 }
 
-func WriteBasicHeaders(rw http.ResponseWriter) {
+func (fw *FlotillaWeb) WriteBasicHeaders(rw http.ResponseWriter) {
 	rw.Header().Set("Access-Control-Allow-Origin", "*")
 	rw.Header().Set("Access-Control-Allow-Methods", "POST, GET")
 	rw.Header().Set("Access-Control-Allow-Headers",
@@ -92,7 +138,7 @@ func WriteBasicHeaders(rw http.ResponseWriter) {
 }
 
 // GetFiles will get the files from Nats and return them
-func GetFiles(w http.ResponseWriter, r *http.Request) {
+func (fw *FlotillaWeb) GetFiles(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Gettin Files!")
 	fileRequest, err := FS.NewFileAction(FS.FileAction_GetFileStructure, "")
 	if err != nil {
@@ -101,13 +147,60 @@ func GetFiles(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	msg, err := FS.SendAction(Nats, 5*time.Second, fileRequest)
+	msg, err := FS.SendAction(fw.Nats, 5*time.Second, fileRequest)
 	if err != nil {
 		w.Write([]byte("Error"))
 		fmt.Printf("Error: %v\n", err)
 		return
 	}
 
-	WriteBasicHeaders(w)
+	fw.WriteBasicHeaders(w)
 	w.Write(msg.Data)
+}
+
+func (fw *FlotillaWeb) websocketHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("Websocket handler activated!")
+	//fw.WriteBasicHeaders(w)
+	var err error
+	fw.websocket, err = fw.upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		fmt.Println("Error with websocket conn: ", err)
+		return
+	}
+
+	go fw.websocketReader()
+	go fw.websocketWriter()
+
+}
+
+// function to read and write to the websocket
+func (fw *FlotillaWeb) websocketReader() {
+
+	for { //ever
+		mt, mess, err := fw.websocket.ReadMessage()
+		if err != nil {
+			fmt.Println("Error with reader!", err)
+			continue
+		}
+
+		fmt.Println("Got message type of ", mt)
+		fmt.Println("Mess: ", string(mess))
+		fw.wsRead <- mess
+	}
+
+}
+
+func (fw *FlotillaWeb) websocketWriter() {
+	for {
+		select {
+		case writeMess := <-fw.wsWrite:
+			fmt.Println("Got message!")
+			fmt.Println(string(writeMess))
+			fw.websocket.WriteMessage(websocket.TextMessage, writeMess)
+		case <-time.After(10 * time.Second):
+			hi := []byte("Hello")
+			fw.wsWrite <- hi
+		}
+
+	}
 }

@@ -50,14 +50,14 @@
   // import TextButton from "@/components/common/TextButton"
   import Hamburger from "@/components/common/Hamburger"
   import TextButton from "./common/TextButton"
-  import { Slide } from 'vue-burger-menu'
+  // import { Slide } from 'vue-burger-menu'
   import Vue from 'vue'
   export default {
   name: 'FlotillaSideBar',
   components: {
     TextButton,
     Hamburger,
-    Slide,
+    //Slide,
     Bars,
     StatsIcon,
     FilesIcon,

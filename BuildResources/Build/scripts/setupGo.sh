@@ -25,8 +25,9 @@ go get github.com/fsnotify/fsnotify
 
 # Commango
 echo "Getting bug.st Serial"
-mkdir -p $GOPATH/src/go.bug.st/
-git clone https://github.com/bugst/go-serial.git -b v1 $GOPATH/src/go.bug.st/serial.v1
+# mkdir -p $GOPATH/src/go.bug.st/
+# git clone https://github.com/bugst/go-serial.git -b v1 $GOPATH/src/go.bug.st/serial.v1
+go get go.bug.st/serial
 echo "Getting goselect"
 go get github.com/creack/goselect
 
@@ -49,8 +50,10 @@ echo "Getting nats server"
 go get github.com/nats-io/gnatsd
 
 # Flotilla Web
-echo "Gettong Gorilla Mux"
+echo "Getting Gorilla Mux"
 go get github.com/gorilla/mux
+echo "Getting Gorilla websocket"
+go get github.com/gorilla/websocket
 
 
 # Setup Protobuffer
