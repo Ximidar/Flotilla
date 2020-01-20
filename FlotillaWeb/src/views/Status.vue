@@ -4,6 +4,10 @@
     <p>Status go here</p>
     <p>{{ Status }}</p>
     <input type='button' v-on:click="GetStatus" value="Get Status">
+    <div>
+      <textarea v-bind:value="CommOut" disabled rows="50" cols="150" ></textarea>
+    </div>
+
   </div>
 </template>
 
@@ -12,7 +16,8 @@ export default {
   name: 'FlotillaStatus',
   data(){
     return {
-      Status: "No Status!"
+      Status: "No Status!",
+      CommOut: "hello!\n"
     }
   },
   methods: {
@@ -22,24 +27,20 @@ export default {
     GetStatus () {
       var status_vue = this
       function status (status) {
-        status_vue.SetStatus(status)
+        status_vue.SetStatus("Got File info")
+        status_vue.NewLineToComm(status)
         console.log(status)
       }
       flot_get_files(status)
+    },
+    NewLineToComm (line){
+      this.CommOut += line + "\n"
     }
   },
-  // created(){
-  //   var Socket = new WebSocket("ws://127.0.0.1:5000/api/ws")
-  //   Socket.onopen = function(){
-  //     console.log("Socket Opened!")
-  //   }
-
-  //   Socket.onmessage = function(evt){
-  //     var mess = evt.data
-  //     console.log(mess)
-  //     console.log(evt)
-  //   }
-  // }
+  created(){
+    // Attach function to update when socket message comes in.
+    flot_register_comm_callback(this.NewLineToComm)
+  }
 }
 </script>
 

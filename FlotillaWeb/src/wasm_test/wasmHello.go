@@ -16,6 +16,8 @@ const (
 	urlBase = "http://127.0.0.1:5000"
 )
 
+var CommCallbacks []js.Value
+
 func main() {
 	fmt.Println("Hello WASM!")
 	registerCallbacks()
@@ -27,11 +29,20 @@ func main() {
 func registerCallbacks() {
 	js.Global().Set("hello_wasm", js.FuncOf(Hello))
 	js.Global().Set("flot_get_files", js.FuncOf(GetFiles))
+	js.Global().Set("flot_register_comm_callback", js.FuncOf(RegisterCommCallback))
 }
 
 // Hello is a simple experiment with WASM
 func Hello(value js.Value, args []js.Value) interface{} {
 	fmt.Println("Hello WASM not Main!")
+	return nil
+}
+
+func RegisterCommCallback(value js.Value, args []js.Value) interface{} {
+	go func() {
+		callback := args[len(args)-1:][0]
+		CommCallbacks = append(CommCallbacks, callback)
+	}()
 	return nil
 }
 
@@ -76,6 +87,10 @@ func printErr(err error) {
 }
 
 func OpenWS() {
+	// initialize comm callbacks
+	CommCallbacks = make([]js.Value, 10)
+
+	// get connection string
 	u := url.URL{
 		Scheme: "ws",
 		Host:   "127.0.0.1:5000",
@@ -92,9 +107,12 @@ func OpenWS() {
 	}))
 
 	ws.Call("addEventListener", "message", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-		fmt.Println(args[0].Get("data"))
+		mess := args[0].Get("data")
 
-		ws.Call("send", "Hello From WASM")
+		for _, c := range CommCallbacks {
+			c.Invoke(mess)
+		}
+
 		return nil
 	}))
 
