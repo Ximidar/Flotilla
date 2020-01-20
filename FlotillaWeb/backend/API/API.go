@@ -8,7 +8,9 @@ import (
 	"time"
 
 	"github.com/Ximidar/Flotilla/CommonTools/NatsConnect"
+	CS "github.com/Ximidar/Flotilla/DataStructures/CommStructures"
 	FS "github.com/Ximidar/Flotilla/DataStructures/FileStructures"
+	"github.com/golang/protobuf/proto"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/websocket"
 	"github.com/nats-io/go-nats"
@@ -171,6 +173,9 @@ func (fw *FlotillaWeb) websocketHandler(w http.ResponseWriter, r *http.Request) 
 	go fw.websocketReader()
 	go fw.websocketWriter()
 
+	// setup modules that will use the websocket
+	fw.setupCommRelay()
+
 }
 
 // function to read and write to the websocket
@@ -194,13 +199,28 @@ func (fw *FlotillaWeb) websocketWriter() {
 	for {
 		select {
 		case writeMess := <-fw.wsWrite:
-			fmt.Println("Got message!")
-			fmt.Println(string(writeMess))
 			fw.websocket.WriteMessage(websocket.TextMessage, writeMess)
-		case <-time.After(10 * time.Second):
-			hi := []byte("Hello")
-			fw.wsWrite <- hi
 		}
-
 	}
+}
+
+func (fw *FlotillaWeb) setupCommRelay() {
+	_, err := fw.Nats.Subscribe(CS.ReadLine, fw.CommRelay)
+	if err != nil {
+		fmt.Println("Could not subscribe to ", CS.ReadLine, err)
+	}
+	_, err = fw.Nats.Subscribe(CS.WriteLine, fw.CommRelay)
+	if err != nil {
+		fmt.Println("Could not subscribe to ", CS.WriteLine, err)
+	}
+}
+
+// CommRelay will receive COMM messages from NATS
+func (fw *FlotillaWeb) CommRelay(msg *nats.Msg) {
+	cm := new(CS.CommMessage)
+	err := proto.Unmarshal(msg.Data, cm)
+	if err != nil {
+		fmt.Println("Could not deconstruct proto message for commrelay")
+	}
+	fw.wsWrite <- []byte(cm.Message)
 }
