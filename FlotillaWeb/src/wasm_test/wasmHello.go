@@ -22,7 +22,7 @@ func main() {
 	fmt.Println("Hello WASM!")
 	registerCallbacks()
 	fmt.Println("Loaded WASM Callbacks")
-	go OpenWS()
+	//go OpenWS()
 	select {} // never exit
 }
 
