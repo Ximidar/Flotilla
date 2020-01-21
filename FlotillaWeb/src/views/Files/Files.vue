@@ -18,7 +18,8 @@
 import FileItem from '@/views/Files/FileItem'
 import ArrowLeft from '@/assets/svg/solid/arrow-left.svg'
 import Vue from 'vue'
-import { isNullOrUndefined } from 'util';
+import { isNullOrUndefined } from 'util'
+import { Flotilla } from "@/flotilla"
 
 export default {
   name: 'FlotillaFiles',
@@ -47,13 +48,12 @@ export default {
     }
   },
   RequestFiles: function(){
-    var current = this
-
-    function set_files(json_list){
-      current.RootFS = JSON.parse(json_list)
-      current.SwitchTo(current.RootFS)
-    }
-    flot_get_files(set_files)
+    console.log(Flotilla)
+    var flot = new Flotilla()
+    flot.GetFiles().then( (files) => {
+      this.RootFS = files
+      this.SwitchTo(this.RootFS)
+    })
   },
   GoPrevious: function(){
     if (!isNullOrUndefined(this.FileList.PreviousFL) && this.FileList.PreviousFL != {}){
