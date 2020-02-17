@@ -23,12 +23,15 @@ import (
 // Monitor will create a Process, then monitor all of the output and store it in a log.
 // It will also tie the output to stdout/err
 type Monitor struct {
+	Error    error
 	Name     string
 	FullPath string
 	Args     []string
 	Exec     *exec.Cmd
 	Output   chan string
+	FullOut  string
 	mux      sync.Mutex
+	end      chan bool
 
 	lf LoggingFunc
 }
@@ -42,11 +45,22 @@ func NewMonitor(ExecPath string, lf LoggingFunc, args ...string) (*Monitor, erro
 	monitor := new(Monitor)
 	monitor.FullPath = path.Clean(ExecPath)
 	monitor.Args = args
-	err := monitor.InitMonitor()
-	if err != nil {
-		return nil, err
-	}
+	// err := monitor.InitMonitor()
+	// if err != nil {
+	// 	return nil, err
+	// }
 	monitor.lf = lf
+	monitor.end = make(chan bool)
+
+	monitor.Name = ExecPath
+
+	// #nosec
+	// Make the cmd to run
+	monitor.Exec = exec.Command(monitor.FullPath, monitor.Args...)
+
+	// Tie the output to a channel
+	monitor.Output = make(chan string)
+	monitor.FullOut = ""
 	return monitor, nil
 }
 
@@ -76,15 +90,19 @@ func (mon *Monitor) checkPaths() error {
 // StartProcessInGoroutine will start the process in a goroutine
 func (mon *Monitor) StartProcessInGoroutine() {
 	mon.lf(mon.Name, fmt.Sprintf("Starting Process %v with args %v\n", mon.Name, strings.Join(mon.Args, " ")))
-	go mon.startProcess()
-	go mon.consumeLines()
+	go mon.ConsumeLines()
+	go mon.StartProcess()
+
 }
 
-func (mon *Monitor) consumeLines() {
+func (mon *Monitor) ConsumeLines() {
 	for {
 		select {
 		case l := <-mon.Output:
 			mon.lf(mon.Name, l)
+			mon.FullOut += l
+		case <-mon.end:
+			return
 		}
 	}
 }
@@ -144,7 +162,13 @@ func (mon *Monitor) captureOutput(outReader, errReader io.ReadCloser) {
 
 }
 
-func (mon *Monitor) startProcess() error {
+// StartProcess will start the monitor process
+func (mon *Monitor) StartProcess() error {
+
+	defer func() {
+		// end any goroutines
+		mon.end <- true
+	}()
 
 	// create a pipe for the output of the Process
 	outReader, err := mon.Exec.StdoutPipe()
@@ -171,6 +195,7 @@ func (mon *Monitor) startProcess() error {
 	err = mon.Exec.Wait()
 	if err != nil {
 		mon.lf(mon.Name, fmt.Sprintf("Program Exited: %v! %v\n", mon.Name, err))
+		mon.Error = err
 		return err
 	}
 

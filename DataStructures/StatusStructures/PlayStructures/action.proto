@@ -1,0 +1,6 @@
+syntax = "proto3";
+package PlayStructures;
+
+message Action{
+    string Action = 1;
+}

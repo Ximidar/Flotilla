@@ -10,3 +10,8 @@ func GetStatus(w http.ResponseWriter, req *http.Request) {
 	WriteBasicHeaders(w)
 	w.Write(hello)
 }
+
+// ChangeStatus will request a status change
+func ChangeStatus(w http.ResponseWriter, req *http.Request) {
+
+}
