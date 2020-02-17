@@ -21,17 +21,10 @@ export default {
     },
   },
   methods: {
-    // StartWasm () {
-    //   // Run WASM app
-    //   var go = new Go()
-    //   var hellowasm = require("@/wasm_test/hellowasm.wasm")
-    //   WebAssembly.instantiateStreaming(fetch(hellowasm), go.importObject).then((result) => {
-    //     go.run(result.instance)
-    //   })
-    // }
+
   },
   created () {
-    //this.StartWasm()
+
   }
 }
 </script>

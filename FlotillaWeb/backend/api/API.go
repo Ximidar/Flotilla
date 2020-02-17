@@ -1,4 +1,4 @@
-package API
+package api
 
 import (
 	"fmt"
@@ -185,7 +185,7 @@ func (fw *FlotillaWeb) websocketReader() {
 		mt, mess, err := fw.websocket.ReadMessage()
 		if err != nil {
 			fmt.Println("Error with reader!", err)
-			continue
+			return
 		}
 
 		fmt.Println("Got message type of ", mt)

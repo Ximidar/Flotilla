@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/Ximidar/Flotilla/FlotillaWeb/backend/api"
 	"github.com/spf13/cobra"
-	"github.com/Ximidar/Flotilla/FlotillaWeb/backend/API"
 )
 
 var rootCmd = &cobra.Command{
@@ -34,7 +34,7 @@ var serveAPI = &cobra.Command{
 	Long:  `Serve the API`,
 	Run: func(cmd *cobra.Command, args []string) {
 
-		API.Serve(Port, WorkingPath+"/dist")
+		api.Serve(Port, WorkingPath+"/dist")
 
 	},
 }

@@ -25,13 +25,7 @@ export default {
       this.Status = status
     },
     GetStatus () {
-      var status_vue = this
-      function status (status) {
-        status_vue.SetStatus("Got File info")
-        status_vue.NewLineToComm(status)
-        console.log(status)
-      }
-      flot_get_files(status)
+     
     },
     NewLineToComm (line){
       this.CommOut.push(line)
