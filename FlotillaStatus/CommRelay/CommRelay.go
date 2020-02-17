@@ -186,7 +186,7 @@ func (CR *CommRelay) ResendLine(lineNum int) {
 // RecieveComm will check for wait, ok, and such then send a signal to a callback
 func (CR *CommRelay) RecieveComm(line string) {
 	if !CR.Playing {
-		fmt.Println("Not playing so not sending line")
+		//fmt.Println("Not playing so not sending line")
 		return
 	}
 	CR.LineParser.ProcessLine(line)

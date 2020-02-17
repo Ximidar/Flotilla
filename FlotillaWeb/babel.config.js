@@ -3,7 +3,7 @@ module.exports = {
     '@vue/app'
   ],
   ignore: [
-    'src/views/Files/js_proto/*',
+    'src/js_proto/*',
     'src/wasm_test/*.go',
     'dist/*'
 ]

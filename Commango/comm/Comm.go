@@ -15,7 +15,7 @@ import (
 	"time"
 
 	CS "github.com/Ximidar/Flotilla/DataStructures/CommStructures"
-	"go.bug.st/serial.v1" //https://godoc.org/go.bug.st/serial.v1
+	"go.bug.st/serial" //https://godoc.org/go.bug.st/serial
 )
 
 // NatsAdapter adapter will be used by other packages when they need to emit statuses
@@ -52,9 +52,9 @@ func NewComm(adapter NatsAdapter) *Comm {
 		DataBits: 8,
 		StopBits: serial.OneStopBit,
 	}
-	comm.ReadStream = make(chan string, 10)
+	comm.ReadStream = make(chan string, 100)
 	comm.ByteStream = make(chan byte, 100)
-	comm.ErrorStream = make(chan error, 10)
+	comm.ErrorStream = make(chan error, 100)
 	return comm
 }
 
@@ -172,6 +172,24 @@ func (comm *Comm) OpenComm() error {
 		return errors.New("Comm is already Connected")
 	}
 
+	// Reset Comm
+	comm.ErrorStream <- fmt.Errorf("Disconnecting Normally")
+	time.Sleep(1 * time.Second)
+
+	// Clear all channels
+	for {
+		if len(comm.ErrorStream) > 0 {
+			<-comm.ErrorStream
+		} else if len(comm.ByteStream) > 0 {
+			<-comm.ByteStream
+		} else if len(comm.ReadStream) > 0 {
+			<-comm.ReadStream
+		} else {
+			// Finished draining all channels
+			break
+		}
+	}
+
 	var err error
 	fmt.Printf("Attempting to open port with address %v\n", comm.PortPath)
 	comm.Port, err = serial.Open(comm.PortPath, comm.options)
@@ -201,6 +219,7 @@ func (comm *Comm) CloseComm() error {
 	}()
 
 	if comm.Connected() {
+		comm.ErrorStream <- fmt.Errorf("Disconnecting Normally")
 		fmt.Printf("Attempting to close port with address %s\n", comm.PortPath)
 		err := comm.Port.Close()
 		if err != nil {
