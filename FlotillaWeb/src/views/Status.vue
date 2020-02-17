@@ -1,30 +1,49 @@
 <template>
   <div class="about">
     <h1>Status</h1>
-    <p>Status go here</p>
-    <p>{{ Status }}</p>
-    <input type='button' v-on:click="GetStatus" value="Get Status">
-    <div class="comm-wrapper" id="comm-wrapper">
-      <span class="comm-item" v-for="message in CommOut">{{message}}</span>
+    <div class="status">
+      Status: {{ Status }}
     </div>
+    <div class="status_buttons">
+      <TextButton :Label="PauseButtonText"
+                  class="PauseButton"></TextButton>
+      <TextButton :Label="Cancel"
+                  ButtonColor="red"
+                  class="CancelButton"></TextButton>
+    </div>
+    <!-- <div class="comm-wrapper" id="comm-wrapper">
+      <span class="comm-item" v-for="message in CommOut">{{message}}</span>
+    </div> -->
 
   </div>
 </template>
 
 <script>
+import { Flotilla } from "@/flotilla"
+import TextButton from "@/components/common/TextButton"
+
 export default {
   name: 'FlotillaStatus',
+  components: {
+    TextButton
+  },
   data(){
     return {
       Status: "No Status!",
+      PauseButtonText: "Not Playing",
+      ButtonSize: [200, 200],
+      Pause: "Pause",
+      Resume: "Resume",
+      Cancel: "Cancel",
+
       CommOut: ["Hello!", "aloha", "comprender"]
     }
   },
   methods: {
-    SetStatus(status){
-      this.Status = status
-    },
     GetStatus () {
+      this.Status = this.flot.GetStatus().then( (status) =>{
+        this.Status = status
+      })
      
     },
     NewLineToComm (line){
@@ -47,6 +66,11 @@ export default {
     ws.onmessage = function(evt){
       status_vue.NewLineToComm(evt.data)
     }
+
+    // Setup flot
+    this.flot = new Flotilla()
+    this.GetStatus()
+
   }
 }
 </script>
@@ -57,6 +81,7 @@ export default {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     color: White;
+  
 }
 
 .comm-wrapper{
@@ -70,5 +95,22 @@ export default {
   display: block;
   text-align: left;
 
+}
+
+.status{
+  display: block;
+  text-align: left;
+  padding-left: 100px;
+}
+
+.status_buttons{
+  display: block;
+  text-align: left;
+  padding-left: 100px;
+  width: 200px;
+  height: 50px;
+}
+
+.PauseButton{
 }
 </style>

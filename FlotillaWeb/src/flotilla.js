@@ -19,5 +19,17 @@ export class Flotilla{
         console.log(file)
         return file
     }
+
+    async GetStatus(){
+        var url = "http://" + this.base + "/api/status"
+        var req = axios.request({ responseType: 'text',
+                                  url: url,
+                                  method: 'get'
+            })
+        var ab = await req
+        var data = await ab.data
+        return data
+
+    }
 }
 

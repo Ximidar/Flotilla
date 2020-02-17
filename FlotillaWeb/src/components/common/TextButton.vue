@@ -46,8 +46,8 @@ export default {
 
 <style scoped>
 .flotilla-button {
-  width: inherit;
-  height: inherit;
+  width: 100%;
+  height: 100%;
   border-radius: 6px;
   border: none;
   color: white;

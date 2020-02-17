@@ -101,7 +101,7 @@ func (fw *FlotillaWeb) setupFileServer(directory string) {
 func (fw *FlotillaWeb) setupRouter() {
 	fw.r = mux.NewRouter()
 	fw.r.HandleFunc("/api/getfiles", fw.GetFiles).Methods("GET")
-	//fw.r.HandleFunc("/api/ws", fw.websocketHandler)
+	fw.r.HandleFunc("/api/status", GetStatus).Methods("GET")
 
 }
 
@@ -133,6 +133,14 @@ func (fw *FlotillaWeb) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 }
 
 func (fw *FlotillaWeb) WriteBasicHeaders(rw http.ResponseWriter) {
+	rw.Header().Set("Access-Control-Allow-Origin", "*")
+	rw.Header().Set("Access-Control-Allow-Methods", "POST, GET")
+	rw.Header().Set("Access-Control-Allow-Headers",
+		"Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
+}
+
+// WriteBasicHeaders will write basic cross origin headers
+func WriteBasicHeaders(rw http.ResponseWriter) {
 	rw.Header().Set("Access-Control-Allow-Origin", "*")
 	rw.Header().Set("Access-Control-Allow-Methods", "POST, GET")
 	rw.Header().Set("Access-Control-Allow-Headers",
