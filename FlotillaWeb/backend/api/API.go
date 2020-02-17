@@ -102,6 +102,7 @@ func (fw *FlotillaWeb) setupRouter() {
 	fw.r = mux.NewRouter()
 	fw.r.HandleFunc("/api/getfiles", fw.GetFiles).Methods("GET")
 	fw.r.HandleFunc("/api/status", GetStatus).Methods("GET")
+	fw.r.HandleFunc("/api/status", ChangeStatus).Methods("POST")
 
 }
 

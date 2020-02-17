@@ -1,5 +1,6 @@
 const axios = require("axios")
 import { FileStructures } from './js_proto/FileStructures.js'
+import { Action } from './js_proto/action_pb.js'
 
 export class Flotilla{
     constructor(){
@@ -30,6 +31,21 @@ export class Flotilla{
         var data = await ab.data
         return data
 
+    }
+
+    async PostAction(action){
+        var act = new Action.Action()
+        act.setAction(action)
+        let byteAction = act.serializeBinary()
+        var url = "http://" + this.base + "/api/status"
+        var req = axios.request({ responseType: 'text',
+                                  url: url,
+                                  data: byteAction,
+                                  method: 'post'
+        })
+        var ab = await req
+        var data = await ab.data
+        console.log(data)
     }
 }
 

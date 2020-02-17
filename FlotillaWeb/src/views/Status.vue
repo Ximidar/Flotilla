@@ -6,6 +6,7 @@
     </div>
     <div class="status_buttons">
       <TextButton :Label="PauseButtonText"
+                  :Action="PostStatus"
                   class="PauseButton"></TextButton>
       <TextButton :Label="Cancel"
                   ButtonColor="red"
@@ -46,14 +47,17 @@ export default {
       })
      
     },
+    PostStatus () {
+      this.flot.PostAction("PAUSE")
+    },
     NewLineToComm (line){
-      this.CommOut.push(line)
-      if (this.CommOut.length >= 200){
-        var cut_point = this.CommOut.length - 200
-        this.CommOut = this.CommOut.slice(cut_point)
-      }
-      var comm_wrapper = this.$el.querySelector("#comm-wrapper")
-      comm_wrapper.scrollTop = comm_wrapper.scrollHeight
+    //   this.CommOut.push(line)
+    //   if (this.CommOut.length >= 200){
+    //     var cut_point = this.CommOut.length - 200
+    //     this.CommOut = this.CommOut.slice(cut_point)
+    //   }
+    //   var comm_wrapper = this.$el.querySelector("#comm-wrapper")
+    //   comm_wrapper.scrollTop = comm_wrapper.scrollHeight
     }
   },
   created(){

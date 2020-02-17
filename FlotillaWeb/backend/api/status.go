@@ -1,6 +1,9 @@
 package api
 
-import "net/http"
+import (
+	"fmt"
+	"net/http"
+)
 
 // Status will take care of play / pause / resume / cancel commands
 
@@ -13,5 +16,6 @@ func GetStatus(w http.ResponseWriter, req *http.Request) {
 
 // ChangeStatus will request a status change
 func ChangeStatus(w http.ResponseWriter, req *http.Request) {
-
+	fmt.Println(w)
+	fmt.Println(req)
 }
