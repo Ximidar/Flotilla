@@ -164,6 +164,7 @@ func (mon *Monitor) captureOutput(outReader, errReader io.ReadCloser) {
 
 // StartProcess will start the monitor process
 func (mon *Monitor) StartProcess() error {
+	mon.lf(mon.Name, fmt.Sprintf("Starting Process %v with args %v\n", mon.Name, strings.Join(mon.Args, " ")))
 
 	defer func() {
 		// end any goroutines

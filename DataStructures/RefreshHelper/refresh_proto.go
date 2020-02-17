@@ -17,10 +17,15 @@ func main() {
 func RefreshDataStructures() {
 	GOPATH := os.Getenv("GOPATH")
 	DataStructures := GOPATH + "/src/github.com/Ximidar/Flotilla/DataStructures"
+	webproto := GOPATH + "/src/github.com/Ximidar/Flotilla/FlotillaWeb/src/js_proto/"
 
 	// Check for existance
 	if _, err := os.Stat(DataStructures); os.IsNotExist(err) {
 		err := fmt.Errorf("PATH: %v Does not exist", DataStructures)
+		panic(err)
+	}
+	if _, err := os.Stat(webproto); os.IsNotExist(err) {
+		err := fmt.Errorf("PATH: %v Does not exist", webproto)
 		panic(err)
 	}
 
@@ -46,6 +51,9 @@ func RefreshDataStructures() {
 		ProtocWithArgs(gargs...)
 		jargs := make([]string, 0)
 		jargs = append(jargs, "--proto_path="+dumpDir, jsargs+dumpDir, proto)
+		ProtocWithArgs(jargs...)
+		jargs = make([]string, 0)
+		jargs = append(jargs, "--proto_path="+dumpDir, jsargs+webproto, proto)
 		ProtocWithArgs(jargs...)
 	}
 
