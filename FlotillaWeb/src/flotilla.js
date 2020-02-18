@@ -1,6 +1,6 @@
 const axios = require("axios")
-import { FileStructures } from './js_proto/FileStructures.js'
-import { Action } from './js_proto/action_pb.js'
+import { FileStructures } from './js_proto/FileStructures_pb.js'
+import { PlayStructures } from './js_proto/action_pb.js'
 
 export class Flotilla{
     constructor(){
@@ -8,13 +8,13 @@ export class Flotilla{
     }
 
     async GetFiles(){
-        var url = "http://" + this.base + "/api/getfiles"
-        var req = axios.request({ responseType: 'blob',
+        let url = "http://" + this.base + "/api/getfiles"
+        let req = axios.request({ responseType: 'blob',
                                   url: url,
                                   method: 'get'
             })
-        var ab = await req
-        var buf = await ab.data.arrayBuffer()
+        let ab = await req
+        let buf = await ab.data.arrayBuffer()
         let transbuf = new Uint8Array(buf)
         let file = FileStructures.File.decode(transbuf)
         console.log(file)
@@ -22,29 +22,33 @@ export class Flotilla{
     }
 
     async GetStatus(){
-        var url = "http://" + this.base + "/api/status"
-        var req = axios.request({ responseType: 'text',
+        let url = "http://" + this.base + "/api/status"
+        let req = axios.request({ responseType: 'text',
                                   url: url,
                                   method: 'get'
             })
-        var ab = await req
-        var data = await ab.data
+        let ab = await req
+        let data = await ab.data
         return data
 
     }
 
     async PostAction(action){
-        var act = new Action.Action()
-        act.setAction(action)
-        let byteAction = act.serializeBinary()
-        var url = "http://" + this.base + "/api/status"
-        var req = axios.request({ responseType: 'text',
+        let action_payload = {Action: action}
+        let act = PlayStructures.Action.create(action_payload)
+        console.log(act.Action)
+        let buffer = PlayStructures.Action.encode(act).finish()
+        console.log(buffer)
+        let url = "http://" + this.base + "/api/status"
+        let req = axios.request({ responseType: 'text',
                                   url: url,
-                                  data: byteAction,
+                                  data: buffer,
+                                  headers: { "content-type": buffer.type,
+                                             "blob-length": buffer.length },
                                   method: 'post'
         })
-        var ab = await req
-        var data = await ab.data
+        let ab = await req
+        let data = await ab.data
         console.log(data)
     }
 }

@@ -48,7 +48,7 @@ export default {
      
     },
     PostStatus () {
-      this.flot.PostAction("PAUSE")
+      this.flot.PostAction("Pause")
     },
     NewLineToComm (line){
     //   this.CommOut.push(line)

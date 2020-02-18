@@ -10,7 +10,9 @@ import (
 	"github.com/Ximidar/Flotilla/CommonTools/NatsConnect"
 	CS "github.com/Ximidar/Flotilla/DataStructures/CommStructures"
 	FS "github.com/Ximidar/Flotilla/DataStructures/FileStructures"
+	"github.com/Ximidar/Flotilla/DataStructures/StatusStructures/PlayStructures"
 	"github.com/golang/protobuf/proto"
+	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/websocket"
 	"github.com/nats-io/go-nats"
@@ -52,8 +54,25 @@ func Serve(port int, directory string) {
 	http.Handle("/", FlotillaWeb)
 	http.HandleFunc("/api/ws", FlotillaWeb.websocketHandler)
 
+	//Make CORS
+	headersOK := handlers.AllowedHeaders([]string{"Accept",
+		"Content-Type",
+		"Content-Length",
+		"Accept-Encoding",
+		"X-CSRF-Token",
+		"Authorization",
+		"blob-length"})
+	originsOk := handlers.AllowedOrigins([]string{"*"})
+	methodsOK := handlers.AllowedMethods([]string{"GET", "HEAD", "POST", "PUT", "OPTIONS"})
+
 	log.Printf("Serving %s on HTTP port: %v\n", directory, port)
-	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%v", port), nil))
+	log.Fatal(
+		http.ListenAndServe(fmt.Sprintf(":%v", port),
+			handlers.CORS(
+				headersOK,
+				originsOk,
+				methodsOK,
+			)(FlotillaWeb.r)))
 }
 
 // NewFlotillaWeb will create a new flotilla webserver
@@ -71,6 +90,9 @@ func NewFlotillaWeb(port int, directory string) *FlotillaWeb {
 	fw.setupRouter()
 	fw.setupFileServer(directory)
 	fw.setupWebSocket()
+
+	// setup Flotilla stuff
+	fw.Node, err = PlayStructures.NewRegisteredNode("WebServer", fw.Nats)
 
 	return fw
 
@@ -90,6 +112,9 @@ type FlotillaWeb struct {
 
 	// nats
 	Nats *nats.Conn
+
+	// flotilla
+	Node *PlayStructures.RegisteredNode
 }
 
 func (fw *FlotillaWeb) setupFileServer(directory string) {
@@ -101,8 +126,8 @@ func (fw *FlotillaWeb) setupFileServer(directory string) {
 func (fw *FlotillaWeb) setupRouter() {
 	fw.r = mux.NewRouter()
 	fw.r.HandleFunc("/api/getfiles", fw.GetFiles).Methods("GET")
-	fw.r.HandleFunc("/api/status", GetStatus).Methods("GET")
-	fw.r.HandleFunc("/api/status", ChangeStatus).Methods("POST")
+	fw.r.HandleFunc("/api/status", fw.GetStatus).Methods("GET")
+	fw.r.HandleFunc("/api/status", fw.ChangeStatus).Methods("POST")
 
 }
 
@@ -121,31 +146,11 @@ func (fw *FlotillaWeb) setupWebSocket() {
 }
 
 func (fw *FlotillaWeb) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
-	fmt.Println("root command!")
-	if origin := req.Header.Get("Origin"); origin != "" {
-		rw.Header().Set("Access-Control-Allow-Origin", "*")
-		rw.Header().Set("Access-Control-Allow-Methods", "POST, GET")
-		rw.Header().Set("Access-Control-Allow-Headers",
-			"Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
-	}
+	// TODO add API key handling
+	fmt.Println("Incoming Request!")
 
 	// Lets Gorilla work
 	fw.r.ServeHTTP(rw, req)
-}
-
-func (fw *FlotillaWeb) WriteBasicHeaders(rw http.ResponseWriter) {
-	rw.Header().Set("Access-Control-Allow-Origin", "*")
-	rw.Header().Set("Access-Control-Allow-Methods", "POST, GET")
-	rw.Header().Set("Access-Control-Allow-Headers",
-		"Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
-}
-
-// WriteBasicHeaders will write basic cross origin headers
-func WriteBasicHeaders(rw http.ResponseWriter) {
-	rw.Header().Set("Access-Control-Allow-Origin", "*")
-	rw.Header().Set("Access-Control-Allow-Methods", "POST, GET")
-	rw.Header().Set("Access-Control-Allow-Headers",
-		"Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
 }
 
 // GetFiles will get the files from Nats and return them
@@ -165,13 +170,11 @@ func (fw *FlotillaWeb) GetFiles(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fw.WriteBasicHeaders(w)
 	w.Write(msg.Data)
 }
 
 func (fw *FlotillaWeb) websocketHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Websocket handler activated!")
-	//fw.WriteBasicHeaders(w)
 	var err error
 	fw.websocket, err = fw.upgrader.Upgrade(w, r, nil)
 	if err != nil {
