@@ -36,20 +36,22 @@ export class Flotilla{
     async PostAction(action){
         let action_payload = {Action: action}
         let act = PlayStructures.Action.create(action_payload)
-        console.log(act.Action)
         let buffer = PlayStructures.Action.encode(act).finish()
-        console.log(buffer)
         let url = "http://" + this.base + "/api/status"
-        let req = axios.request({ responseType: 'text',
-                                  url: url,
-                                  data: buffer,
-                                  headers: { "content-type": buffer.type,
-                                             "blob-length": buffer.length },
-                                  method: 'post'
-        })
-        let ab = await req
-        let data = await ab.data
-        console.log(data)
+        axios.request({ responseType: 'text',
+                        url: url,
+                        data: buffer,
+                        headers: { "content-type": buffer.type,
+                                    "blob-length": buffer.length - 1 },
+                        method: 'post'
+        }).then(response => {
+            console.log(response)
+            return response
+          })
+          .catch(err => {
+            console.log(err)
+          })
+        
     }
 }
 

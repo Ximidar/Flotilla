@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/Ximidar/Flotilla/CommonTools/NatsConnect"
@@ -52,7 +53,7 @@ func Serve(port int, directory string) {
 	FlotillaWeb := NewFlotillaWeb(port, directory)
 
 	http.Handle("/", FlotillaWeb)
-	http.HandleFunc("/api/ws", FlotillaWeb.websocketHandler)
+	// http.HandleFunc("/api/ws", FlotillaWeb.websocketHandler)
 
 	//Make CORS
 	headersOK := handlers.AllowedHeaders([]string{"Accept",
@@ -92,7 +93,8 @@ func NewFlotillaWeb(port int, directory string) *FlotillaWeb {
 	fw.setupWebSocket()
 
 	// setup Flotilla stuff
-	fw.Node, err = PlayStructures.NewRegisteredNode("WebServer", fw.Nats)
+	fw.setupCommRelay()
+	fw.setupStatus()
 
 	return fw
 
@@ -105,16 +107,17 @@ type FlotillaWeb struct {
 	r  *mux.Router
 
 	//websocket
-	websocket *websocket.Conn
-	upgrader  websocket.Upgrader
-	wsWrite   chan []byte
-	wsRead    chan []byte
+	websockets []*websocket.Conn
+	upgrader   websocket.Upgrader
+	wsWrite    chan []byte
+	wsRead     chan []byte
 
 	// nats
 	Nats *nats.Conn
 
 	// flotilla
 	Node *PlayStructures.RegisteredNode
+	mux  sync.Mutex
 }
 
 func (fw *FlotillaWeb) setupFileServer(directory string) {
@@ -128,6 +131,7 @@ func (fw *FlotillaWeb) setupRouter() {
 	fw.r.HandleFunc("/api/getfiles", fw.GetFiles).Methods("GET")
 	fw.r.HandleFunc("/api/status", fw.GetStatus).Methods("GET")
 	fw.r.HandleFunc("/api/status", fw.ChangeStatus).Methods("POST")
+	fw.r.HandleFunc("/api/ws", fw.websocketHandler)
 
 }
 
@@ -142,6 +146,9 @@ func (fw *FlotillaWeb) setupWebSocket() {
 	// make read and write chans
 	fw.wsRead = make(chan []byte, 1000)
 	fw.wsWrite = make(chan []byte, 1000)
+
+	go fw.websocketReader()
+	go fw.websocketWriter()
 
 }
 
@@ -175,18 +182,13 @@ func (fw *FlotillaWeb) GetFiles(w http.ResponseWriter, r *http.Request) {
 
 func (fw *FlotillaWeb) websocketHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Websocket handler activated!")
-	var err error
-	fw.websocket, err = fw.upgrader.Upgrade(w, r, nil)
+	ws, err := fw.upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		fmt.Println("Error with websocket conn: ", err)
 		return
 	}
 
-	go fw.websocketReader()
-	go fw.websocketWriter()
-
-	// setup modules that will use the websocket
-	fw.setupCommRelay()
+	fw.websockets = append(fw.websockets, ws)
 
 }
 
@@ -194,15 +196,25 @@ func (fw *FlotillaWeb) websocketHandler(w http.ResponseWriter, r *http.Request) 
 func (fw *FlotillaWeb) websocketReader() {
 
 	for { //ever
-		mt, mess, err := fw.websocket.ReadMessage()
-		if err != nil {
-			fmt.Println("Error with reader!", err)
-			return
-		}
+		deleteWS := make([]int, 0)
+		for index, ws := range fw.websockets {
+			mt, mess, err := ws.ReadMessage()
+			if err != nil {
+				fmt.Println("Error with reader!", err)
+				deleteWS = append(deleteWS, index)
+			}
 
-		fmt.Println("Got message type of ", mt)
-		fmt.Println("Mess: ", string(mess))
-		fw.wsRead <- mess
+			fmt.Println("Got message type of ", mt)
+			fmt.Println("Mess: ", string(mess))
+			fw.wsRead <- mess
+		}
+		fw.mux.Lock()
+		for offset, val := range deleteWS {
+			fw.websockets = append(fw.websockets[:val-offset],
+				fw.websockets[(val+1)-offset:]...)
+		}
+		fw.mux.Unlock()
+
 	}
 
 }
@@ -211,7 +223,21 @@ func (fw *FlotillaWeb) websocketWriter() {
 	for {
 		select {
 		case writeMess := <-fw.wsWrite:
-			fw.websocket.WriteMessage(websocket.TextMessage, writeMess)
+			fw.mux.Lock()
+			deleteWS := make([]int, 0)
+			for index, ws := range fw.websockets {
+				err := ws.WriteMessage(websocket.TextMessage, writeMess)
+				if err != nil {
+					fmt.Println("Error with Writer ", err)
+					deleteWS = append(deleteWS, index)
+				}
+			}
+			for offset, val := range deleteWS {
+				fw.websockets = append(fw.websockets[:val-offset],
+					fw.websockets[(val+1)-offset:]...)
+			}
+			fw.mux.Unlock()
+
 		}
 	}
 }

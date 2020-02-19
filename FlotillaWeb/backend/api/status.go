@@ -12,6 +12,24 @@ import (
 
 // Status will take care of play / pause / resume / cancel commands
 
+func (fw *FlotillaWeb) setupStatus() {
+	var err error
+	fw.Node, err = PlayStructures.NewRegisteredNode("WebServer", fw.Nats)
+	if err != nil {
+		fmt.Println("Error with registering node: ", err)
+		panic(err)
+	}
+
+	fw.Node.StatusObserver.AddFunction(PlayStructures.AnyStatusUpdate,
+		fw.AnyStatusUpdate)
+
+}
+
+// AnyStatusUpdate will be called whenever there is a status update over NATS
+func (fw *FlotillaWeb) AnyStatusUpdate() {
+	fw.wsWrite <- []byte("NewStatus")
+}
+
 // GetStatus will get the current status of the flotilla server
 func (fw *FlotillaWeb) GetStatus(w http.ResponseWriter, req *http.Request) {
 	status := fw.Node.StatusObserver.CurrentStatus

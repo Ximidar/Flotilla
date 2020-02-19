@@ -15,6 +15,11 @@ import (
 	nats "github.com/nats-io/go-nats"
 )
 
+const (
+	// AnyStatusUpdate will call a function regardless of status
+	AnyStatusUpdate = "ANY"
+)
+
 // StatusFlags is a convinient struct to quickly find the current status
 type StatusFlags struct {
 	CurrentAction string `json:"status"`
@@ -100,7 +105,7 @@ func (so *StatusObserver) UpdateStatus(bstatus []byte) {
 	}
 	so.CurrentStatus = newstatus
 	fmt.Println("UPDATED STATUS!", so.CurrentStatus.CurrentAction)
-	so.call(so.CurrentStatus.CurrentAction)
+	go so.call(so.CurrentStatus.CurrentAction)
 }
 
 // UpdateStatusFromNats is a simple function to plug into the nats server to monitor for changes
@@ -109,6 +114,13 @@ func (so *StatusObserver) UpdateStatusFromNats(msg *nats.Msg) {
 }
 
 func (so *StatusObserver) call(action string) {
+	anyCalls, anyok := so.callbackFuncs[AnyStatusUpdate]
+	if anyok {
+		for _, val := range anyCalls {
+			go val()
+		}
+	}
+
 	callbacks, ok := so.callbackFuncs[action]
 
 	if !ok {

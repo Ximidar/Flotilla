@@ -10,6 +10,7 @@
                   class="PauseButton"></TextButton>
       <TextButton :Label="Cancel"
                   ButtonColor="red"
+                  :Action="SendCancel"
                   class="CancelButton"></TextButton>
     </div>
     <!-- <div class="comm-wrapper" id="comm-wrapper">
@@ -43,12 +44,19 @@ export default {
   methods: {
     GetStatus () {
       this.Status = this.flot.GetStatus().then( (status) =>{
+        if (!status){
+          this.Status = "Idle"
+          return
+        }
         this.Status = status
       })
      
     },
     PostStatus () {
       this.flot.PostAction("Pause")
+    },
+    SendCancel () {
+      this.flot.PostAction("Cancel")
     },
     NewLineToComm (line){
     //   this.CommOut.push(line)
@@ -58,6 +66,16 @@ export default {
     //   }
     //   var comm_wrapper = this.$el.querySelector("#comm-wrapper")
     //   comm_wrapper.scrollTop = comm_wrapper.scrollHeight
+    },
+    WS_Select (action){
+      switch(action){
+        case "NewStatus":
+          this.GetStatus()
+          break
+        default:
+          this.NewLineToComm(action)
+          break
+      }
     }
   },
   created(){
@@ -68,7 +86,7 @@ export default {
       ws.send("Hello!")
     }
     ws.onmessage = function(evt){
-      status_vue.NewLineToComm(evt.data)
+      status_vue.WS_Select(evt.data)
     }
 
     // Setup flot

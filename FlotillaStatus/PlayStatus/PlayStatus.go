@@ -12,6 +12,7 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/Ximidar/Flotilla/DataStructures/StatusStructures/PlayStructures"
 )
@@ -191,6 +192,9 @@ func (ps *PlayStatus) CanSetPause() error {
 	if ps.CurrentAction == PlayStructures.PAUSE || ps.IsPaused {
 		return ErrAlreadyPaused
 	}
+	if !ps.IsPlaying {
+		return ErrNotPlaying
+	}
 	return nil
 }
 
@@ -269,7 +273,15 @@ func (ps *PlayStatus) setDone() error {
 	ps.CurrentAction = ps.proposedAction
 	ps.reset()
 
+	go ps.SetIdle()
+
 	return nil
+}
+
+// SetIdle will set the current status to IDLE
+func (ps *PlayStatus) SetIdle() {
+	<-time.After(60 * time.Second)
+	ps.CurrentAction = PlayStructures.IDLE
 }
 
 // SetError will be used to set the error state
