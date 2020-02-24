@@ -54,6 +54,7 @@ func (fw *FlotillaWeb) ChangeStatus(w http.ResponseWriter, req *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte("Include blob-length in the header"))
 	}
+	fmt.Println(body)
 	body = body[:blobLength]
 	fmt.Println(len(body))
 

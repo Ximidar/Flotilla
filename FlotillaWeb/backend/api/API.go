@@ -128,9 +128,16 @@ func (fw *FlotillaWeb) setupFileServer(directory string) {
 
 func (fw *FlotillaWeb) setupRouter() {
 	fw.r = mux.NewRouter()
+
+	// Files
 	fw.r.HandleFunc("/api/getfiles", fw.GetFiles).Methods("GET")
+	fw.r.HandleFunc("/api/selectfile", fw.SelectFile).Methods("POST")
+
+	// Status
 	fw.r.HandleFunc("/api/status", fw.GetStatus).Methods("GET")
 	fw.r.HandleFunc("/api/status", fw.ChangeStatus).Methods("POST")
+
+	// WebSockets
 	fw.r.HandleFunc("/api/ws", fw.websocketHandler)
 
 }

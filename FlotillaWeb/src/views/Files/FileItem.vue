@@ -1,8 +1,8 @@
 <template>
     <li v-on:click="ClickEvent">
         
-        <FileIcon class="iconsize" v-if="File.Type == 'file'"/>
-        <FolderIcon class="iconsize" v-if="File.Type == 'folder'"/>
+        <FileIcon class="iconsize" v-if="File.FileType === 'file'"/>
+        <FolderIcon class="iconsize" v-else/>
         <div class="file-details">
             <div class="file-details name"><b>{{File.Name}}</b></div>
             <div class="file-details size">{{ ReadableSize }}</div> 
@@ -64,6 +64,8 @@ export default {
         File: function(newval, oldval){
             this.ReadableSize = this.HumanReadable(newval.Size)
             this.FileDate = this.ConvertUnixTimestamp(this.File.UnixTime)
+
+            console.log(File)
             console.log(this.ReadableSize)
         }
     }

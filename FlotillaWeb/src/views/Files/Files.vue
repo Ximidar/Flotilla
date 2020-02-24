@@ -4,18 +4,26 @@
       <ArrowLeft v-on:click="GoPrevious" class="iconsize" />
       {{ FileList.CurrentFL.Path }}
     </div>
-    <div class="file-items">
-      <ul v-for="file in Contents" v-bind:key="file.Path">
-        <FileItem :File=file
-                  @clicked="ClickFile">
-        </FileItem>
-      </ul>  
+    <div class="filecontainer">
+      <div class="file-items">
+        <ul v-for="file in Contents" v-bind:key="file.Path">
+          <FileItem :File=file
+                    @clicked="ClickFile">
+          </FileItem>
+        </ul>  
+      </div>
+      <div class=fileinfo>
+        <FileInfo v-bind:File="SelectedFile">
+        </FileInfo>
+      </div>
+
     </div>
   </div>
 </template>
 
 <script>
 import FileItem from '@/views/Files/FileItem'
+import FileInfo from '@/views/Files/FileInfo'
 import ArrowLeft from '@/assets/svg/solid/arrow-left.svg'
 import Vue from 'vue'
 import { isNullOrUndefined } from 'util'
@@ -25,6 +33,7 @@ export default {
   name: 'FlotillaFiles',
   components:{
     FileItem,
+    FileInfo,
     ArrowLeft
   },
   data(){
@@ -35,6 +44,7 @@ export default {
         PreviousFL: null,
       },
       Contents: [],
+      SelectedFile: {}
     }
   },
   
@@ -44,7 +54,8 @@ export default {
       console.log("Switching to ", file.Name)
       this.SwitchTo(file)
     } else {
-      console.log(file.Name)
+      console.log("Selecting File")
+      this.SelectedFile = file
     }
   },
   RequestFiles: function(){
@@ -110,6 +121,28 @@ created(){
   text-align: left;
   overflow: hidden;
   padding-top: 10px;
+  width:40%;
+  height: 80%;
+  float: left;
+  /* border: 2px solid blue ; */
+
+}
+
+.file-info{
+  text-align: left;
+  overflow: hidden;
+  padding-top:10px;
+  width:40%;
+  height: 80%;
+  /* border: 2px solid red ; */
+}
+
+.filecontainer{
+  width: 80%;
+  padding: 10px;
+  margin:auto;
+  overflow: auto;
+
 
 }
 
