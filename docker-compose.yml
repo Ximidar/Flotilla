@@ -69,3 +69,10 @@ services:
         volumes:
             - /dev:/dev
 
+    # State Keeping
+    redis:
+        container_name: redis
+        image: redis:latest
+        networks: 
+            - flotilla-bridge
+

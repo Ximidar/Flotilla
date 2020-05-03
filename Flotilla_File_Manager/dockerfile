@@ -1,4 +1,4 @@
-FROM flotilla_root:latest
+FROM ximidar/flotilla_root:latest
 
 RUN mkdir -p $HOME/gcode/
 

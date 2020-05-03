@@ -1,4 +1,4 @@
-FROM flotilla_root:latest
+FROM ximidar/flotilla_root:latest
 
 WORKDIR $FLOTILLA_DIR/Commango/
 COPY . .
