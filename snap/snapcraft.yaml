@@ -48,10 +48,10 @@ apps:
       - io-ports-control
       - serial-port
   
-  # web
-  # flot-web:
-  #   command: bin/FlotillaWeb
-  #   daemon: simple
+  web
+  flot-web:
+    command: bin/FlotillaWeb
+    daemon: simple
 
 
 parts:

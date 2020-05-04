@@ -88,13 +88,14 @@ func NewFlotillaWeb(port int, directory string) *FlotillaWeb {
 		log.Fatal(err)
 	}
 
-	fw.setupRouter()
-	fw.setupFileServer(directory)
-	fw.setupWebSocket()
+	go fw.setupRouter()
+	go fw.setupFileServer(directory)
+	// TODO figure out why websockets mess with the file upload function
+	// go fw.setupWebSocket()
 
 	// setup Flotilla stuff
-	fw.setupCommRelay()
-	fw.setupStatus()
+	go fw.setupCommRelay()
+	go fw.setupStatus()
 
 	return fw
 
@@ -132,6 +133,7 @@ func (fw *FlotillaWeb) setupRouter() {
 	// Files
 	fw.r.HandleFunc("/api/getfiles", fw.GetFiles).Methods("GET")
 	fw.r.HandleFunc("/api/selectfile", fw.SelectFile).Methods("POST")
+	fw.r.HandleFunc("/api/file", fw.UploadFile).Methods("POST")
 
 	// Status
 	fw.r.HandleFunc("/api/status", fw.GetStatus).Methods("GET")

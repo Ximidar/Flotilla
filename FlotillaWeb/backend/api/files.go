@@ -4,8 +4,10 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"strconv"
 	"time"
 
@@ -88,4 +90,52 @@ func (fw *FlotillaWeb) returnReplyString(msg *nats.Msg) (*DS.ReplyString, error)
 	}
 
 	return &msgdata, nil
+}
+
+// UploadFile will take in a fileobject and store it in the gcode folder
+func (fw *FlotillaWeb) UploadFile(w http.ResponseWriter, req *http.Request) {
+	fmt.Println("Parsing Multipart Form")
+	err := req.ParseMultipartForm(32 << 20)
+	if err != nil {
+		// return a failure
+		fmt.Println("Error UploadFile: Cannot parse multipart form")
+		fmt.Println(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(err.Error()))
+		return
+	}
+
+	fmt.Println("Got an upload request from ", req.RemoteAddr)
+
+	fmt.Println("Getting File Info")
+	file, header, err := req.FormFile("file")
+
+	if err != nil {
+		// return a failure
+		fmt.Println("Error UploadFile: Cannot read file info")
+		fmt.Println(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(err.Error()))
+		return
+	}
+	defer file.Close()
+
+	fmt.Printf("Received file with name %s and size %v\n", header.Filename, header.Size)
+
+	tfile, err := os.OpenFile("/tmp/temp.gcode", os.O_WRONLY|os.O_CREATE, 0666)
+	if err != nil {
+		// return a failure
+		fmt.Println("Error UploadFile: Could not create temp file")
+		fmt.Println(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(err.Error()))
+		return
+	}
+	defer tfile.Close()
+
+	io.Copy(tfile, file)
+
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("OK"))
+
 }
