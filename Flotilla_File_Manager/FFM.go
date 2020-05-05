@@ -38,5 +38,5 @@ func Run() {
 	fmt.Println("Flotilla File Manager Started")
 	<-TermChannel
 	fmt.Println("Recieved Interrupt Sig, Now Exiting.")
-	os.Exit(1)
+	os.Exit(0)
 }

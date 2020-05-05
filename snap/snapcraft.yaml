@@ -8,6 +8,14 @@ description: |
 grade: devel # must be 'stable' to release into candidate/stable channels
 confinement: devmode # use 'strict' once you have the right plugs and slots
 
+plugs:
+  etc-conf:
+    interface: system-files
+    read:
+      - /etc/flotilla
+    write:
+      - /etc/flotilla
+
 apps:
   # flotcli
   cli:
@@ -30,15 +38,6 @@ apps:
     plugs:
       - network
   
-  # file manager
-  file-manager:
-    command: bin/Flotilla_File_Manager
-    daemon: simple
-    plugs:
-      - network
-      - home
-      - io-ports-control
-  
   # commango
   commango:
     command: bin/Commango
@@ -48,10 +47,23 @@ apps:
       - io-ports-control
       - serial-port
   
-  web
-  flot-web:
-    command: bin/FlotillaWeb
+  # web
+  # flot-web:
+  #   command: bin/FlotillaWeb
+  #   daemon: simple
+  #   plugs:
+  #     - network
+  #     - network-bind
+  #     - etc-conf
+  
+  # file manager
+  file-manager:
+    command: bin/Flotilla_File_Manager
     daemon: simple
+    plugs:
+      - network
+      - etc-conf
+      - io-ports-control
 
 
 parts:

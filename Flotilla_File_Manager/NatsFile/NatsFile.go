@@ -11,7 +11,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"os"
 	"path"
 
 	"github.com/Ximidar/Flotilla/CommonTools/NatsConnect"
@@ -82,8 +81,9 @@ func NewNatsFile() (nf *NatsFile, err error) {
 	// 	return nil, err
 	// }
 
+	// TODO create this off of a config
 	// Create File manager
-	home := os.Getenv("HOME")
+	home := "/etc/flotilla"
 	defaultPath := path.Clean(home + "/gcode")
 	nf.FileManager, err = FM.NewFileManager(defaultPath)
 	nf.FileStreamer, err = FileStreamer.NewFileStreamer(nf)
