@@ -10,7 +10,6 @@ package RootFolder
 import (
 	"errors"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -25,9 +24,27 @@ var (
 	ARM64 = "arm64"
 	// AMD64 Denotes an arch
 	AMD64 = "amd64"
+	// ALLARCH Denotes to build all arches
+	ALLARCH = "all"
 
 	// Arches contains all the available arches
 	Arches = []string{ARM32, ARM64, AMD64}
+
+	BuildPak = []string{
+		"Commango",
+		"Flotilla_File_Manager",
+		"FlotillaStatus",
+		"Flotilla_CLI",
+		"FlotillaWeb",
+	}
+
+	// Tags for Version, Author, and Date
+	VERSION     = "0.0.1"
+	DATE        = `date '+%d %b %y at %H:%M:%S %p'`
+	AUTHOR      = "Matt Pedler"
+	COMMIT_HASH = "git rev-parse HEAD"
+
+	VERSION_PATH = "github.com/Ximidar/Flotilla/CommonTools/versioning"
 )
 
 // PopulateFolder will be used in conjunction with the root folder to populate the executables
@@ -71,13 +88,11 @@ func (pf *PopulateFolder) evaluateMuster() {
 	pf.Muster = make(map[string]string)
 
 	// Core Binaries
-	pf.Muster["Commango"] = pf.RootFolder.CoreBins
-	pf.Muster["Flotilla_File_Manager"] = pf.RootFolder.CoreBins
-	pf.Muster["FlotillaStatus"] = pf.RootFolder.CoreBins
-
-	// Extra Binaries
-	pf.Muster["Flotilla_CLI"] = pf.RootFolder.ExtraBins
-	pf.Muster["NodeLauncher"] = pf.RootFolder.ExtraBins
+	pf.Muster["Commango"] = pf.RootFolder.BinPath
+	pf.Muster["Flotilla_File_Manager"] = pf.RootFolder.BinPath
+	pf.Muster["FlotillaStatus"] = pf.RootFolder.BinPath
+	pf.Muster["Flotilla_CLI"] = pf.RootFolder.BinPath
+	pf.Muster["Flotilla_Web"] = pf.RootFolder.BinPath
 
 }
 
@@ -204,160 +219,66 @@ func (pf *PopulateFolder) FindStaticFile(name string) (string, error) {
 
 }
 
-// MakePackage will run make on the package specified
-func (pf *PopulateFolder) MakePackage(packageName string) error {
+// BuildPackages will build the different flotilla packages
+func (pf *PopulateFolder) BuildPackages() error {
+	for _, flotpack := range BuildPak {
 
-	packagePath, err := pf.FindFolder(packageName, pf.FlotillaPath)
-	if err != nil {
-		return err
-	}
-
-	// #nosec
-	// Start a command from the package path
-	cmd := exec.Command("make")
-
-	// Add the directory to run it from
-	cmd.Dir = packagePath
-
-	// Output the output
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-
-	err = cmd.Start()
-	if err != nil {
-		return err
-	}
-
-	return cmd.Wait()
-}
-
-func (pf *PopulateFolder) simpleCopy(src, dest string) error {
-
-	fmt.Printf("Copying %v to %v\n", src, dest)
-	buf := make([]byte, 5*1000)
-	// #nosec
-	source, err := os.Open(src)
-	if err != nil {
-		return err
-	}
-	defer source.Close()
-	destination, err := os.Create(dest)
-	if err != nil {
-		return err
-	}
-	defer destination.Close()
-	for {
-		n, err := source.Read(buf)
-		if err != nil && err != io.EOF {
-			return err
-		}
-		if n == 0 {
-			break
-		}
-
-		if _, err := destination.Write(buf[:n]); err != nil {
-			return err
-		}
-	}
-
-	// #nosec
-	// Change Mode of destination file so it is executable to a normal user
-	os.Chmod(dest, 0755)
-	return nil
-}
-
-// MakeAll will make all packages
-func (pf *PopulateFolder) MakeAll() error {
-	for name := range pf.Muster {
-		err := pf.MakePackage(name)
+		// Get the package path
+		packagePath, err := pf.FindFolder(flotpack, pf.FlotillaPath)
 		if err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-// PackageAllBinaries will send all built binaries to their destinations
-func (pf *PopulateFolder) PackageAllBinaries() error {
-	for name, dest := range pf.Muster {
-		// Find bin folder
-		binFolder, err := pf.FindFlotillaBinFolder(name)
-		if err != nil {
-			return err
+			errMsg := fmt.Sprintf("Package %s has failed to build because %v", flotpack, err)
+			panic(errMsg)
 		}
 
-		// extract binary
-		bin, name, err := pf.FindBinForArch(binFolder)
-		if err != nil {
-			return err
-		}
+		entry, _ := pf.FindFile(flotpack+".go", packagePath)
+		entry = path.Base(entry)
 
-		// Copy to dest
-		prefix := pf.Arch + "_"
-		base := strings.Replace(name, prefix, "", 1)
-		fulldest := path.Clean(dest + "/" + base)
-		err = pf.simpleCopy(bin, fulldest)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
-}
+		for _, arch := range Arches {
+			ldflags := []string{"`-X",
+				fmt.Sprintf("'%s.Version=%s'", VERSION_PATH, VERSION),
+				"-X",
+				fmt.Sprintf("'%s.CompiledBy=%s'", VERSION_PATH, AUTHOR),
+				"-X",
+				fmt.Sprintf("'%s.CompiledDate=$(%s)'", VERSION_PATH, DATE),
+				"-X",
+				fmt.Sprintf("'%s.CommitHash=$(%s)'`", VERSION_PATH, COMMIT_HASH),
+			}
+			arguments := []string{
+				"build",
+				"-ldflags",
+				strings.Join(ldflags, " "),
+				"-o",
+				fmt.Sprintf("%s%s", pf.RootFolder.ArchPath[arch], flotpack),
+				entry,
+			}
 
-// PackageStaticFiles will send all static files to their destinations
-func (pf *PopulateFolder) PackageStaticFiles() error {
-	staticFiles := []string{pf.RootFolder.ConfigFile, pf.RootFolder.StartServerFile}
+			// LOG build vars
+			fmt.Println("BUILDING ", flotpack)
+			fmt.Println("PACKAGE LOCATION", packagePath)
+			fmt.Println("ENTRY FILE ", entry)
+			fmt.Println("ARCH ", arch)
 
-	for _, sf := range staticFiles {
-		basename := path.Base(sf)
-		src, err := pf.FindStaticFile(basename)
-		if err != nil {
-			return err
+			// build executable
+			logCom := "go " + strings.Join(arguments, " ")
+			fmt.Println("RUNNING ", logCom)
+			fmt.Println("")
+
+			shell := exec.Command("go", arguments...)
+			shell.Dir = packagePath
+			shell.Env = append(os.Environ(),
+				"GOOS=linux",
+				fmt.Sprintf("GOARCH=%s", arch))
+			shell.Stdout = os.Stdout
+			shell.Stderr = os.Stderr
+			err := shell.Run()
+			if err != nil {
+				return err
+			}
+
 		}
-		pf.simpleCopy(src, sf)
 
 	}
 	return nil
-}
-
-// GenerateCerts will generate the TLS config files
-func (pf *PopulateFolder) GenerateCerts() error {
-
-	// Get the static file for the config file
-	tlsCNFPath, err := pf.FindStaticFile("flotillaTLS.cnf")
-	if err != nil {
-		fmt.Println("Could not find config file for TLS")
-		return err
-	}
-
-	// Make a monitor for a command we want to run
-	command := "openssl"
-	args := []string{"req",
-		"-new",
-		"-x509",
-		"-newkey",
-		"rsa:2048",
-		"-config",
-		tlsCNFPath,
-		"-keyout",
-		"flotilla.key",
-		"-out",
-		"flotilla.pem",
-		"-outform",
-		"PEM"}
-
-	cmd := exec.Command(command, args...)
-	cmd.Dir = pf.RootFolder.TLS
-
-	err = cmd.Run()
-	if err != nil {
-		out, _ := cmd.Output()
-		fmt.Println("Could not run openssl command", string(out), err)
-		return err
-	}
-
-	return nil
-
 }
 
 // Populate will populate the RootFolder with items
@@ -367,28 +288,10 @@ func (pf *PopulateFolder) Populate(skipMakeAll bool) error {
 
 	// Make All
 	if !skipMakeAll {
-		err := pf.MakeAll()
+		err := pf.BuildPackages()
 		if err != nil {
 			return err
 		}
-	}
-
-	// Package all binaries
-	err := pf.PackageAllBinaries()
-	if err != nil {
-		return err
-	}
-
-	// Package all static files
-	err = pf.PackageStaticFiles()
-	if err != nil {
-		return err
-	}
-
-	// Generate Certificates
-	err = pf.GenerateCerts()
-	if err != nil {
-		return err
 	}
 
 	return nil

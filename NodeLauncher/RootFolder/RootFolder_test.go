@@ -8,7 +8,6 @@
 package RootFolder
 
 import (
-	"errors"
 	"fmt"
 	"os"
 	"path"
@@ -34,28 +33,10 @@ func Setup() {
 func CreatePaths() {
 	// Folders
 	os.Mkdir(path.Clean(TestLocation+"/Flotilla"), 0755)
-	os.Mkdir(path.Clean(TestLocation+"/Flotilla"+"/"+GCODEFolderName), 0755)
 	os.Mkdir(path.Clean(TestLocation+"/Flotilla"+"/"+BinName), 0755)
-	os.Mkdir(path.Clean(TestLocation+"/Flotilla"+"/"+BinName+"/"+BinCoreSubfolder), 0755)
-	os.Mkdir(path.Clean(TestLocation+"/Flotilla"+"/"+BinName+"/"+BinExtraSubfolder), 0755)
-	os.Mkdir(path.Clean(TestLocation+"/Flotilla"+"/"+WorkspaceName), 0755)
-	os.Mkdir(path.Clean(TestLocation+"/Flotilla"+"/"+WorkspaceName+"/"+WSLogs), 0755)
-
-	// Files
-	file, err := os.Create(path.Clean(TestLocation + "/Flotilla" + "/" + ConfigName))
-	if err != nil {
-		fmt.Println("ERROR Could not create config file")
-		return
-	}
-	file.Write([]byte("Config stuff"))
-	file.Close()
-	file, err = os.Create(path.Clean(TestLocation + "/Flotilla" + "/" + StartServerName))
-	if err != nil {
-		fmt.Println("ERROR Could not create start server file")
-		return
-	}
-	file.Write([]byte("echo \"Flotilla Start\""))
-	file.Close()
+	os.Mkdir(path.Clean(TestLocation+"/Flotilla"+"/"+BinName+"/amd64"), 0755)
+	os.Mkdir(path.Clean(TestLocation+"/Flotilla"+"/"+BinName+"/arm64"), 0755)
+	os.Mkdir(path.Clean(TestLocation+"/Flotilla"+"/"+BinName+"/armhf"), 0755)
 }
 
 func Clean() {
@@ -87,28 +68,6 @@ func Test_MakeRootFolderWithPreExistingFolder(t *testing.T) {
 
 	fmt.Println(root.RootPath)
 
-	Clean()
-}
-
-func Test_MakeRootFolderWithoutPreExistingFolder(t *testing.T) {
-	Clean()
-	_, err := NewRootFolder(TestLocation + "/Flotilla")
-	if err == nil {
-		CommonTestTools.CheckErr(t, "Making RootFolder Without Folder", errors.New("Making RootFolder Object succeeded"))
-	}
-
-	// Setup the files for testing
-	Setup()
-	CreatePaths()
-
-	// Delete one of the files
-	os.Remove(path.Clean(TestLocation + "/Flotilla" + "/" + ConfigName))
-
-	// test for setup failure
-	_, err = NewRootFolder(TestLocation + "/Flotilla")
-	if err == nil {
-		CommonTestTools.CheckErr(t, "Making RootFolder Without config file", errors.New("Making RootFolder Object succeeded"))
-	}
 	Clean()
 }
 

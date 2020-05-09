@@ -42,3 +42,7 @@ public/
 *app
 *output
 *bind*.go
+
+# snapcraft
+*prime/*
+*.snap
