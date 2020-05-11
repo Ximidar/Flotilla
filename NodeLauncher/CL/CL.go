@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/Ximidar/Flotilla/NodeLauncher/GetNats"
 	"github.com/Ximidar/Flotilla/NodeLauncher/RootFolder"
 	"github.com/spf13/cobra"
 )
@@ -64,17 +65,40 @@ var BuildFlotilla = &cobra.Command{
 
 		fmt.Println("Flotilla Root Folder created at", rf.RootPath)
 
+		// Make Paths
 		fmt.Println("Populating Root Folder")
 		pf, err := RootFolder.NewPopulateFolder(rf, archFlag)
 		if err != nil {
 			fmt.Println("Could not populate due to: ", err)
 			os.Exit(1)
 		}
+
+		// Build Flotilla
 		err = pf.Populate(skipMakeAllFlag)
 		if err != nil {
 			fmt.Println("Could not populate due to: ", err)
 			os.Exit(1)
 		}
+
+		// Add Nats Server
+		err = GetNats.DownloadNats(rf)
+		if err != nil {
+			fmt.Println("Could not download nats due to: ", err)
+			os.Exit(1)
+		}
+		err = GetNats.UnzipAndClean(rf)
+		if err != nil {
+			fmt.Println("Could not unzip nats due to: ", err)
+			os.Exit(1)
+		}
+
+		// package arches into seperate zip files
+		err = rf.PackageArches()
+		if err != nil {
+			fmt.Println("Could not Package Flotilla due to: ", err)
+			os.Exit(1)
+		}
+
 	},
 }
 

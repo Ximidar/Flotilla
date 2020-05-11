@@ -28,7 +28,7 @@ var (
 	ALLARCH = "all"
 
 	// Arches contains all the available arches
-	Arches = []string{ARM32, ARM64, AMD64}
+	Arches = []string{AMD64, ARM64, ARM32}
 
 	BuildPak = []string{
 		"Commango",
@@ -234,19 +234,20 @@ func (pf *PopulateFolder) BuildPackages() error {
 		entry = path.Base(entry)
 
 		for _, arch := range Arches {
-			ldflags := []string{"`-X",
-				fmt.Sprintf("'%s.Version=%s'", VERSION_PATH, VERSION),
-				"-X",
-				fmt.Sprintf("'%s.CompiledBy=%s'", VERSION_PATH, AUTHOR),
-				"-X",
-				fmt.Sprintf("'%s.CompiledDate=$(%s)'", VERSION_PATH, DATE),
-				"-X",
-				fmt.Sprintf("'%s.CommitHash=$(%s)'`", VERSION_PATH, COMMIT_HASH),
-			}
+			// ldflags := []string{"`-X",
+			// 	fmt.Sprintf("'%s.Version=%s'", VERSION_PATH, VERSION),
+			// 	"-X",
+			// 	fmt.Sprintf("'%s.CompiledBy=%s'", VERSION_PATH, AUTHOR),
+			// 	"-X",
+			// 	fmt.Sprintf("'%s.CompiledDate=$(%s)'", VERSION_PATH, DATE),
+			// 	"-X",
+			// 	fmt.Sprintf("'%s.CommitHash=$(%s)'`", VERSION_PATH, COMMIT_HASH),
+			// }
 			arguments := []string{
 				"build",
-				"-ldflags",
-				strings.Join(ldflags, " "),
+				//TODO Re-enable ldflags when versioning is important
+				//"-ldflags",
+				//strings.Join(ldflags, " "),
 				"-o",
 				fmt.Sprintf("%s%s", pf.RootFolder.ArchPath[arch], flotpack),
 				entry,
@@ -259,15 +260,14 @@ func (pf *PopulateFolder) BuildPackages() error {
 			fmt.Println("ARCH ", arch)
 
 			// build executable
-			logCom := "go " + strings.Join(arguments, " ")
-			fmt.Println("RUNNING ", logCom)
-			fmt.Println("")
 
+			// Construct command
 			shell := exec.Command("go", arguments...)
 			shell.Dir = packagePath
 			shell.Env = append(os.Environ(),
 				"GOOS=linux",
-				fmt.Sprintf("GOARCH=%s", arch))
+				"GOARCH="+arch,
+			)
 			shell.Stdout = os.Stdout
 			shell.Stderr = os.Stderr
 			err := shell.Run()

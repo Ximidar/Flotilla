@@ -1,8 +1,13 @@
 package RootFolder
 
 import (
+	"archive/zip"
+	"bufio"
+	"bytes"
 	"errors"
 	"fmt"
+	"io"
+	"io/ioutil"
 	"os"
 	"path"
 )
@@ -157,4 +162,72 @@ func (root *RootFolder) pathExists(path string) bool {
 		return false
 	}
 	return true
+}
+
+// PackageArches will package the build arches into their respective zip files
+func (root *RootFolder) PackageArches() error {
+
+	for arch, loc := range root.ArchPath {
+		fmt.Println("Packaging Arch: ", arch)
+
+		zipbuf := new(bytes.Buffer)
+
+		// zip arch
+		zw := zip.NewWriter(zipbuf)
+
+		// Add Files
+		files, err := ioutil.ReadDir(loc)
+		if err != nil {
+			fmt.Println("Cannot find files at: ", loc)
+			return err
+		}
+
+		for _, file := range files {
+			fmt.Println("Zipping File ", file.Name())
+			f, err := zw.Create(file.Name())
+			if err != nil {
+				fmt.Println("Cannot create zip file because: ", err)
+				return err
+			}
+			src, err := os.Open(loc + "/" + file.Name())
+			if err != nil {
+				fmt.Println("Could not open ", loc+"/"+file.Name())
+				return err
+			}
+			srcReader := bufio.NewReader(src)
+			_, err = io.Copy(f, srcReader)
+			if err != nil {
+				fmt.Println("Could not zip file into buffer")
+				return err
+			}
+		}
+
+		// close the zip writer
+		err = zw.Close()
+		if err != nil {
+			fmt.Println("Error Occured while closing zip")
+			return err
+		}
+
+		// Write buffer to file
+		fmt.Println("Done Packaging files")
+
+		bufReader := bufio.NewReader(zipbuf)
+		zipFilePath := root.RootPath + "/" + "Flotilla_linux_" + arch + ".zip"
+
+		fmt.Println("Writing file: ", zipFilePath)
+		zipfile, err := os.Create(zipFilePath)
+		if err != nil {
+			fmt.Println("Could not create Zip File ", err)
+			return err
+		}
+		defer zipfile.Close()
+		_, err = io.Copy(zipfile, bufReader)
+		if err != nil {
+			fmt.Println("Could not write Zip File ", err)
+			return err
+		}
+	}
+
+	return nil
 }
