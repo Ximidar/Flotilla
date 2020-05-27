@@ -99,7 +99,7 @@ func (snap *Snappy) CopySnapFile(arch string) error {
 	}
 
 	// get snap file text
-	snapFileText := snap.generateSnapFile(archFile)
+	snapFileText := snap.generateSnapFile(arch, archFile)
 
 	// copy file text to the snap file
 	snapFile := snap.rf.JoinAndClean(snap.rf.SnapPath, "snapcraft.yaml")
@@ -129,7 +129,10 @@ func (snap *Snappy) CopySnapFile(arch string) error {
 
 // generateSnapFile will give back a yaml string to use with
 // the snap
-func (snap *Snappy) generateSnapFile(archPath string) string {
+func (snap *Snappy) generateSnapFile(arch string, archPath string) string {
+	if arch == "arm" {
+		arch = "armhf"
+	}
 	snapFile := fmt.Sprintf(`name: flotilla # you probably want to 'snapcraft register <name>'
 base: core18 # the base snap is the execution environment for this snap
 version: '0.1' # just for humans, typically '1.2+git' or '1.3.2'
@@ -140,6 +143,9 @@ description: |
 grade: devel # must be 'stable' to release into candidate/stable channels
 confinement: devmode # use 'strict' once you have the right plugs and slots
 
+architectures:
+	- build-on: amd64
+	  run-on: %s
 
 plugs:
 	etc-conf:
@@ -205,7 +211,7 @@ parts:
 		source: %s
 		source-type: zip
 
-	`, archPath)
+	`, arch, archPath)
 	snapFile = strings.ReplaceAll(snapFile, "\t", "  ")
 	return snapFile
 }
