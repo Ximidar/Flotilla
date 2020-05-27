@@ -24,6 +24,7 @@ type RootFolder struct {
 	// Important Paths
 	RootPath string
 	BinPath  string
+	SnapPath string
 	ArchPath map[string]string
 }
 
@@ -71,6 +72,7 @@ func (root *RootFolder) GeneratePaths() error {
 	pathsToCreate := []string{
 		root.RootPath,
 		root.BinPath,
+		root.SnapPath,
 		root.ArchPath["amd64"],
 		root.ArchPath["arm64"],
 		root.ArchPath["arm"],
@@ -116,6 +118,7 @@ func (root *RootFolder) generateDefaultPaths() {
 
 	// Folders
 	root.BinPath = root.JoinAndClean(root.RootPath, BinName)
+	root.SnapPath = root.JoinAndClean(root.RootPath, "snap")
 	root.ArchPath["amd64"] = root.JoinAndClean(root.BinPath, "amd64/")
 	root.ArchPath["arm64"] = root.JoinAndClean(root.BinPath, "arm64/")
 	root.ArchPath["arm"] = root.JoinAndClean(root.BinPath, "arm/")
@@ -144,20 +147,21 @@ func (root *RootFolder) verifyPaths() error {
 	checkPaths := []string{
 		root.RootPath,
 		root.BinPath,
+		root.SnapPath,
 		root.ArchPath["amd64"],
 		root.ArchPath["arm64"],
 		root.ArchPath["arm"],
 	}
 
 	for _, rawpath := range checkPaths {
-		if !root.pathExists(rawpath) {
+		if !root.PathExists(rawpath) {
 			return fmt.Errorf("Path %v Does not exist", rawpath)
 		}
 	}
 	return nil
 }
 
-func (root *RootFolder) pathExists(path string) bool {
+func (root *RootFolder) PathExists(path string) bool {
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		return false
 	}
@@ -184,7 +188,12 @@ func (root *RootFolder) PackageArches() error {
 
 		for _, file := range files {
 			fmt.Println("Zipping File ", file.Name())
-			f, err := zw.Create(file.Name())
+			headerInfo, err := zip.FileInfoHeader(file)
+			if err != nil {
+				fmt.Println("Cannot create header info because: ", err)
+				return err
+			}
+			f, err := zw.CreateHeader(headerInfo)
 			if err != nil {
 				fmt.Println("Cannot create zip file because: ", err)
 				return err

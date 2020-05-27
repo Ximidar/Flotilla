@@ -9,11 +9,6 @@ grade: devel # must be 'stable' to release into candidate/stable channels
 confinement: devmode # use 'strict' once you have the right plugs and slots
 
 
-architectures:
-  - build-on: amd64
-  - build-on: arm64
-  - build-on: armhf
-
 plugs:
   etc-conf:
     interface: system-files
@@ -25,13 +20,13 @@ plugs:
 apps:
   # flotcli
   cli:
-    command: bin/Flotilla_CLI
+    command: Flotilla_CLI
     plugs:
       - network
   
   # nats-server
   nats:
-    command: bin/nats-server
+    command: nats-server
     daemon: simple
     plugs:
       - network
@@ -39,14 +34,14 @@ apps:
   
   # status
   status:
-    command: bin/FlotillaStatus
+    command: FlotillaStatus
     daemon: simple
     plugs:
       - network
   
   # commango
   commango:
-    command: bin/Commango
+    command: Commango
     daemon: simple
     plugs:
       - network
@@ -64,7 +59,7 @@ apps:
   
   # file manager
   file-manager:
-    command: bin/Flotilla_File_Manager
+    command: Flotilla_File_Manager
     daemon: simple
     plugs:
       - network
@@ -73,21 +68,7 @@ apps:
 
 
 parts:
-  flot-root:
-    plugin: go
-    go-packages:
-      - github.com/Ximidar/Flotilla/FlotillaStatus
-      - github.com/Ximidar/Flotilla/Commango
-      - github.com/Ximidar/Flotilla/Flotilla_CLI
-      - github.com/Ximidar/Flotilla/Flotilla_File_Manager
-      - github.com/Ximidar/Flotilla/FlotillaWeb
-    source: .
-    go-importpath: github.com/Ximidar/Flotilla
-  
-  nats-server:
-    plugin: go
-    source: https://github.com/nats-io/nats-server
-    source-type: git
-    go-importpath: github.com/nats-io/nats-server
-    go-packages:
-      - github.com/nats-io/nats-server
+    flot-root-amd64:
+        plugin: dump
+        source: Flotilla_linux_amd64.zip
+        source-type: zip

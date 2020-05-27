@@ -13,6 +13,7 @@ import (
 
 	"github.com/Ximidar/Flotilla/NodeLauncher/GetNats"
 	"github.com/Ximidar/Flotilla/NodeLauncher/RootFolder"
+	"github.com/Ximidar/Flotilla/NodeLauncher/snappy"
 	"github.com/spf13/cobra"
 )
 
@@ -97,6 +98,14 @@ var BuildFlotilla = &cobra.Command{
 		if err != nil {
 			fmt.Println("Could not Package Flotilla due to: ", err)
 			os.Exit(1)
+		}
+
+		// create snaps
+		snappy := snappy.NewSnappy(rf)
+		err = snappy.MakeSnaps()
+		if err != nil {
+			fmt.Println("Could not make snaps: ", err)
+			panic(err)
 		}
 
 	},
