@@ -81,11 +81,23 @@ services:
             - ./FlotillaWeb:/code
         ports:
             - "8080:8080"
-
-    # State Keeping
-    redis:
-        container_name: redis
-        image: redis:latest
+    
+    flotilla_api:
+        container_name: Flot-API
+        build:
+            context: ./FlotillaWebAPI
+            dockerfile: dockerfile
+        image: flotilla_api:latest
         networks: 
             - flotilla-bridge
+        ports:
+            - "5000:5000"
+
+
+    # State Keeping
+    # redis:
+    #     container_name: redis
+    #     image: redis:latest
+    #     networks: 
+    #         - flotilla-bridge
 

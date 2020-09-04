@@ -18,7 +18,8 @@ import (
 
 const (
 	// DockerNATS is used by background tasks
-	DockerNATS = "nats://0.0.0.0:4222"
+	//DockerNATS = "nats://0.0.0.0:4222"
+	DockerNATS = "nats:4222"
 
 	// LocalNATS is used by programs that are not within docker
 	LocalNATS = "nats://0.0.0.0:4222"

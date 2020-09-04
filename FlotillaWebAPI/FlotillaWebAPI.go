@@ -4,7 +4,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/Ximidar/Flotilla/FlotillaWeb/backend"
+	"github.com/Ximidar/Flotilla/FlotillaWebAPI/backend"
 )
 
 func main() {

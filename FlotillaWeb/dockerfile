@@ -1,16 +1,9 @@
-FROM ximidar/flotilla_root:latest as flot
-WORKDIR $FLOTILLA_DIR/FlotillaWeb
-COPY . .
-RUN mkdir /artifacts
-RUN go build -o /artifacts/FlotillaWeb
-
 # Goals of this dockerfile. Set up for Go and a website
 FROM node:lts-alpine
 
 RUN mkdir code
-WORKDIR ./code
-
 # install depends
+WORKDIR /code
 RUN npm install -g @vue/cli
 RUN npm install -g @vue/cli-service-global
 # copy over all files 
@@ -19,7 +12,6 @@ RUN npm install
 
 # Expose port
 EXPOSE 8080
-WORKDIR ./src
-COPY --from=flot /artifacts/FlotillaWeb .
-CMD ["./FlotillaWeb", "&&", "npm", "run", "serve"]
+WORKDIR /code/src
+CMD ["npm", "run", "serve"]
 

@@ -83,19 +83,19 @@ func NewFlotillaWeb(port int, directory string) *FlotillaWeb {
 	var err error
 
 	// setup nats
-	fw.Nats, err = NatsConnect.DefaultConn(NatsConnect.LocalNATS, "flotillaInterface")
+	fw.Nats, err = NatsConnect.DefaultConn(NatsConnect.DockerNATS, "flotillaInterface")
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	go fw.setupRouter()
-	go fw.setupFileServer(directory)
+	//go fw.setupFileServer(directory)
 	// TODO figure out why websockets mess with the file upload function
 	// go fw.setupWebSocket()
 
 	// setup Flotilla stuff
 	go fw.setupCommRelay()
-	go fw.setupStatus()
+	//go fw.setupStatus()
 
 	return fw
 

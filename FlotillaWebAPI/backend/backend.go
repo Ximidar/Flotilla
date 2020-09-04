@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/Ximidar/Flotilla/FlotillaWeb/backend/api"
+	"github.com/Ximidar/Flotilla/FlotillaWebAPI/backend/api"
 	"github.com/spf13/cobra"
 )
 
