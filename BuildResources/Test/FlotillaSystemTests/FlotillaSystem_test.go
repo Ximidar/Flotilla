@@ -22,9 +22,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/nats-io/gnatsd/server"
-	"github.com/nats-io/gnatsd/test"
-	nats "github.com/nats-io/go-nats"
 	"github.com/Ximidar/Flotilla/BuildResources/Test/CommonTestTools"
 	"github.com/Ximidar/Flotilla/BuildResources/Test/FakeSerialDevice/Printer"
 	FakeSerialDevice "github.com/Ximidar/Flotilla/BuildResources/Test/FakeSerialDevice/SerialDevice"
@@ -33,6 +30,9 @@ import (
 	"github.com/Ximidar/Flotilla/DataStructures/StatusStructures/PlayStructures"
 	"github.com/Ximidar/Flotilla/Flotilla_CLI/FlotillaInterface"
 	"github.com/Ximidar/Flotilla/Flotilla_File_Manager/FileManager"
+	"github.com/nats-io/gnatsd/server"
+	"github.com/nats-io/gnatsd/test"
+	nats "github.com/nats-io/go-nats"
 )
 
 var TestLocation = "/tmp/FlotillaSystem/Test/Flotilla"

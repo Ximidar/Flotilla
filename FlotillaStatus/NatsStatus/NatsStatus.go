@@ -359,6 +359,8 @@ func (ns *NatsStatus) DonePrinting() {
 func (ns *NatsStatus) GetPlayCommand() {
 	ns.CommRelay.Playing = true
 	ns.RNode.UpdateNode(PlayStructures.PLAY)
+	// give an OK command so it starts playing
+	ns.CommRelay.OKEvent <- true
 }
 
 // GetCancelCommand will get the CANCEL status update and set up comm relay to cancel printing
