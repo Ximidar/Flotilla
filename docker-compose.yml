@@ -69,6 +69,19 @@ services:
         volumes:
             - /dev:/dev
 
+    flotilla_web:
+        container_name: Flot-Web
+        build:
+            context: ./FlotillaWeb
+            dockerfile: dockerfile
+        image: flotilla_web:latest
+        networks: 
+            - flotilla-bridge
+        volumes: 
+            - ./FlotillaWeb:/code
+        ports:
+            - "8080:8080"
+
     # State Keeping
     redis:
         container_name: redis
