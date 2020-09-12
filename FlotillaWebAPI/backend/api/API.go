@@ -53,7 +53,7 @@ func Serve(port int, directory string) {
 	FlotillaWeb := NewFlotillaWeb(port, directory)
 
 	http.Handle("/", FlotillaWeb)
-	// http.HandleFunc("/api/ws", FlotillaWeb.websocketHandler)
+	http.HandleFunc("/api/ws", FlotillaWeb.websocketHandler)
 
 	//Make CORS
 	headersOK := handlers.AllowedHeaders([]string{"Accept",
@@ -91,11 +91,11 @@ func NewFlotillaWeb(port int, directory string) *FlotillaWeb {
 	go fw.setupRouter()
 	//go fw.setupFileServer(directory)
 	// TODO figure out why websockets mess with the file upload function
-	// go fw.setupWebSocket()
+	go fw.setupWebSocket()
 
 	// setup Flotilla stuff
 	go fw.setupCommRelay()
-	//go fw.setupStatus()
+	go fw.setupStatus()
 
 	return fw
 

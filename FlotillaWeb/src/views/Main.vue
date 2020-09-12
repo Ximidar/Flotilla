@@ -1,19 +1,29 @@
-<template>
-  <div class="layout">
-    <FlotillaSideBar class="fixedTop"/>
-    <router-view style="{display: inline-block;}"></router-view>
 
-  </div>
-  
+<template>
+  <v-app>
+    <router-view dark style="{display: inline-block;}"></router-view> 
+    <v-bottom-navigation>
+      <v-btn fab dark small color="primary" v-on:click.native="RouterFiles">
+        <v-icon>$vuetify.icons.flot.files</v-icon>
+        <span> Files </span>
+      </v-btn>
+      <v-btn fab dark small color="primary" v-on:click.native="RouterStats">
+      </v-btn>
+      <v-btn fab dark small color="primary" v-on:click.native="RouterUtil">
+      </v-btn>
+    </v-bottom-navigation>
+    <!-- <FlotillaSideBar class="fixedTop"/>-->
+    
+  </v-app>
 </template>
+  
 
 <script>
 import FlotillaSideBar from '@/components/FlotillaSideBar'
-
 export default {
   name: 'FlotillaMain',
   components: {
-    FlotillaSideBar,
+    FlotillaSideBar
   },
   computed: {
     activeWidgets: function(){
@@ -21,6 +31,17 @@ export default {
     },
   },
   methods: {
+    RouterFiles (){
+      console.log("pushed")
+      this.$router.push("files")
+    },
+    RouterStats (){
+      this.$router.push("status")
+    },
+    RouterUtil (){
+      this.$router.push("util")
+
+    }
 
   },
   created () {
@@ -30,7 +51,7 @@ export default {
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
+<style lang="css" scoped>
 
 .remainingArea{
   flex-grow: 1;
@@ -67,5 +88,11 @@ export default {
 }
 .fade-move{
   transition: transform 1s;
+}
+
+.iconsize{
+  width: 45px;
+  height: 45px;
+  fill:white;
 }
 </style>

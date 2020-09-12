@@ -40,7 +40,7 @@ services:
         networks:
             - flotilla-bridge
         volumes:
-            - ~/gcode:/home/flotilla/gcode
+            - /home/ximidar/gcode:/etc/flotilla/gcode
     
     comm:
         container_name: Flotilla-Commango
@@ -69,18 +69,20 @@ services:
         volumes:
             - /dev:/dev
 
-    flotilla_web:
-        container_name: Flot-Web
-        build:
-            context: ./FlotillaWeb
-            dockerfile: dockerfile
-        image: flotilla_web:latest
-        networks: 
-            - flotilla-bridge
-        volumes: 
-            - ./FlotillaWeb:/code
-        ports:
-            - "8080:8080"
+    # flotilla_web:
+    #     container_name: Flot-Web
+    #     build:
+    #         context: ./FlotillaWeb
+    #         dockerfile: dockerfile
+    #     image: flotilla_web:latest
+    #     depends_on: 
+    #         - "nats"
+    #     networks: 
+    #         - flotilla-bridge
+    #     volumes: 
+    #         - ./FlotillaWeb:/code
+    #     ports:
+    #         - "8080:8080"
     
     flotilla_api:
         container_name: Flot-API
@@ -88,6 +90,10 @@ services:
             context: ./FlotillaWebAPI
             dockerfile: dockerfile
         image: flotilla_api:latest
+        depends_on: 
+            - "nats"
+            - "status"
+            - "file_manager"
         networks: 
             - flotilla-bridge
         ports:

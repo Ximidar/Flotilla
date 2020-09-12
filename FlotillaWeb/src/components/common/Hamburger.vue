@@ -45,7 +45,10 @@ export default {
       default: function(){},
       type: Function
     },
-    collapseButton: false,
+    collapseButton: {
+      type: Boolean,
+      default: false
+    },
     buttonText: {
       default: "None!",
       type: String
