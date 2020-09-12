@@ -1,43 +1,60 @@
 <template>
-  <div class="about">
-    <h1>Status</h1>
-    <div class="status">
-      Status: {{ Status }}
-    </div>
-    <div class="status_buttons">
-      <TextButton :Label="PauseButtonText"
-                  :Action="PostStatus"
-                  class="PauseButton"></TextButton>
-      <TextButton :Label="Cancel"
-                  ButtonColor="red"
-                  :Action="SendCancel"
-                  class="CancelButton"></TextButton>
-    </div>
-    <!-- <div class="comm-wrapper" id="comm-wrapper">
-      <span class="comm-item" v-for="message in CommOut">{{message}}</span>
-    </div> -->
-
-  </div>
+  <v-container>
+    <v-system-bar color="primary"
+                  fixed
+                  window
+    >
+      <v-icon>$vuetify.icons.solid_lock_open</v-icon>
+      <v-icon>$vuetify.icons.solid_lock</v-icon>
+      <span>{{ Status }}</span>
+      <v-spacer></v-spacer>
+      <v-icon>$vuetify.icons.solid_wifi</v-icon>
+    </v-system-bar>
+    <v-tabs>
+      <v-tab
+        href="#tab-flot-console"
+      >Console</v-tab>
+      <v-tab
+        href="#tab-flot-control"
+      >Control</v-tab>
+      <v-tab
+        href="#tab-flot-temp"
+      >Temperature</v-tab>
+      <v-tab-item
+        value="tab-flot-console"
+      >
+        <FlotConsole/>
+      </v-tab-item>
+      <v-tab-item
+        value="tab-flot-temp"
+      >
+        <span>Aloha!</span>
+      </v-tab-item>
+      <v-tab-item
+        value="tab-flot-control"
+      >
+        <span>Bonjour!</span>
+      </v-tab-item>
+    </v-tabs>
+  </v-container>
 </template>
 
 <script>
 import { Flotilla } from "@/flotilla"
-import TextButton from "@/components/common/TextButton"
+import FlotConsole from "@/views/Status/console.vue"
 
 export default {
   name: 'FlotillaStatus',
   components: {
-    TextButton
+    FlotConsole
   },
   data(){
     return {
       Status: "No Status!",
       PauseButtonText: "Not Playing",
-      ButtonSize: [200, 200],
       Pause: "Pause",
       Resume: "Resume",
       Cancel: "Cancel",
-
       CommOut: ["Hello!", "aloha", "comprender"]
     }
   },

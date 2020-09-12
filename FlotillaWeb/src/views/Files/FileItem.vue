@@ -1,26 +1,51 @@
 <template>
-    <li v-on:click="ClickEvent">
-        
-        <FileIcon class="iconsize" v-if="File.FileType === 'file'"/>
-        <FolderIcon class="iconsize" v-else/>
-        <div class="file-details">
-            <div class="file-details name"><b>{{File.Name}}</b></div>
-            <div class="file-details size">{{ ReadableSize }}</div> 
-            <div class="file-details date">{{ FileDate }}</div>
-        </div>
-          
-    </li>
+    <v-container>
+    <v-expansion-panels>
+    <v-expansion-panel >
+        <v-expansion-panel-header>
+            <v-hover  v-slot:default="{ hover }">
+                <v-toolbar :elevation="hover ? 12 : 5" :color="hover ? 'secondary' : 'primary'">
+                    <v-icon v-if="File.FileType === 'file'">$vuetify.icons.solid_file</v-icon>
+                    <v-icon v-else>$vuetify.icons.solid_folder</v-icon>
+                    <v-toolbar-title class="pl-5" >{{File.Name}}</v-toolbar-title>
+                    <v-spacer></v-spacer>
+                    <v-icon class="mx-1">$vuetify.icons.solid_info</v-icon>
+                    <span>{{ ReadableSize }}</span>
+                    <v-icon class="mx-1">$vuetify.icons.solid_carrot</v-icon>
+                    <span>{{ FileDate }}</span>
+                </v-toolbar>
+            </v-hover>
+        </v-expansion-panel-header>
+        <v-expansion-panel-content>
+            <v-row v-if="File.FileType === 'file'">
+                <v-btn v-on:click.native="SnackShow">
+                    <v-icon class="pr-1">$vuetify.icons.regular_play_circle</v-icon>
+                    <span>Play</span>
+                </v-btn>
+                <v-spacer></v-spacer>
+                <v-btn>
+                    <v-icon class="pr-1">$vuetify.icons.solid_download</v-icon>
+                    <span>Download</span>
+                </v-btn>
+                <v-btn>
+                    <v-icon class="pr-1">$vuetify.icons.solid_skull</v-icon>
+                    <span>Delete</span>
+                </v-btn>
+            </v-row>
+        </v-expansion-panel-content>
+    </v-expansion-panel>
+    </v-expansion-panels>
+    <v-snackbar v-model="snackbar"
+                centered
+                timeout="4000"
+                color="secondary"
+        >{{ snackbar_text }}</v-snackbar>
+    </v-container>
 </template>
 
 <script>
-import FileIcon from "@/assets/svg/solid/file.svg"
-import FolderIcon from "@/assets/svg/solid/folder.svg"
 export default {
     name: 'FileItem',
-    components:{
-        FileIcon,
-        FolderIcon
-    },
     props:{
         File:{
             type: Object,
@@ -30,7 +55,9 @@ export default {
     data: function() {
         return {
             ReadableSize: this.HumanReadable(this.File.Size),
-            FileDate: this.ConvertUnixTimestamp(this.File.UnixTime)
+            FileDate: this.ConvertUnixTimestamp(this.File.UnixTime),
+            snackbar: false,
+            snackbar_text: "Playing " + this.File.Name
         }
     },
     methods:{
@@ -58,6 +85,10 @@ export default {
         },
         ClickEvent: function() {
             this.$emit('clicked', this.File)
+        },
+        SnackShow: function() {
+            console.log("Showing Snackbar")
+            this.snackbar = true
         }
     },
     watch: {
@@ -74,7 +105,7 @@ export default {
 
 <style scoped>
 
-li:hover{
+hover:hover{
     opacity: 0.75;
 }
 

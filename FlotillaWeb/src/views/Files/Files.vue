@@ -1,24 +1,28 @@
 <template>
-  <div class="files">
-    <div class="path-bar">
-      <ArrowLeft v-on:click="GoPrevious" class="iconsize" />
-      {{ FileList.CurrentFL.Path }}
-    </div>
-    <div class="filecontainer">
-      <div class="file-items">
-        <ul v-for="file in Contents" v-bind:key="file.Path">
-          <FileItem :File=file
-                    @clicked="ClickFile">
+  <v-container>
+    <v-toolbar dense color="primary">
+      <v-btn icon v-on:click.native="GoPrevious">
+        <v-icon>$vuetify.icons.solid_arrow_left</v-icon>
+      </v-btn>
+      <v-toolbar-title class="px-3" >{{ FileList.CurrentFL.Path }}</v-toolbar-title>
+      <v-spacer></v-spacer>
+      <v-btn icon>
+        <v-icon>$vuetify.icons.solid_plus</v-icon>
+      </v-btn>
+      <v-btn icon>
+        <v-icon>$vuetify.icons.solid_folder_plus</v-icon>
+      </v-btn>
+      <v-btn icon>
+        <v-icon>$vuetify.icons.solid_ellipsis_h</v-icon>
+      </v-btn>
+    </v-toolbar>
+    <v-container>
+          <FileItem v-for="file in Contents" v-bind:key="file.Path"
+            :File=file
+            @clicked="ClickFile">
           </FileItem>
-        </ul>  
-      </div>
-      <div class=fileinfo>
-        <FileInfo v-bind:File="SelectedFile">
-        </FileInfo>
-      </div>
-
-    </div>
-  </div>
+    </v-container>
+  </v-container>
 </template>
 
 <script>
