@@ -2,7 +2,7 @@
 <template>
     <v-container>
       <router-view></router-view> 
-      <v-bottom-navigation fixed grow shift background-color="primary">
+      <v-bottom-navigation app fixed grow shift background-color="primary">
         <v-btn class="mx-3" fab color="secondary" v-on:click.native="RouterFiles">
           <v-icon>$vuetify.icons.solid_hdd</v-icon>
           <span> Files </span>
@@ -16,7 +16,6 @@
           <span> Util </span>
         </v-btn>
       </v-bottom-navigation>
-      <!-- <FlotillaSideBar class="fixedTop"/>-->
     </v-container>
   
 </template>
