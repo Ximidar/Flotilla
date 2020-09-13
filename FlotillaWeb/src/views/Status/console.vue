@@ -1,8 +1,8 @@
 <template>
-    <v-card dark class="pt-3">
-        <flex>
-            <v-col sm="6" cols="12">
-                <v-subheader><b>Console Monitor</b></v-subheader>
+    <v-container fill-height fill-width>
+        <v-row align="center" justify="center">
+            <v-col sm="6" cols="10">
+                <v-toolbar><b>Console Monitor</b></v-toolbar>
                 <v-sheet outlined >
                     <v-virtual-scroll
                         :items="console_text"
@@ -20,6 +20,7 @@
                     :auto-grow="auto_clear_single"
                     :clearable="auto_clear_single"
                     :single-line="auto_clear_single"
+                    filled
                     rows="1"
                     row-height="24"
                     @keyup="onEnter"
@@ -27,17 +28,21 @@
                 ></v-textarea>
                 
             </v-col>
-            
-        </flex>
-    </v-card>
+            <v-col sm="6" cols="10">
+                <PConsole/>
+            </v-col>
+        </v-row>
+    </v-container>
 </template>
 
 <script>
 import ConsoleItem from "@/views/Status/console_item.vue"
+import PConsole from "@/views/Status/printer_connection.vue"
 export default {
     name: 'console',
     components: {
-        ConsoleItem
+        ConsoleItem,
+        PConsole,
     },
     data(){
         return{
