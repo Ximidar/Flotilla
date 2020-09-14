@@ -33,7 +33,7 @@
       <v-tab-item
         value="tab-flot-control"
       >
-        <span>Bonjour!</span>
+        <FlotControl/>
       </v-tab-item>
     </v-tabs>
   </v-container>
@@ -42,11 +42,13 @@
 <script>
 import { Flotilla } from "@/flotilla"
 import FlotConsole from "@/views/Status/console.vue"
+import FlotControl from "@/views/Status/control/printer_control.vue"
 
 export default {
   name: 'FlotillaStatus',
   components: {
-    FlotConsole
+    FlotConsole,
+    FlotControl
   },
   data(){
     return {
