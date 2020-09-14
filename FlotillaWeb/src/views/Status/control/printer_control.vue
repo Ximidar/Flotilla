@@ -61,7 +61,7 @@
         </v-row>
         <v-row>
             <v-col cols="2" align="center" justify="center">
-                <v-card outlined>
+                <v-card outlined flat height="55px">
                     <v-chip class="ma-2" color="primary">X</v-chip>
                     <v-chip class="ma-2" color="primary">Y</v-chip>
                     <v-chip class="ma-2" color="primary">Z</v-chip>
@@ -72,6 +72,7 @@
                     label="Travel in mm"
                     outlined
                     placeholder="10"
+                    height="55px"
                 >
                 </v-text-field>
             </v-col>
