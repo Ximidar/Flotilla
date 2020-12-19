@@ -68,6 +68,7 @@ services:
             - flotilla-bridge
         volumes:
             - /dev:/dev
+ 
 
     # flotilla_web:
     #     container_name: Flot-Web
@@ -84,20 +85,20 @@ services:
     #     ports:
     #         - "8080:8080"
     
-    flotilla_api:
-        container_name: Flot-API
-        build:
-            context: ./FlotillaWebAPI
-            dockerfile: dockerfile
-        image: flotilla_api:latest
-        depends_on: 
-            - "nats"
-            - "status"
-            - "file_manager"
-        networks: 
-            - flotilla-bridge
-        ports:
-            - "5000:5000"
+    # flotilla_api:
+    #     container_name: Flot-API
+    #     build:
+    #         context: ./FlotillaWebAPI
+    #         dockerfile: dockerfile
+    #     image: flotilla_api:latest
+    #     depends_on: 
+    #         - "nats"
+    #         - "status"
+    #         - "file_manager"
+    #     networks: 
+    #         - flotilla-bridge
+    #     ports:
+    #         - "5000:5000"
 
 
     # State Keeping
