@@ -109,6 +109,18 @@ func (comm Comm) GetCommStatus() *CS.CommStatus {
 	return cs
 }
 
+// GetCommOptions will return the ports and speeds for the available Comms
+func (comm *Comm) GetCommOptions() (*CS.CommOptions, error) {
+	comm.GetAvailablePorts()
+	comm.GetSuggestedSpeeds()
+
+	options := new(CS.CommOptions)
+	options.Ports = comm.AvailablePorts
+	options.Bauds = comm.SuggestedSpeeds
+
+	return options, nil
+}
+
 // GetAvailablePorts will query the system for all available ports we can connect to
 func (comm *Comm) GetAvailablePorts() (*CS.Ports, error) {
 	// Reset the available ports

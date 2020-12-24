@@ -68,6 +68,7 @@ func (gnats *NatsConn) Serve() {
 func (gnats *NatsConn) createReqReplies() (err error) {
 	// req replies
 	_, err = gnats.NC.Subscribe(CS.ListPorts, gnats.listPorts)
+	_, err = gnats.NC.Subscribe(CS.ListOptions, gnats.getCommOptions)
 	_, err = gnats.NC.Subscribe(CS.InitializeComm, gnats.initComm)
 	_, err = gnats.NC.Subscribe(CS.ConnectComm, gnats.connectComm)
 	_, err = gnats.NC.Subscribe(CS.DisconnectComm, gnats.disconnectComm)
@@ -92,6 +93,20 @@ func (gnats *NatsConn) listPorts(msg *nats.Msg) {
 	mReply, err := proto.Marshal(ports)
 
 	// Publish
+	gnats.NC.Publish(msg.Reply, mReply)
+}
+
+func (gnats *NatsConn) getCommOptions(msg *nats.Msg) {
+	options, err := gnats.Comm.GetCommOptions()
+	if err != nil {
+		reply := DS.ConstructNegativeReplyString(err.Error())
+		// Marshal reply
+		mreply, _ := json.Marshal(reply)
+		gnats.NC.Publish(msg.Reply, mreply)
+		return
+	}
+
+	mReply, err := proto.Marshal(options)
 	gnats.NC.Publish(msg.Reply, mReply)
 }
 
