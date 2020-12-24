@@ -83,9 +83,9 @@ $root.FileStructures = (function() {
         FileAction.encode = function encode(message, writer) {
             if (!writer)
                 writer = $Writer.create();
-            if (message.Action != null && message.hasOwnProperty("Action"))
+            if (message.Action != null && Object.hasOwnProperty.call(message, "Action"))
                 writer.uint32(/* id 1, wireType 0 =*/8).int32(message.Action);
-            if (message.Path != null && message.hasOwnProperty("Path"))
+            if (message.Path != null && Object.hasOwnProperty.call(message, "Path"))
                 writer.uint32(/* id 2, wireType 2 =*/18).string(message.Path);
             return writer;
         };
@@ -256,7 +256,7 @@ $root.FileStructures = (function() {
         /**
          * Option enum.
          * @name FileStructures.FileAction.Option
-         * @enum {string}
+         * @enum {number}
          * @property {number} SelectFile=0 SelectFile value
          * @property {number} GetFileStructure=1 GetFileStructure value
          * @property {number} AddFile=2 AddFile value
@@ -368,15 +368,15 @@ $root.FileStructures = (function() {
         FileProg.encode = function encode(message, writer) {
             if (!writer)
                 writer = $Writer.create();
-            if (message.FileName != null && message.hasOwnProperty("FileName"))
+            if (message.FileName != null && Object.hasOwnProperty.call(message, "FileName"))
                 writer.uint32(/* id 1, wireType 2 =*/10).string(message.FileName);
-            if (message.Size != null && message.hasOwnProperty("Size"))
+            if (message.Size != null && Object.hasOwnProperty.call(message, "Size"))
                 writer.uint32(/* id 2, wireType 0 =*/16).uint64(message.Size);
-            if (message.BytesRead != null && message.hasOwnProperty("BytesRead"))
+            if (message.BytesRead != null && Object.hasOwnProperty.call(message, "BytesRead"))
                 writer.uint32(/* id 3, wireType 0 =*/24).uint64(message.BytesRead);
-            if (message.CurrentLine != null && message.hasOwnProperty("CurrentLine"))
+            if (message.CurrentLine != null && Object.hasOwnProperty.call(message, "CurrentLine"))
                 writer.uint32(/* id 4, wireType 0 =*/32).uint64(message.CurrentLine);
-            if (message.Progress != null && message.hasOwnProperty("Progress"))
+            if (message.Progress != null && Object.hasOwnProperty.call(message, "Progress"))
                 writer.uint32(/* id 5, wireType 5 =*/45).float(message.Progress);
             return writer;
         };
@@ -714,19 +714,19 @@ $root.FileStructures = (function() {
         File.encode = function encode(message, writer) {
             if (!writer)
                 writer = $Writer.create();
-            if (message.PreviousPath != null && message.hasOwnProperty("PreviousPath"))
+            if (message.PreviousPath != null && Object.hasOwnProperty.call(message, "PreviousPath"))
                 writer.uint32(/* id 1, wireType 2 =*/10).string(message.PreviousPath);
-            if (message.Name != null && message.hasOwnProperty("Name"))
+            if (message.Name != null && Object.hasOwnProperty.call(message, "Name"))
                 writer.uint32(/* id 2, wireType 2 =*/18).string(message.Name);
-            if (message.Path != null && message.hasOwnProperty("Path"))
+            if (message.Path != null && Object.hasOwnProperty.call(message, "Path"))
                 writer.uint32(/* id 3, wireType 2 =*/26).string(message.Path);
-            if (message.FileType != null && message.hasOwnProperty("FileType"))
+            if (message.FileType != null && Object.hasOwnProperty.call(message, "FileType"))
                 writer.uint32(/* id 4, wireType 2 =*/34).string(message.FileType);
-            if (message.Size != null && message.hasOwnProperty("Size"))
+            if (message.Size != null && Object.hasOwnProperty.call(message, "Size"))
                 writer.uint32(/* id 5, wireType 0 =*/40).uint64(message.Size);
-            if (message.IsDir != null && message.hasOwnProperty("IsDir"))
+            if (message.IsDir != null && Object.hasOwnProperty.call(message, "IsDir"))
                 writer.uint32(/* id 6, wireType 0 =*/48).bool(message.IsDir);
-            if (message.UnixTime != null && message.hasOwnProperty("UnixTime"))
+            if (message.UnixTime != null && Object.hasOwnProperty.call(message, "UnixTime"))
                 writer.uint32(/* id 7, wireType 0 =*/56).int64(message.UnixTime);
             if (message.Contents != null && message.Contents.length)
                 for (var i = 0; i < message.Contents.length; ++i)

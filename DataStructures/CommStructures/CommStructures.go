@@ -15,6 +15,8 @@ const (
 
 	// ListPorts will list all available ports to connect to
 	ListPorts = Name + "list_ports"
+	// ListOptions will list all available ports and suggested speeds
+	ListOptions = Name + "list_options"
 	// InitializeComm will initialize the comm object
 	InitializeComm = Name + "init_comm"
 	// ConnectComm will connect the Comm Object to the Serial Connection

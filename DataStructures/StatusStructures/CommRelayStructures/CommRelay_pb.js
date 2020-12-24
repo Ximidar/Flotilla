@@ -92,11 +92,11 @@ $root.CommRelayStructures = (function() {
         Line.encode = function encode(message, writer) {
             if (!writer)
                 writer = $Writer.create();
-            if (message.Line != null && message.hasOwnProperty("Line"))
+            if (message.Line != null && Object.hasOwnProperty.call(message, "Line"))
                 writer.uint32(/* id 1, wireType 2 =*/10).string(message.Line);
-            if (message.LineNumber != null && message.hasOwnProperty("LineNumber"))
+            if (message.LineNumber != null && Object.hasOwnProperty.call(message, "LineNumber"))
                 writer.uint32(/* id 2, wireType 0 =*/16).uint64(message.LineNumber);
-            if (message.KnownNumber != null && message.hasOwnProperty("KnownNumber"))
+            if (message.KnownNumber != null && Object.hasOwnProperty.call(message, "KnownNumber"))
                 writer.uint32(/* id 3, wireType 0 =*/24).bool(message.KnownNumber);
             return writer;
         };
@@ -320,7 +320,7 @@ $root.CommRelayStructures = (function() {
         RequestLines.encode = function encode(message, writer) {
             if (!writer)
                 writer = $Writer.create();
-            if (message.Amount != null && message.hasOwnProperty("Amount"))
+            if (message.Amount != null && Object.hasOwnProperty.call(message, "Amount"))
                 writer.uint32(/* id 1, wireType 0 =*/8).int32(message.Amount);
             return writer;
         };
@@ -520,7 +520,7 @@ $root.CommRelayStructures = (function() {
             if (message.Lines != null && message.Lines.length)
                 for (var i = 0; i < message.Lines.length; ++i)
                     $root.CommRelayStructures.Line.encode(message.Lines[i], writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
-            if (message.EOF != null && message.hasOwnProperty("EOF"))
+            if (message.EOF != null && Object.hasOwnProperty.call(message, "EOF"))
                 writer.uint32(/* id 2, wireType 0 =*/16).bool(message.EOF);
             return writer;
         };
