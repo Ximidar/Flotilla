@@ -17,6 +17,26 @@ import (
 	"github.com/nats-io/go-nats"
 )
 
+// GetFiles will get the files from Nats and return them
+func (fw *FlotillaWeb) GetFiles(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("Gettin Files!")
+	fileRequest, err := FS.NewFileAction(FS.FileAction_GetFileStructure, "")
+	if err != nil {
+		w.Write([]byte("Error"))
+		fmt.Printf("Error: %v\n", err)
+		return
+	}
+
+	msg, err := FS.SendAction(fw.Nats, 5*time.Second, fileRequest)
+	if err != nil {
+		w.Write([]byte("Error"))
+		fmt.Printf("Error: %v\n", err)
+		return
+	}
+
+	w.Write(msg.Data)
+}
+
 // SelectFile will take in a file object and select it on Nats
 func (fw *FlotillaWeb) SelectFile(w http.ResponseWriter, req *http.Request) {
 	body, err := ioutil.ReadAll(req.Body)
