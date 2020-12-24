@@ -2,6 +2,7 @@ package api
 
 import (
 	"fmt"
+	"io/ioutil"
 	"net/http"
 
 	"github.com/gorilla/websocket"
@@ -19,7 +20,6 @@ func (fw *FlotillaWeb) setupWebSocket() {
 	fw.wsRead = make(chan []byte, 1000)
 	fw.wsWrite = make(chan []byte, 1000)
 
-	go fw.websocketReader()
 	go fw.websocketWriter()
 
 }
@@ -33,34 +33,29 @@ func (fw *FlotillaWeb) websocketHandler(w http.ResponseWriter, r *http.Request) 
 	}
 
 	fw.websockets = append(fw.websockets, ws)
+	go fw.websocketReadLoop(ws)
 
 }
 
-// function to read and write to the websocket
-func (fw *FlotillaWeb) websocketReader() {
+func (fw *FlotillaWeb) websocketReadLoop(ws *websocket.Conn) {
+	for {
+		mt, reader, err := ws.NextReader()
 
-	for { //ever
-		deleteWS := make([]int, 0)
-		for index, ws := range fw.websockets {
-			mt, mess, err := ws.ReadMessage()
-			if err != nil {
-				fmt.Println("Error with reader!", err)
-				deleteWS = append(deleteWS, index)
-			}
+		if err != nil {
+			ws.Close()
+			return
+		}
 
-			fmt.Println("Got message type of ", mt)
-			fmt.Println("Mess: ", string(mess))
-			fw.wsRead <- mess
+		mess, err := ioutil.ReadAll(reader)
+		if err != nil {
+			fmt.Println("Got Err from attempting to read Message: ", err)
 		}
-		fw.mux.Lock()
-		for offset, val := range deleteWS {
-			fw.websockets = append(fw.websockets[:val-offset],
-				fw.websockets[(val+1)-offset:]...)
-		}
-		fw.mux.Unlock()
+		//Handle Reader
+		fmt.Println("Got message type of ", mt)
+		fmt.Println("Mess: ", string(mess))
+		fw.wsRead <- mess
 
 	}
-
 }
 
 func (fw *FlotillaWeb) websocketWriter() {
