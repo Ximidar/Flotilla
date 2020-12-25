@@ -52,7 +52,8 @@ export default {
             history_pos: -1,
             temp_input: "",
             console_input: "",
-            auto_clear_single: true
+            auto_clear_single: true,
+            console_websocket: null
         }
     },
     methods: {
@@ -104,6 +105,34 @@ export default {
         consolePush: function(item_input){
             // TODO push to flotilla console
             this.console_text.push(item_input.replace(/[\s\n\r]/g, ''))
+            if (this.console_websocket != null) {
+                this.console_websocket.send(item_input)
+            } else {
+                console.log("Warning, websocket is null!")
+            }
+        },
+        consoleReceiveData: function(event){
+            console.log(event)
+        }
+    },
+    created(){
+        var console_vue = this
+        // Connect to WebSocket
+
+        if (console_vue.console_websocket == null) {
+            console.log("Connecting to Websocket!")
+            console_vue.console_websocket = new WebSocket("ws://0.0.0.0:5000/api/ws")
+
+            console_vue.console_websocket.onopen = function(){
+                console_vue.console_websocket.send("Hello!")
+            }
+            console_vue.console_websocket.onmessage = function(evt){
+                console_vue.consoleReceiveData(evt.data)
+            }
+        
+
+        } else {
+            console.log("Websocket Already Connected")
         }
     }
 }

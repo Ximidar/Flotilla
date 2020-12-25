@@ -2,6 +2,7 @@ package api
 
 import (
 	"fmt"
+	"io/ioutil"
 	"net/http"
 
 	CS "github.com/Ximidar/Flotilla/DataStructures/CommStructures"
@@ -66,24 +67,77 @@ func (fw *FlotillaWeb) CommStatus(w http.ResponseWriter, r *http.Request) {
 func (fw *FlotillaWeb) CommOptions(w http.ResponseWriter, r *http.Request) {
 
 	// get ports
-	ports, err := fw.MakeNatsRequest(CS.ListPorts, EMPTY)
+	options, err := fw.MakeNatsRequest(CS.ListOptions, EMPTY)
 	if err != nil {
 		fmt.Println("Error while listing Comm Ports: ", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte("Error"))
 	}
 
-	speeds := []string{"250000", "230400", "115200", "57600", "38400", "19200", "9600"}
+	w.WriteHeader(http.StatusOK)
+	w.Write(options)
 
 }
 
 // CommInit will take in a comm init structure then Connect the Comm. POST function
 func (fw *FlotillaWeb) CommInit(w http.ResponseWriter, r *http.Request) {
 
-	// get message
+	// get the body
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		fmt.Println("Error CommInit: Cannot ReadAll of the Body")
+		fmt.Println(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(err.Error()))
+		return
+	}
 
-	// figure out action
+	// attempt to unmarshal the CommInit
+	commInit := new(CS.InitComm)
+	err = proto.Unmarshal(body, commInit)
+	if err != nil {
+		fmt.Println("CommInit Could not unmarshal Proto!", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(err.Error()))
+		return
+	}
 
-	// do action
+	// send the CommInit out over nats
+	_, err = fw.MakeNatsRequest(CS.InitializeComm, body)
+	if err != nil {
+		fmt.Println("CommInit Could not make Nats Request!", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(err.Error()))
+		return
+	}
 
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("OK"))
+
+}
+
+// CommConnect will make an attempt to connect the comm
+func (fw *FlotillaWeb) CommConnect(w http.ResponseWriter, r *http.Request) {
+	resp, err := fw.MakeNatsRequest(CS.ConnectComm, EMPTY)
+	if err != nil {
+		fmt.Println("CommConnect Could not make Nats Request!", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(err.Error()))
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+	w.Write(resp)
+}
+
+// CommDisconnect will make an attempt to disconnect the comm
+func (fw *FlotillaWeb) CommDisconnect(w http.ResponseWriter, r *http.Request) {
+	resp, err := fw.MakeNatsRequest(CS.DisconnectComm, EMPTY)
+	if err != nil {
+		fmt.Println("CommDisconnect Could not make Nats Request!", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(err.Error()))
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+	w.Write(resp)
 }

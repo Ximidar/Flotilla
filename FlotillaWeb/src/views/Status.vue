@@ -40,9 +40,9 @@
 </template>
 
 <script>
-import { Flotilla } from "@/flotilla"
 import FlotConsole from "@/views/Status/console.vue"
 import FlotControl from "@/views/Status/control/printer_control.vue"
+import flotilla from '@/flotilla'
 
 export default {
   name: 'FlotillaStatus',
@@ -50,6 +50,7 @@ export default {
     FlotConsole,
     FlotControl
   },
+  mixins: [flotilla],
   data(){
     return {
       Status: "No Status!",
@@ -62,7 +63,8 @@ export default {
   },
   methods: {
     GetStatus () {
-      this.Status = this.flot.GetStatus().then( (status) =>{
+      
+      this.flotGetStatus().then( (status) =>{
         if (!status){
           this.Status = "Idle"
           return
@@ -72,46 +74,14 @@ export default {
      
     },
     PostStatus () {
-      this.flot.PostAction("Pause")
+      this.flotPostAction("Pause")
     },
     SendCancel () {
-      this.flot.PostAction("Cancel")
-    },
-    NewLineToComm (line){
-    //   this.CommOut.push(line)
-    //   if (this.CommOut.length >= 200){
-    //     var cut_point = this.CommOut.length - 200
-    //     this.CommOut = this.CommOut.slice(cut_point)
-    //   }
-    //   var comm_wrapper = this.$el.querySelector("#comm-wrapper")
-    //   comm_wrapper.scrollTop = comm_wrapper.scrollHeight
-    },
-    WS_Select (action){
-      switch(action){
-        case "NewStatus":
-          this.GetStatus()
-          break
-        default:
-          this.NewLineToComm(action)
-          break
-      }
+      this.flotPostAction("Cancel")
     }
   },
   created(){
-    var status_vue = this
-    // Connect to WebSocket
-    var ws = new WebSocket("ws://0.0.0.0:5000/api/ws")
-    ws.onopen = function(){
-      ws.send("Hello!")
-    }
-    ws.onmessage = function(evt){
-      status_vue.WS_Select(evt.data)
-    }
-
-    // Setup flot
-    this.flot = new Flotilla()
     this.GetStatus()
-
   }
 }
 </script>

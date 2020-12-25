@@ -111,6 +111,13 @@ func (fw *FlotillaWeb) setupRouter() {
 	fw.r.HandleFunc("/api/status", fw.GetStatus).Methods("GET")
 	fw.r.HandleFunc("/api/status", fw.ChangeStatus).Methods("POST")
 
+	// Comm
+	fw.r.HandleFunc("/api/comm/options", fw.CommOptions).Methods("GET")
+	fw.r.HandleFunc("/api/comm/status", fw.CommStatus).Methods("GET")
+	fw.r.HandleFunc("/api/comm/init", fw.CommInit).Methods("POST")
+	fw.r.HandleFunc("/api/comm/connect", fw.CommConnect).Methods("GET")
+	fw.r.HandleFunc("/api/comm/disconnect", fw.CommDisconnect).Methods("GET")
+
 	// WebSockets
 	fw.r.HandleFunc("/api/ws", fw.websocketHandler)
 

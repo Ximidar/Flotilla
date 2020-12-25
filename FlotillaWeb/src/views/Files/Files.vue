@@ -31,7 +31,7 @@ import FileInfo from '@/views/Files/FileInfo'
 import ArrowLeft from '@/assets/svg/solid/arrow-left.svg'
 import Vue from 'vue'
 import { isNullOrUndefined } from 'util'
-import { Flotilla } from "@/flotilla"
+import flotilla from "@/flotilla"
 
 export default {
   name: 'FlotillaFiles',
@@ -40,6 +40,7 @@ export default {
     FileInfo,
     ArrowLeft
   },
+  mixins: [flotilla],
   data(){
     return{
       RootFS: {},
@@ -63,9 +64,8 @@ export default {
     }
   },
   RequestFiles: function(){
-    console.log(Flotilla)
-    var flot = new Flotilla()
-    flot.GetFiles().then( (files) => {
+    
+    this.flotGetFiles().then( (files) => {
       this.RootFS = files
       this.SwitchTo(this.RootFS)
     })
