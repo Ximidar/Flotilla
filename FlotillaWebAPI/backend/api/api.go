@@ -34,7 +34,9 @@ func Serve(port int, directory string) {
 	//Make CORS
 	headersOK := handlers.AllowedHeaders([]string{"Accept",
 		"Content-Type",
+		"content-type",
 		"Content-Length",
+		"content-length",
 		"Accept-Encoding",
 		"X-CSRF-Token",
 		"Authorization",

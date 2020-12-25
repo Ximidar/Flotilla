@@ -38,12 +38,15 @@
 <script>
 import ConsoleItem from "@/views/Status/console_item.vue"
 import PConsole from "@/views/Status/printer_connection.vue"
+import flotilla from '@/flotilla'
+
 export default {
     name: 'console',
     components: {
         ConsoleItem,
         PConsole,
     },
+    mixins: [flotilla],
     data(){
         return{
             connected: false,
@@ -112,7 +115,7 @@ export default {
             }
         },
         consoleReceiveData: function(event){
-            console.log(event)
+            this.consolePush(event)
         }
     },
     created(){
@@ -134,6 +137,15 @@ export default {
         } else {
             console.log("Websocket Already Connected")
         }
+
+        // let ci = this.flotCreateCommInit("/dev/fakeprinter", 115200)
+        // console.log(ci)
+        // this.flotSendCommInit(ci).then( reply =>{
+        //     this.flotCommConnect().then( reply =>{
+        //         console.log("Check if we are connected!")
+        //     })
+        // })
+        
     }
 }
 </script>

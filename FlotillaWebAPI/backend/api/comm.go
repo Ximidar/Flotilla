@@ -37,10 +37,16 @@ func (fw *FlotillaWeb) ReceivedComm(commMsg string) {
 		select {
 		case mess := <-fw.wsRead:
 			fmt.Println("Got Message from WebSocket!", string(mess))
-			// cm := new(CS.CommMessage)
-			// cm.Message = string(mess)
+			cm := new(CS.CommMessage)
+			cm.Message = string(mess)
 
-			//TODO send message back to Comm
+			cmProto, err := proto.Marshal(cm)
+			if err != nil {
+				fmt.Println("ReceivedComm Could not package: ", mess)
+				continue
+			}
+
+			_, err = fw.MakeNatsRequest(CS.WriteComm, cmProto)
 		}
 	}
 }
@@ -102,7 +108,7 @@ func (fw *FlotillaWeb) CommInit(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// send the CommInit out over nats
+	//send the CommInit out over nats
 	_, err = fw.MakeNatsRequest(CS.InitializeComm, body)
 	if err != nil {
 		fmt.Println("CommInit Could not make Nats Request!", err)

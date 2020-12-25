@@ -39,7 +39,7 @@ func (fw *FlotillaWeb) websocketHandler(w http.ResponseWriter, r *http.Request) 
 
 func (fw *FlotillaWeb) websocketReadLoop(ws *websocket.Conn) {
 	for {
-		mt, reader, err := ws.NextReader()
+		_, reader, err := ws.NextReader()
 
 		if err != nil {
 			ws.Close()
@@ -51,8 +51,6 @@ func (fw *FlotillaWeb) websocketReadLoop(ws *websocket.Conn) {
 			fmt.Println("Got Err from attempting to read Message: ", err)
 		}
 		//Handle Reader
-		fmt.Println("Got message type of ", mt)
-		fmt.Println("Mess: ", string(mess))
 		fw.wsRead <- mess
 
 	}

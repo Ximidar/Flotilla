@@ -1,6 +1,7 @@
 const axios = require("axios")
 import { FileStructures } from './js_proto/FileStructures_pb.js'
 import { PlayStructures } from './js_proto/action_pb.js'
+import { CommStructures } from './js_proto/CommStructures_pb.js'
 import { BufferReader } from 'protobufjs'
 
 //const base = "0.0.0.0:5000"
@@ -92,8 +93,76 @@ export default {
                 })
     
             // we will have played a file!
-        }
+        },
 
         // Comm
+        flotGetCommOptions: async function(){
+            let url = "http://" + this.base + "/api/comm/options"
+            let req = axios.request({
+                responseType: 'blob',
+                url: url,
+                method: 'get'
+            })
+
+            let ab = await req
+            let buf = await ab.data.arrayBuffer()
+            let transbuf = new Uint8Array(buf)
+            let commOptions = await CommStructures.CommOptions.decode(transbuf)
+            return commOptions
+
+        },
+        flotCreateCommInit: function(port, baud){
+            let InitComm = CommStructures.InitComm.create({
+                port: port,
+                baud: baud
+            })
+            return InitComm
+        },
+        flotSendCommInit: async function(commInit){
+            let url = "http://" + this.base + "/api/comm/init"
+            let ci = CommStructures.InitComm.encode(commInit).finish()
+            axios.request({ responseType: 'blob',
+                            url: url,
+                            data: Buffer.from(ci),
+                            headers: { "content-type": "application/octet-stream"},
+                            method: 'post'
+            }).then(response => {
+                console.log(response)
+                return response
+            }).catch(err => {
+                console.log(err)
+                return err
+            })
+
+        },
+        flotCommConnect: async function(){
+            let url = "http://" + this.base + "/api/comm/connect"
+            axios.request({
+                responseType: 'blob',
+                url: url,
+                method: 'get'
+            }).then(response =>{
+                console.log(response)
+                return response
+            }).catch(err =>{
+                console.log(err)
+                return err
+            })
+
+        },
+        flotCommDisconnect: async function(){
+            let url = "http://" + this.base + "/api/comm/disconnect"
+            axios.request({
+                responseType: 'blob',
+                url: url,
+                method: 'get'
+            }).then(response =>{
+                console.log(response)
+                return response
+            }).catch(err =>{
+                console.log(err)
+                return err
+            })
+        }
     }
 }

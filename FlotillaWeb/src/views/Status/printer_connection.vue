@@ -32,6 +32,8 @@
 </template>
 
 <script>
+import flotilla from '@/flotilla'
+
 export default {
     data() {
         return{
@@ -40,6 +42,20 @@ export default {
             baudRate: ["115200", "250000"],
 
         }
+    },
+    mixins: [flotilla],
+    created(){
+        this.flotGetCommOptions().then( commOptions =>{
+            this.connections = []
+            commOptions.ports.ports.forEach(port =>{
+                this.connections.push(port.address)
+            })
+
+            this.baudRate = []
+            commOptions.bauds.bauds.forEach(baud =>{
+                this.baudRate.push(baud.speed)
+            })
+        })
     }
 }
 </script>
