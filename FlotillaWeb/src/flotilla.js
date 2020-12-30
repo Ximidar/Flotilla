@@ -94,6 +94,19 @@ export default {
     
             // we will have played a file!
         },
+        flotUploadFile: async function(fileInfo, uploadDir) {
+            console.log(fileInfo)
+            console.log(uploadDir)
+            let url = "http://" + this.base + "/api/file"
+
+            let formData = new FormData()
+            formData.append("file", fileInfo)
+            axios.post(url, formData, {
+                headers: {
+                  'Content-Type': 'multipart/form-data'
+                }
+            })
+        },
 
         // Comm
         flotGetCommOptions: async function(){

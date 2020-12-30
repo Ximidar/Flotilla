@@ -6,10 +6,10 @@
       </v-btn>
       <v-toolbar-title class="px-3" >{{ FileList.CurrentFL.Path }}</v-toolbar-title>
       <v-spacer></v-spacer>
-      <v-btn icon>
+      <v-btn @click="uploadFile" icon>
         <v-icon>$vuetify.icons.solid_plus</v-icon>
       </v-btn>
-      <v-btn icon>
+      <v-btn @click="newFolder" icon>
         <v-icon>$vuetify.icons.solid_folder_plus</v-icon>
       </v-btn>
       <v-btn icon>
@@ -22,12 +22,14 @@
             @clicked="ClickFile">
           </FileItem>
     </v-container>
+    <FileUploadOverlay v-model="viewFileUpload" />
   </v-container>
 </template>
 
 <script>
 import FileItem from '@/views/Files/FileItem'
 import FileInfo from '@/views/Files/FileInfo'
+import FileUploadOverlay from '@/views/Files/FileUpload'
 import ArrowLeft from '@/assets/svg/solid/arrow-left.svg'
 import Vue from 'vue'
 import { isNullOrUndefined } from 'util'
@@ -38,6 +40,7 @@ export default {
   components:{
     FileItem,
     FileInfo,
+    FileUploadOverlay,
     ArrowLeft
   },
   mixins: [flotilla],
@@ -49,7 +52,10 @@ export default {
         PreviousFL: null,
       },
       Contents: [],
-      SelectedFile: {}
+      SelectedFile: {},
+
+      // file upload
+      viewFileUpload: false
     }
   },
   
@@ -95,6 +101,14 @@ export default {
     for (var file in this.FileList.CurrentFL.Contents){
       this.Contents.push(this.FileList.CurrentFL.Contents[file])
     }
+  },
+  newFolder: function() {
+    // Add folder to current directory
+    console.log("New Folder Button Pushed!")
+  },
+  uploadFile: function() {
+    console.log("upload file button has been pushed!")
+    this.viewFileUpload = true
   }
 },
 created(){

@@ -143,7 +143,7 @@ func (fw *FlotillaWeb) UploadFile(w http.ResponseWriter, req *http.Request) {
 	fmt.Printf("Received file with name %s and size %v\n", header.Filename, header.Size)
 	// TODO reject any unapproved file types
 
-	tfile, err := os.OpenFile(fmt.Sprintf("/etc/flotilla/gcode/%s", header.Filename), os.O_WRONLY|os.O_CREATE, 0666)
+	tfile, err := os.OpenFile(fmt.Sprintf("/home/ximidar/gcode/%s", header.Filename), os.O_WRONLY|os.O_CREATE, 0666)
 	if err != nil {
 		// return a failure
 		fmt.Println("Error UploadFile: Could not create temp file")
