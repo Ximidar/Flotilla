@@ -19,6 +19,8 @@ func (fw *FlotillaWeb) setupCommRelay() {
 	if err != nil {
 		fmt.Println("Could not subscribe to ", CS.WriteLine, err)
 	}
+
+	go fw.ReceivedComm()
 }
 
 // CommRelay will receive COMM messages from NATS
@@ -32,7 +34,7 @@ func (fw *FlotillaWeb) CommRelay(msg *nats.Msg) {
 }
 
 // ReceivedComm will monitor for new messages from the websocket
-func (fw *FlotillaWeb) ReceivedComm(commMsg string) {
+func (fw *FlotillaWeb) ReceivedComm() {
 	for {
 		select {
 		case mess := <-fw.wsRead:

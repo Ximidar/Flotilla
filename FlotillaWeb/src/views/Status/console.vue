@@ -50,7 +50,7 @@ export default {
     data(){
         return{
             connected: false,
-            console_text: ["line1", "line2", "line3"],
+            console_text: [],
             console_history: [],
             history_pos: -1,
             temp_input: "",
@@ -61,21 +61,21 @@ export default {
     },
     methods: {
         onEnter: function(input){
-            console.log("got input!")
-            console.log(input)
+            // console.log("got input!")
+            // console.log(input)
             switch(input.key) {
                 case "Enter": {
-                    console.log("Got Enter")
-                    console.log(this.console_input)
+                    // console.log("Got Enter")
+                    // console.log(this.console_input)
                     this.historyPush(this.console_input)
-                    this.consolePush(this.console_input)
+                    this.consoleWriteData(this.console_input)
                     this.console_input = ""
                     this.history_pos = this.console_history.length
 
                 }
                 break;
                 case "ArrowUp": {
-                    console.log("arrow up")
+                    // console.log("arrow up")
                     this.history_pos--
                     if(this.history_pos < 0){
                         this.history_pos = -1
@@ -89,7 +89,7 @@ export default {
                 }
                 break;
                 case "ArrowDown": {
-                    console.log("arrow down")
+                    // console.log("arrow down")
                     this.history_pos++
                     if (this.history_pos >= this.console_history.length){
                         this.history_pos = this.console_history.length
@@ -108,14 +108,17 @@ export default {
         consolePush: function(item_input){
             // TODO push to flotilla console
             this.console_text.push(item_input.replace(/[\s\n\r]/g, ''))
-            if (this.console_websocket != null) {
-                this.console_websocket.send(item_input)
-            } else {
-                console.log("Warning, websocket is null!")
-            }
+            
         },
         consoleReceiveData: function(event){
             this.consolePush(event)
+        },
+        consoleWriteData: function(data) {
+            if (this.console_websocket != null) {
+                this.console_websocket.send(data)
+            } else {
+                console.log("Warning, websocket is null!")
+            }
         }
     },
     created(){
@@ -137,14 +140,6 @@ export default {
         } else {
             console.log("Websocket Already Connected")
         }
-
-        // let ci = this.flotCreateCommInit("/dev/fakeprinter", 115200)
-        // console.log(ci)
-        // this.flotSendCommInit(ci).then( reply =>{
-        //     this.flotCommConnect().then( reply =>{
-        //         console.log("Check if we are connected!")
-        //     })
-        // })
         
     }
 }

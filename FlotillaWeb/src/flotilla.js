@@ -111,6 +111,21 @@ export default {
             return commOptions
 
         },
+        flotGetCommStatus: async function() {
+            let url = "http://" + this.base + "/api/comm/status"
+            let req = axios.request({
+                responseType: 'blob',
+                url: url,
+                method: 'get'
+            })
+
+            let ab = await req
+            let buf = await ab.data.arrayBuffer()
+            let transbuf = new Uint8Array(buf)
+            let commStatus = await CommStructures.CommStatus.decode(transbuf)
+            return commStatus
+
+        },
         flotCreateCommInit: function(port, baud){
             let InitComm = CommStructures.InitComm.create({
                 port: port,
@@ -142,10 +157,10 @@ export default {
                 url: url,
                 method: 'get'
             }).then(response =>{
-                console.log(response)
+                // console.log(response)
                 return response
             }).catch(err =>{
-                console.log(err)
+                // console.log(err)
                 return err
             })
 
@@ -157,10 +172,10 @@ export default {
                 url: url,
                 method: 'get'
             }).then(response =>{
-                console.log(response)
+                // console.log(response)
                 return response
             }).catch(err =>{
-                console.log(err)
+                // console.log(err)
                 return err
             })
         }

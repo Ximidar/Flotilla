@@ -42,6 +42,7 @@ func (fw *FlotillaWeb) websocketReadLoop(ws *websocket.Conn) {
 		_, reader, err := ws.NextReader()
 
 		if err != nil {
+			fmt.Println("Got Error while trying to read ws: ", err)
 			ws.Close()
 			return
 		}
