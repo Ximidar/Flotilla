@@ -1,5 +1,5 @@
 <template>
-    <v-expansion-panel>
+    <v-expansion-panel @click="ClickEvent">
         <v-expansion-panel-header class="pa-0 ma-0">
             <v-hover v-slot:default="{ hover }">
                 <v-toolbar class="toolbar-override" rounded='lg' :elevation="hover ? 12 : 5" :color="hover ? 'secondary' : 'primary'">

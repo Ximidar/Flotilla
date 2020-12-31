@@ -12,6 +12,9 @@
     </v-system-bar>
     <v-tabs>
       <v-tab
+        href="#tab-flot-overview"
+      >Overview</v-tab>
+      <v-tab
         href="#tab-flot-console"
       >Console</v-tab>
       <v-tab
@@ -35,6 +38,11 @@
       >
         <FlotControl/>
       </v-tab-item>
+      <v-tab-item
+        value="tab-flot-overview"
+      >
+        <FlotOverview/>
+      </v-tab-item>
     </v-tabs>
   </v-container>
 </template>
@@ -42,13 +50,15 @@
 <script>
 import FlotConsole from "@/views/Status/console.vue"
 import FlotControl from "@/views/Status/control/printer_control.vue"
+import FlotOverview from "@/views/Status/overview/overview"
 import flotilla from '@/flotilla'
 
 export default {
   name: 'FlotillaStatus',
   components: {
     FlotConsole,
-    FlotControl
+    FlotControl,
+    FlotOverview
   },
   mixins: [flotilla],
   data(){

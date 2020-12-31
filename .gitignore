@@ -18,6 +18,7 @@ bin
 *.wasm
 FlotillaWeb/FlotillaWeb
 Flotilla_CLI/Flotilla_CLI
+FlotillaWebAPI/FlotillaWebAPI
 
 
 # Test binary, build with `go test -c`
