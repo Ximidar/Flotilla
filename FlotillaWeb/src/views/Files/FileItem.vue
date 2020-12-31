@@ -1,10 +1,8 @@
 <template>
-    <v-container>
-    <v-expansion-panels>
-    <v-expansion-panel >
-        <v-expansion-panel-header>
-            <v-hover  v-slot:default="{ hover }">
-                <v-toolbar :elevation="hover ? 12 : 5" :color="hover ? 'secondary' : 'primary'">
+    <v-expansion-panel>
+        <v-expansion-panel-header class="pa-0 ma-0">
+            <v-hover v-slot:default="{ hover }">
+                <v-toolbar class="toolbar-override" rounded='lg' :elevation="hover ? 12 : 5" :color="hover ? 'secondary' : 'primary'">
                     <v-icon v-if="File.FileType === 'file'">$vuetify.icons.solid_file</v-icon>
                     <v-icon v-else>$vuetify.icons.solid_folder</v-icon>
                     <v-toolbar-title class="pl-5" >{{File.Name}}</v-toolbar-title>
@@ -16,11 +14,16 @@
                 </v-toolbar>
             </v-hover>
         </v-expansion-panel-header>
-        <v-expansion-panel-content>
+        <v-expansion-panel-content class="pa-0 pt-3 ma-0">
             <v-row v-if="File.FileType === 'file'">
                 <v-btn v-on:click.native="SnackShow">
                     <v-icon class="pr-1">$vuetify.icons.regular_play_circle</v-icon>
                     <span>Play</span>
+                    <v-snackbar v-model="snackbar"
+                            centered
+                            timeout="4000"
+                            color="secondary"
+                    >{{ snackbar_text }}</v-snackbar>
                 </v-btn>
                 <v-spacer></v-spacer>
                 <v-btn>
@@ -34,13 +37,6 @@
             </v-row>
         </v-expansion-panel-content>
     </v-expansion-panel>
-    </v-expansion-panels>
-    <v-snackbar v-model="snackbar"
-                centered
-                timeout="4000"
-                color="secondary"
-        >{{ snackbar_text }}</v-snackbar>
-    </v-container>
 </template>
 
 <script>
@@ -109,14 +105,6 @@ hover:hover{
     opacity: 0.75;
 }
 
-li{
-  min-height: 50px;
-  max-height: 50px;
-  width: 100%;
-  margin: 0 0 5px 0;
-  text-align: left;
-  cursor: default;
-}
 
 .iconsize{
   width: 25px;
@@ -127,12 +115,6 @@ li{
   display:inline-block;
 }
 
-.file-details{
-    display:inline-block;
-    transform: translate(0%, -20%);
-    padding-right: 10px;
-    
-}
 .name{
     color: #859900;
     

@@ -16,12 +16,12 @@
         <v-icon>$vuetify.icons.solid_ellipsis_h</v-icon>
       </v-btn>
     </v-toolbar>
-    <v-container>
+    <v-expansion-panels>
           <FileItem v-for="file in Contents" v-bind:key="file.Path"
             :File=file
             @clicked="ClickFile">
           </FileItem>
-    </v-container>
+    </v-expansion-panels>
     <FileUploadOverlay v-model="viewFileUpload" />
   </v-container>
 </template>
