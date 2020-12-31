@@ -16,7 +16,7 @@
         </v-expansion-panel-header>
         <v-expansion-panel-content class="pa-0 pt-3 ma-0">
             <v-row v-if="File.FileType === 'file'">
-                <v-btn v-on:click.native="SnackShow">
+                <v-btn @click="playFile">
                     <v-icon class="pr-1">$vuetify.icons.regular_play_circle</v-icon>
                     <span>Play</span>
                     <v-snackbar v-model="snackbar"
@@ -40,6 +40,7 @@
 </template>
 
 <script>
+import flotilla from "@/flotilla"
 export default {
     name: 'FileItem',
     props:{
@@ -48,6 +49,7 @@ export default {
             default: {}
         }
     },
+    mixins: [flotilla],
     data: function() {
         return {
             ReadableSize: this.HumanReadable(this.File.Size),
@@ -82,9 +84,15 @@ export default {
         ClickEvent: function() {
             this.$emit('clicked', this.File)
         },
-        SnackShow: function() {
-            console.log("Showing Snackbar")
+        playFile: function() {
             this.snackbar = true
+            this.flotSelectFile(this.File).then( response=>{
+                console.log(response)
+                // play file after it is selected
+                this.flotPostAction("Play")
+                console.log("Sent Play")
+            })
+
         }
     },
     watch: {
