@@ -20,8 +20,13 @@ export default {
                                     url: url,
                                     method: 'get'
                 })
+
             let ab = await req
             let data = await ab.data
+
+            if (!data){
+                return "Idle"
+            }
             return data
         },
 

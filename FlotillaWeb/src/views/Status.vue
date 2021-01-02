@@ -63,31 +63,16 @@ export default {
   mixins: [flotilla],
   data(){
     return {
-      Status: "No Status!",
-      PauseButtonText: "Not Playing",
-      Pause: "Pause",
-      Resume: "Resume",
-      Cancel: "Cancel",
-      CommOut: ["Hello!", "aloha", "comprender"]
+      Status: "No Status!"
     }
   },
   methods: {
     GetStatus () {
       
       this.flotGetStatus().then( (status) =>{
-        if (!status){
-          this.Status = "Idle"
-          return
-        }
         this.Status = status
       })
      
-    },
-    PostStatus () {
-      this.flotPostAction("Pause")
-    },
-    SendCancel () {
-      this.flotPostAction("Cancel")
     }
   },
   created(){
