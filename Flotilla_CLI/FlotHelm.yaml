@@ -20,7 +20,7 @@ fakeprinter:
   container: true
   container_name: "FakePrinter"
   image: flotilla-fake-printer:latest
-  dockerfile: ./BuildResources/Test/FakeSerialDevice/dockerfile
+  dockerfile: ../BuildResources/Test/FakeSerialDevice/dockerfile
   args:
     - "-v"
     - "/dev:/dev"

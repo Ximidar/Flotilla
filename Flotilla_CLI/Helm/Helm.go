@@ -42,10 +42,11 @@ func StartHelm(confPath string) {
 	}
 
 	// Parse Configuration into exec rules
-	ParseConfig()
+	rules := ParseConfig()
 
 	// Execute Rules
-
+	Executor := NewExecutor(rules)
+	Executor.Start()
 }
 
 func FindConfiguration() (string, error) {
@@ -79,12 +80,20 @@ func ConfigureHelm(confPath string) error {
 	return viper.ReadInConfig()
 }
 
-func ParseConfig() {
+func ParseConfig() []*ExecRule {
+	// get top level keys
 	tlk := GetTopLevelKeys()
 
+	// give the tlk to a constructor which will make
+	// exec rules for each key
+
+	rules := make([]*ExecRule, 0)
 	for _, key := range tlk {
-		fmt.Println(key)
+		rule := ExecRuleCreator(key)
+		rules = append(rules, rule)
 	}
+
+	return rules
 
 }
 
