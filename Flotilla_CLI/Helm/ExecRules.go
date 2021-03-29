@@ -1,12 +1,23 @@
 package Helm
 
 import (
+	"bufio"
+	"context"
+	"errors"
 	"fmt"
+	"io"
 	"os"
+	"os/exec"
 	"path"
 
+	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/client"
+	"github.com/docker/docker/pkg/archive"
 	"github.com/spf13/viper"
 )
+
+var RuleNotContainer = errors.New("rule is not a container")
+var NoContainerImage = errors.New("no container image")
 
 type ExecRule struct {
 	Name           string
@@ -37,6 +48,9 @@ func ExecRuleCreator(TopLevelKey string) *ExecRule {
 	image := viper.GetString(fmt.Sprintf("%s.image", TopLevelKey))
 	dockerfile := viper.GetString(fmt.Sprintf("%s.dockerfile", TopLevelKey))
 
+	fmt.Printf("Command: %s\nArgs: %s\nWorkDir: %s\nBuild: %s\nContainer: %t\nContainerName: %s\nImage: %s\nDockerFile: %s\n",
+		command, args, workDir, build, container, containerName, image, dockerfile)
+
 	// Parse Paths
 	pwd, err := os.Getwd()
 	if err != nil {
@@ -47,7 +61,7 @@ func ExecRuleCreator(TopLevelKey string) *ExecRule {
 	workDir = path.Join(pwd, workDir)
 	workDir = path.Clean(workDir)
 
-	if container {
+	if container && dockerfile != "" {
 		dockerfile = path.Join(pwd, dockerfile)
 		dockerfile = path.Clean(dockerfile)
 	}
@@ -72,6 +86,7 @@ func ExecRuleCreator(TopLevelKey string) *ExecRule {
 		)
 	}
 
+	fmt.Println(exec.String())
 	return exec
 }
 
@@ -90,6 +105,7 @@ func NewExecContainerRule(Name string, Args []string, ContainerName string, Imag
 	rule := new(ExecRule)
 	rule.Name = Name
 	rule.Args = Args
+	rule.Container = true
 	rule.ContainerName = ContainerName
 	rule.ContainerImage = Image
 	rule.Dockerfile = Dockerfile
@@ -97,8 +113,17 @@ func NewExecContainerRule(Name string, Args []string, ContainerName string, Imag
 	return rule
 }
 
+func (rule *ExecRule) String() string {
+	return fmt.Sprintf("Command: %s\nArgs: %s\nWorkDir: %s\nBuild: %s\nContainer: %t\nContainerName: %s\nImage: %s\nDockerFile: %s\n",
+		rule.Command, rule.Args, rule.WorkDir, rule.Build, rule.Container, rule.ContainerName, rule.ContainerImage, rule.Dockerfile)
+}
+
 // Start will begin execution of the rule
 func (rule *ExecRule) Start() error {
+	err := rule.BuildRule()
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -108,9 +133,123 @@ func (rule *ExecRule) Stop(force bool) error {
 }
 
 func (rule *ExecRule) BuildRule() error {
-	if !rule.Container {
+	if rule.Container {
+		return rule.BuildContainerRule()
+	}
+	err := rule.RunCommand(
+		rule.Build,
+		[]string{},
+		rule.WorkDir,
+	)
+	if err != nil {
+		fmt.Println("Could not build", rule.Name)
+		return err
+	}
+	return nil
 
+}
+
+func (rule *ExecRule) BuildContainerRule() error {
+	if !rule.Container {
+		return RuleNotContainer
 	}
 
+	if rule.Dockerfile == "" {
+		rule.LogChannel <- "No Dockerfile, Attempting to pull"
+		return rule.PullContainer()
+	}
+
+	cli, err := client.NewClientWithOpts()
+	if err != nil {
+		return err
+	}
+
+	// create build config
+	config := types.ImageBuildOptions{
+		Dockerfile: "Dockerfile",
+		Tags:       []string{fmt.Sprintf("flot/%s:latest", rule.Name)},
+		Remove:     true,
+	}
+
+	// archive the folder
+	if rule.WorkDir == "" {
+		rule.WorkDir = path.Base(rule.Dockerfile)
+	}
+	archive, _ := archive.TarWithOptions(
+		rule.WorkDir,
+		&archive.TarOptions{},
+	)
+
+	// make the context
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	// build the image
+	build, err := cli.ImageBuild(ctx, archive, config)
+	if err != nil {
+		rule.LogChannel <- fmt.Sprintf("Image Build Failed for %s Err: %s\n", rule.Name, err)
+		return err
+	}
+
+	defer build.Body.Close()
+
+	rule.ScanReader(build.Body)
+
 	return nil
+}
+
+func (rule *ExecRule) PullContainer() error {
+	if !rule.Container {
+		return RuleNotContainer
+	}
+
+	if rule.ContainerImage == "" {
+		rule.LogChannel <- "No container image name to pull"
+		return NoContainerImage
+	}
+
+	// client
+	cli, err := client.NewClientWithOpts()
+	if err != nil {
+		return err
+	}
+
+	// make the context
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	// pull the image
+	log, err := cli.ImagePull(ctx, rule.ContainerImage, types.ImagePullOptions{})
+	if err != nil {
+		rule.LogChannel <- fmt.Sprintf("Cannot Pull Image %s", rule.ContainerImage)
+	}
+	defer log.Close()
+
+	rule.ScanReader(log)
+
+	return nil
+}
+
+func (rule *ExecRule) ScanReader(reader io.Reader) {
+	scanner := bufio.NewScanner(reader)
+	for scanner.Scan() {
+		rule.LogChannel <- scanner.Text()
+	}
+}
+
+func (rule *ExecRule) RunCommand(command string, args []string, workDir string) error {
+	cmd := exec.Command(command, args...)
+	cmd.Dir = workDir
+
+	// get stdout
+	outPipe, _ := cmd.StdoutPipe()
+	go rule.ScanReader(outPipe)
+
+	// get stderr
+	errPipe, _ := cmd.StderrPipe()
+	go rule.ScanReader(errPipe)
+
+	cmd.Start()
+	err := cmd.Wait()
+	return err
 }

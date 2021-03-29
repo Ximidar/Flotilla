@@ -1,29 +1,29 @@
-commango:
-  command: "bin/Commango"
-  path: "../Commango/"
-  build: "make"
-  container: false
+# commango:
+#   command: "bin/Commango"
+#   path: "../Commango/"
+#   build: "make"
+#   container: false
 
-flotillastatus:
-  container: true
-  container_name: "FlotillaStatus"
-  image: flotilla-status:latest
-  dockerfile: "../FlotillaStatus/dockerfile"
+# flotillastatus:
+#   container: true
+#   container_name: "FlotillaStatus"
+#   image: flotilla-status:latest
+#   dockerfile: "../FlotillaStatus/dockerfile"
 
-filemanager:
-  container: true
-  container_name: "FlotillaFileManager"
-  image: flotilla-file-manager:latest
-  dockerfile: "../Flotilla_File_Manager/dockerfile"
+# filemanager:
+#   container: true
+#   container_name: "FlotillaFileManager"
+#   image: flotilla-file-manager:latest
+#   dockerfile: "../Flotilla_File_Manager/dockerfile"
 
-fakeprinter:
-  container: true
-  container_name: "FakePrinter"
-  image: flotilla-fake-printer:latest
-  dockerfile: ../BuildResources/Test/FakeSerialDevice/dockerfile
-  args:
-    - "-v"
-    - "/dev:/dev"
+# fakeprinter:
+#   container: true
+#   container_name: "FakePrinter"
+#   image: flotilla-fake-printer:latest
+#   dockerfile: ../BuildResources/Test/FakeSerialDevice/dockerfile
+#   args:
+#     - "-v"
+#     - "/dev:/dev"
 
 nats:
   container: true

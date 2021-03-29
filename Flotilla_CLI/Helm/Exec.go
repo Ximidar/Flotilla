@@ -20,33 +20,33 @@ type Executor struct {
 func NewExecutor(rules []*ExecRule) *Executor {
 	exec := new(Executor)
 	exec.Rules = rules
-	exec.LogChan = make(chan string, 100)
+	exec.LogChan = make(chan string, 1000)
 	return exec
 }
 
 func (exec *Executor) Start() error {
-
+	go exec.LogMon()
 	for _, rule := range exec.Rules {
-
-		go exec.LogMon(rule.LogChannel)
-		go rule.Start()
+		// Give all the rules a single channel to output to
+		fmt.Println("Attempting to start:", rule.Name)
+		rule.LogChannel = exec.LogChan
+		rule.Start()
 
 	}
 
 	// Monitor for exit signal
-	stop := make(chan os.Signal, 10)
-	signal.Notify(stop)
-	for {
-		select {
-		case sig := <-stop:
-			fmt.Println("Got Signal:", sig)
-			if sig == syscall.SIGTERM {
-				exec.Stop()
-				fmt.Println("Finished Quitting!")
-				return nil
-			}
-		}
+	stop := make(chan os.Signal, 1)
+	signal.Notify(stop, os.Interrupt, syscall.SIGTERM)
+	for sig := range stop {
+
+		fmt.Println("Got Signal:", sig)
+
+		exec.Stop()
+		fmt.Println("Finished Quitting!")
+		break
+
 	}
+	return nil
 }
 
 func (exec *Executor) Stop() error {
@@ -62,16 +62,16 @@ func (exec *Executor) Stop() error {
 	return nil
 }
 
-func (exec *Executor) LogMon(logChan chan string) {
+func (exec *Executor) LogMon() {
 	escape := make(chan string, 10)
 	exec.StopChan = append(exec.StopChan, escape)
 	for {
 		select {
-		case mess := <-logChan:
-			exec.LogChan <- mess
+		case mess := <-exec.LogChan:
+			fmt.Println(mess)
 		case mess := <-escape:
 			fmt.Println("Escaping Due to", mess)
-			break
+			return
 		}
 	}
 }
