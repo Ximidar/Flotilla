@@ -9,10 +9,15 @@ import (
 	"os"
 	"os/exec"
 	"path"
+	"regexp"
+	"strings"
 
 	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/api/types/mount"
 	"github.com/docker/docker/client"
 	"github.com/docker/docker/pkg/archive"
+	"github.com/docker/go-connections/nat"
 	"github.com/spf13/viper"
 )
 
@@ -26,11 +31,14 @@ type ExecRule struct {
 	WorkDir string
 	Build   string
 
-	Container      bool
-	ContainerName  string
-	ContainerImage string
-	Dockerfile     string
-	ContainerTag   string
+	Container        bool
+	ContainerName    string
+	ContainerImage   string
+	Dockerfile       string
+	ContainerTag     string
+	ContainerVolumes []string
+	ContainerPorts   []string
+	ContainerId      string
 
 	LogChannel  chan string
 	ControlChan chan string
@@ -49,9 +57,11 @@ func ExecRuleCreator(TopLevelKey string) *ExecRule {
 	containerName := viper.GetString(fmt.Sprintf("%s.container_name", TopLevelKey))
 	image := viper.GetString(fmt.Sprintf("%s.image", TopLevelKey))
 	dockerfile := viper.GetString(fmt.Sprintf("%s.dockerfile", TopLevelKey))
+	volumes := viper.GetStringSlice(fmt.Sprintf("%s.volumes", TopLevelKey))
+	ports := viper.GetStringSlice(fmt.Sprintf("%s.ports", TopLevelKey))
 
-	fmt.Printf("Command: %s\nArgs: %s\nWorkDir: %s\nBuild: %s\nContainer: %t\nContainerName: %s\nImage: %s\nDockerFile: %s\n",
-		command, args, workDir, build, container, containerName, image, dockerfile)
+	fmt.Printf("Command: %s\nArgs: %s\nWorkDir: %s\nBuild: %s\nContainer: %t\nContainerName: %s\nImage: %s\nDockerFile: %s\nVolumes: %s\nPorts: %s\n",
+		command, args, workDir, build, container, containerName, image, dockerfile, volumes, ports)
 
 	// Parse Paths
 	pwd, err := os.Getwd()
@@ -68,6 +78,26 @@ func ExecRuleCreator(TopLevelKey string) *ExecRule {
 		dockerfile = path.Clean(dockerfile)
 	}
 
+	// Parse any environment variables in volumes
+	if len(volumes) != 0 {
+		var re = regexp.MustCompile(`(?m)[$]{(\S+)}`)
+		for index, volume := range volumes {
+			newVol := volume
+			for _, match := range re.FindAllStringSubmatch(volume, -1) {
+				val := os.Getenv(match[1])
+				newVol = strings.Replace(newVol, match[0], val, 1)
+			}
+
+			if strings.HasPrefix(newVol, "~/") {
+				homedir, _ := os.UserHomeDir()
+				newVol = strings.Replace(newVol, "~", homedir, 1)
+			}
+
+			volumes[index] = newVol
+
+		}
+	}
+
 	// Create Exec Rule
 	var exec *ExecRule
 	if container {
@@ -77,6 +107,8 @@ func ExecRuleCreator(TopLevelKey string) *ExecRule {
 			containerName,
 			image,
 			dockerfile,
+			volumes,
+			ports,
 		)
 	} else {
 		exec = NewExecRule(
@@ -103,7 +135,8 @@ func NewExecRule(Name string, Command string, Build string, Args []string, WD st
 	return rule
 }
 
-func NewExecContainerRule(Name string, Args []string, ContainerName string, Image string, Dockerfile string) *ExecRule {
+func NewExecContainerRule(Name string, Args []string, ContainerName string, Image string, Dockerfile string,
+	Volumes []string, Ports []string) *ExecRule {
 	rule := new(ExecRule)
 	rule.Name = Name
 	rule.Args = Args
@@ -112,13 +145,15 @@ func NewExecContainerRule(Name string, Args []string, ContainerName string, Imag
 	rule.ContainerImage = Image
 	rule.Dockerfile = Dockerfile
 	rule.ContainerTag = fmt.Sprintf("flot/%s:latest", rule.Name)
+	rule.ContainerVolumes = Volumes
+	rule.ContainerPorts = Ports
 
 	return rule
 }
 
 func (rule *ExecRule) String() string {
-	return fmt.Sprintf("Command: %s\nArgs: %s\nWorkDir: %s\nBuild: %s\nContainer: %t\nContainerName: %s\nImage: %s\nDockerFile: %s\n",
-		rule.Command, rule.Args, rule.WorkDir, rule.Build, rule.Container, rule.ContainerName, rule.ContainerImage, rule.Dockerfile)
+	return fmt.Sprintf("Command: %s\nArgs: %s\nWorkDir: %s\nBuild: %s\nContainer: %t\nContainerName: %s\nImage: %s\nDockerFile: %s\nVolumes: %s\nPorts: %s\n",
+		rule.Command, rule.Args, rule.WorkDir, rule.Build, rule.Container, rule.ContainerName, rule.ContainerImage, rule.Dockerfile, rule.ContainerVolumes, rule.ContainerPorts)
 }
 
 // Start will begin execution of the rule
@@ -233,6 +268,125 @@ func (rule *ExecRule) PullContainer() error {
 	rule.ScanReader(log)
 
 	return nil
+}
+
+func (rule *ExecRule) StartContainer() error {
+	if !rule.Container {
+		return ErrRuleNotContainer
+	}
+
+	// make the context
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	// client
+	cli, err := client.NewClientWithOpts()
+	if err != nil {
+		return err
+	}
+
+	// ports
+	portMap := nat.PortMap{}
+	for _, rawport := range rule.ContainerPorts {
+		prts := strings.Split(rawport, ":")
+		local := prts[0]
+		container := prts[1]
+		protoString, portString := nat.SplitProtoPort(container)
+
+		cport, err := nat.NewPort(protoString, portString)
+		if err != nil {
+			rule.LogChannel <- fmt.Sprintf("Could not create port for %s", rawport)
+			return err
+		}
+
+		entry := []nat.PortBinding{
+			{
+				HostIP:   "0.0.0.0",
+				HostPort: local,
+			},
+		}
+
+		portMap[cport] = entry
+
+	}
+
+	// Volumes (mounts)
+	volumeBind := make([]mount.Mount, 0)
+	for _, volume := range rule.ContainerVolumes {
+		vols := strings.Split(volume, ":")
+		local := vols[0]
+		cont := vols[1]
+		mountPoint := mount.Mount{
+			Source: local,
+			Target: cont,
+		}
+		volumeBind = append(volumeBind, mountPoint)
+	}
+
+	// Config
+	contConfig := container.Config{
+		Image: rule.ContainerImage,
+	}
+
+	hostConfig := container.HostConfig{
+		Mounts:       volumeBind,
+		PortBindings: portMap,
+	}
+
+	container, err := cli.ContainerCreate(
+		ctx,
+		&contConfig,
+		&hostConfig,
+		nil, nil, rule.Name)
+	if err != nil {
+		rule.LogChannel <- fmt.Sprintf("RULE: %s Could not build image. Err: %s", rule.Name, err)
+		return err
+	}
+
+	rule.ContainerId = container.ID
+	rule.LogChannel <- fmt.Sprintf("RULE: %s Created Container ID: %s", rule.ContainerName, rule.ContainerId)
+	return nil
+}
+
+func (rule *ExecRule) ContainerLogger() {
+	if !rule.Container {
+		return
+	}
+	if rule.ContainerId == "" {
+		return
+	}
+
+	logConfig := types.ContainerLogsOptions{
+		ShowStdout: true,
+		ShowStderr: true,
+		Follow:     true,
+		Details:    true,
+	}
+
+	// make the context
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	// client
+	cli, err := client.NewClientWithOpts()
+	if err != nil {
+		rule.LogChannel <- "Cannot form client"
+		rule.LogChannel <- err.Error()
+		return
+	}
+
+	logReader, err := cli.ContainerLogs(ctx, rule.ContainerId, logConfig)
+
+	if err != nil {
+		rule.LogChannel <- "Cannot get logs for container"
+		rule.LogChannel <- err.Error()
+		return
+	}
+
+	defer logReader.Close()
+
+	rule.ScanReader(logReader)
+
 }
 
 func (rule *ExecRule) ScanReader(reader io.Reader) {

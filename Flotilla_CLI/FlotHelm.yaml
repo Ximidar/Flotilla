@@ -15,24 +15,22 @@ filemanager:
   container_name: "FlotillaFileManager"
   image: flotilla-file-manager:latest
   dockerfile: "../Flotilla_File_Manager/dockerfile"
+  volumes:
+    - "/home/${USER}/gcode:/etc/flotilla/gcode"
 
 fakeprinter:
   container: true
   container_name: "FakePrinter"
   image: flotilla-fake-printer:latest
   dockerfile: ../BuildResources/Test/FakeSerialDevice/dockerfile
-  args:
-    - "-v"
+  volumes:
     - "/dev:/dev"
 
 nats:
   container: true
   container_name: "Nats"
   image: 'nats:latest'
-  args:
-    - "-p"
+  ports:
     - "4222:4222"
-    - "-p"
-    - 6222:6222
-    - "-p"
-    - 8222:8222
+    - "6222:6222"
+    - "8222:8222"
