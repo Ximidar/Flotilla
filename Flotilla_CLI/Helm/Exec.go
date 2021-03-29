@@ -26,12 +26,22 @@ func NewExecutor(rules []*ExecRule) *Executor {
 
 func (exec *Executor) Start() error {
 	go exec.LogMon()
+
+	// Build Rules
 	for _, rule := range exec.Rules {
 		// Give all the rules a single channel to output to
-		fmt.Println("Attempting to start:", rule.Name)
+		fmt.Println("Attempting to Build:", rule.Name)
 		rule.LogChannel = exec.LogChan
-		rule.Start()
+		err := rule.BuildRule()
+		if err != nil {
+			return fmt.Errorf("could not start %s Err: %s", rule.Name, err)
+		}
+	}
 
+	// Start Everything!
+	fmt.Println("Starting Flotilla!")
+	for _, rule := range exec.Rules {
+		go rule.Start()
 	}
 
 	// Monitor for exit signal

@@ -11,6 +11,7 @@ import (
 	"path"
 	"regexp"
 	"strings"
+	"time"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
@@ -40,10 +41,9 @@ type ExecRule struct {
 	ContainerPorts   []string
 	ContainerId      string
 
-	LogChannel  chan string
-	ControlChan chan string
+	LogChannel chan string
 
-	Info interface{} // TODO change to whatever the Command Type is
+	Exec *exec.Cmd
 }
 
 func ExecRuleCreator(TopLevelKey string) *ExecRule {
@@ -158,16 +158,26 @@ func (rule *ExecRule) String() string {
 
 // Start will begin execution of the rule
 func (rule *ExecRule) Start() error {
-	err := rule.BuildRule()
-	if err != nil {
-		return err
+	if rule.Container {
+		return rule.StartContainer()
 	}
-	return nil
+
+	err := rule.RunCommand(
+		rule.Command,
+		rule.Args,
+		rule.WorkDir,
+	)
+	return err
 }
 
 // Stop will stop the rule
 func (rule *ExecRule) Stop(force bool) error {
-	return nil
+	if rule.Container {
+		return rule.StopContainer()
+	}
+
+	rule.Exec.Process.Signal(os.Kill)
+	return rule.Exec.Wait()
 }
 
 func (rule *ExecRule) BuildRule() error {
@@ -317,6 +327,7 @@ func (rule *ExecRule) StartContainer() error {
 		local := vols[0]
 		cont := vols[1]
 		mountPoint := mount.Mount{
+			Type:   mount.TypeBind,
 			Source: local,
 			Target: cont,
 		}
@@ -331,6 +342,7 @@ func (rule *ExecRule) StartContainer() error {
 	hostConfig := container.HostConfig{
 		Mounts:       volumeBind,
 		PortBindings: portMap,
+		AutoRemove:   true,
 	}
 
 	container, err := cli.ContainerCreate(
@@ -345,7 +357,45 @@ func (rule *ExecRule) StartContainer() error {
 
 	rule.ContainerId = container.ID
 	rule.LogChannel <- fmt.Sprintf("RULE: %s Created Container ID: %s", rule.ContainerName, rule.ContainerId)
+
+	err = cli.ContainerStart(ctx, rule.ContainerId, types.ContainerStartOptions{})
+	if err != nil {
+		rule.LogChannel <- fmt.Sprintf("RULE: %s Cannot Start Container ID: %s Err: %s", rule.ContainerName, rule.ContainerId, err)
+		return err
+	}
+	rule.ContainerLogger()
 	return nil
+}
+
+func (rule *ExecRule) StopContainer() error {
+	if !rule.Container {
+		return ErrRuleNotContainer
+	}
+
+	// make the context
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	// client
+	cli, err := client.NewClientWithOpts()
+	if err != nil {
+		rule.LogChannel <- fmt.Sprintf("Cannot stop %s Err: %s", rule.Name, err)
+		return err
+	}
+
+	rule.LogChannel <- fmt.Sprintf("Stopping %s", rule.Name)
+	duration, _ := time.ParseDuration("5m")
+	err = cli.ContainerStop(ctx, rule.ContainerId, &duration)
+	if err != nil {
+		rule.LogChannel <- fmt.Sprintf("Cannot stop %s Err: %s", rule.Name, err)
+	}
+
+	rule.LogChannel <- fmt.Sprintf("Removing %s ID: %s", rule.Name, rule.ContainerId)
+	err = cli.ContainerRemove(ctx, rule.ContainerId, types.ContainerRemoveOptions{})
+	if err != nil {
+		rule.LogChannel <- fmt.Sprintf("Cannot Remove %s Err: %s", rule.Name, err)
+	}
+	return err
 }
 
 func (rule *ExecRule) ContainerLogger() {
@@ -407,6 +457,8 @@ func (rule *ExecRule) RunCommand(command string, args []string, workDir string) 
 	// get stderr
 	errPipe, _ := cmd.StderrPipe()
 	go rule.ScanReader(errPipe)
+
+	rule.Exec = cmd
 
 	cmd.Start()
 	err := cmd.Wait()

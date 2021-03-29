@@ -7,13 +7,13 @@ commango:
 flotillastatus:
   container: true
   container_name: "FlotillaStatus"
-  image: flotilla-status:latest
+  image: flot/flotillastatus:latest
   dockerfile: "../FlotillaStatus/dockerfile"
 
 filemanager:
   container: true
   container_name: "FlotillaFileManager"
-  image: flotilla-file-manager:latest
+  image: flot/filemanager:latest
   dockerfile: "../Flotilla_File_Manager/dockerfile"
   volumes:
     - "/home/${USER}/gcode:/etc/flotilla/gcode"
@@ -21,7 +21,7 @@ filemanager:
 fakeprinter:
   container: true
   container_name: "FakePrinter"
-  image: flotilla-fake-printer:latest
+  image: flot/fakeprinter:latest
   dockerfile: ../BuildResources/Test/FakeSerialDevice/dockerfile
   volumes:
     - "/dev:/dev"
