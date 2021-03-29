@@ -16,19 +16,21 @@ import (
 	"github.com/spf13/viper"
 )
 
-var RuleNotContainer = errors.New("rule is not a container")
-var NoContainerImage = errors.New("no container image")
+var ErrRuleNotContainer = errors.New("rule is not a container")
+var ErrNoContainerImage = errors.New("no container image")
 
 type ExecRule struct {
-	Name           string
-	Command        string
-	Args           []string
-	WorkDir        string
-	Build          string
+	Name    string
+	Command string
+	Args    []string
+	WorkDir string
+	Build   string
+
 	Container      bool
 	ContainerName  string
 	ContainerImage string
 	Dockerfile     string
+	ContainerTag   string
 
 	LogChannel  chan string
 	ControlChan chan string
@@ -109,6 +111,7 @@ func NewExecContainerRule(Name string, Args []string, ContainerName string, Imag
 	rule.ContainerName = ContainerName
 	rule.ContainerImage = Image
 	rule.Dockerfile = Dockerfile
+	rule.ContainerTag = fmt.Sprintf("flot/%s:latest", rule.Name)
 
 	return rule
 }
@@ -151,7 +154,7 @@ func (rule *ExecRule) BuildRule() error {
 
 func (rule *ExecRule) BuildContainerRule() error {
 	if !rule.Container {
-		return RuleNotContainer
+		return ErrRuleNotContainer
 	}
 
 	if rule.Dockerfile == "" {
@@ -165,16 +168,18 @@ func (rule *ExecRule) BuildContainerRule() error {
 	}
 
 	// create build config
+	dockerfileName := path.Base(rule.Dockerfile)
 	config := types.ImageBuildOptions{
-		Dockerfile: "Dockerfile",
-		Tags:       []string{fmt.Sprintf("flot/%s:latest", rule.Name)},
+		Dockerfile: dockerfileName,
+		Tags:       []string{rule.ContainerTag},
 		Remove:     true,
 	}
 
 	// archive the folder
 	if rule.WorkDir == "" {
-		rule.WorkDir = path.Base(rule.Dockerfile)
+		rule.WorkDir = path.Dir(rule.Dockerfile)
 	}
+	rule.LogChannel <- fmt.Sprintf("Attempting to archive %s", rule.WorkDir)
 	archive, _ := archive.TarWithOptions(
 		rule.WorkDir,
 		&archive.TarOptions{},
@@ -200,12 +205,12 @@ func (rule *ExecRule) BuildContainerRule() error {
 
 func (rule *ExecRule) PullContainer() error {
 	if !rule.Container {
-		return RuleNotContainer
+		return ErrRuleNotContainer
 	}
 
 	if rule.ContainerImage == "" {
 		rule.LogChannel <- "No container image name to pull"
-		return NoContainerImage
+		return ErrNoContainerImage
 	}
 
 	// client
