@@ -203,7 +203,7 @@ func (rule *ExecRule) BuildContainerRule() error {
 	}
 
 	if rule.Dockerfile == "" {
-		rule.LogChannel <- "No Dockerfile, Attempting to pull"
+		rule.log("No Dockerfile, Attempting to pull")
 		return rule.PullContainer()
 	}
 
@@ -224,7 +224,7 @@ func (rule *ExecRule) BuildContainerRule() error {
 	if rule.WorkDir == "" {
 		rule.WorkDir = path.Dir(rule.Dockerfile)
 	}
-	rule.LogChannel <- fmt.Sprintf("Attempting to archive %s", rule.WorkDir)
+	rule.log(fmt.Sprintf("Attempting to archive %s", rule.WorkDir))
 	archive, _ := archive.TarWithOptions(
 		rule.WorkDir,
 		&archive.TarOptions{},
@@ -237,7 +237,7 @@ func (rule *ExecRule) BuildContainerRule() error {
 	// build the image
 	build, err := cli.ImageBuild(ctx, archive, config)
 	if err != nil {
-		rule.LogChannel <- fmt.Sprintf("Image Build Failed for %s Err: %s\n", rule.Name, err)
+		rule.log(fmt.Sprintf("Image Build Failed for %s Err: %s\n", rule.Name, err))
 		return err
 	}
 
@@ -254,7 +254,7 @@ func (rule *ExecRule) PullContainer() error {
 	}
 
 	if rule.ContainerImage == "" {
-		rule.LogChannel <- "No container image name to pull"
+		rule.log("No container image name to pull")
 		return ErrNoContainerImage
 	}
 
@@ -271,7 +271,7 @@ func (rule *ExecRule) PullContainer() error {
 	// pull the image
 	log, err := cli.ImagePull(ctx, rule.ContainerImage, types.ImagePullOptions{})
 	if err != nil {
-		rule.LogChannel <- fmt.Sprintf("Cannot Pull Image %s", rule.ContainerImage)
+		rule.log(fmt.Sprintf("Cannot Pull Image %s", rule.ContainerImage))
 	}
 	defer log.Close()
 
@@ -305,7 +305,7 @@ func (rule *ExecRule) StartContainer() error {
 
 		cport, err := nat.NewPort(protoString, portString)
 		if err != nil {
-			rule.LogChannel <- fmt.Sprintf("Could not create port for %s", rawport)
+			rule.log(fmt.Sprintf("Could not create port for %s", rawport))
 			return err
 		}
 
@@ -351,16 +351,16 @@ func (rule *ExecRule) StartContainer() error {
 		&hostConfig,
 		nil, nil, rule.Name)
 	if err != nil {
-		rule.LogChannel <- fmt.Sprintf("RULE: %s Could not build image. Err: %s", rule.Name, err)
+		rule.log(fmt.Sprintf("RULE: %s Could not build image. Err: %s", rule.Name, err))
 		return err
 	}
 
 	rule.ContainerId = container.ID
-	rule.LogChannel <- fmt.Sprintf("RULE: %s Created Container ID: %s", rule.ContainerName, rule.ContainerId)
+	rule.log(fmt.Sprintf("RULE: %s Created Container ID: %s", rule.ContainerName, rule.ContainerId))
 
 	err = cli.ContainerStart(ctx, rule.ContainerId, types.ContainerStartOptions{})
 	if err != nil {
-		rule.LogChannel <- fmt.Sprintf("RULE: %s Cannot Start Container ID: %s Err: %s", rule.ContainerName, rule.ContainerId, err)
+		rule.log(fmt.Sprintf("RULE: %s Cannot Start Container ID: %s Err: %s", rule.ContainerName, rule.ContainerId, err))
 		return err
 	}
 	rule.ContainerLogger()
@@ -379,21 +379,21 @@ func (rule *ExecRule) StopContainer() error {
 	// client
 	cli, err := client.NewClientWithOpts()
 	if err != nil {
-		rule.LogChannel <- fmt.Sprintf("Cannot stop %s Err: %s", rule.Name, err)
+		rule.log(fmt.Sprintf("Cannot stop %s Err: %s", rule.Name, err))
 		return err
 	}
 
-	rule.LogChannel <- fmt.Sprintf("Stopping %s", rule.Name)
+	rule.log(fmt.Sprintf("Stopping %s", rule.Name))
 	duration, _ := time.ParseDuration("5m")
 	err = cli.ContainerStop(ctx, rule.ContainerId, &duration)
 	if err != nil {
-		rule.LogChannel <- fmt.Sprintf("Cannot stop %s Err: %s", rule.Name, err)
+		rule.log(fmt.Sprintf("Cannot stop %s Err: %s", rule.Name, err))
 	}
 
-	rule.LogChannel <- fmt.Sprintf("Removing %s ID: %s", rule.Name, rule.ContainerId)
+	rule.log(fmt.Sprintf("Removing %s ID: %s", rule.Name, rule.ContainerId))
 	err = cli.ContainerRemove(ctx, rule.ContainerId, types.ContainerRemoveOptions{})
 	if err != nil {
-		rule.LogChannel <- fmt.Sprintf("Cannot Remove %s Err: %s", rule.Name, err)
+		rule.log(fmt.Sprintf("Cannot Remove %s Err: %s", rule.Name, err))
 	}
 	return err
 }
@@ -420,16 +420,14 @@ func (rule *ExecRule) ContainerLogger() {
 	// client
 	cli, err := client.NewClientWithOpts()
 	if err != nil {
-		rule.LogChannel <- "Cannot form client"
-		rule.LogChannel <- err.Error()
+		rule.log(fmt.Sprintf("Cannot form client Err: %s", err.Error()))
 		return
 	}
 
 	logReader, err := cli.ContainerLogs(ctx, rule.ContainerId, logConfig)
 
 	if err != nil {
-		rule.LogChannel <- "Cannot get logs for container"
-		rule.LogChannel <- err.Error()
+		rule.log(fmt.Sprintf("Cannot get logs for container Err: %s", err.Error()))
 		return
 	}
 
@@ -443,6 +441,12 @@ func (rule *ExecRule) ScanReader(reader io.Reader) {
 	scanner := bufio.NewScanner(reader)
 	for scanner.Scan() {
 		rule.LogChannel <- scanner.Text()
+	}
+}
+
+func (rule *ExecRule) log(mess string) {
+	if rule.LogChannel != nil {
+		rule.LogChannel <- mess
 	}
 }
 
