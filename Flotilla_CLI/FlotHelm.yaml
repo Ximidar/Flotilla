@@ -5,18 +5,22 @@ commango:
   container: false
 
 flotillastatus:
-  container: true
-  container_name: "FlotillaStatus"
-  image: flot/flotillastatus:latest
-  dockerfile: "../FlotillaStatus/dockerfile"
+  command: "bin/FlotillaStatus"
+  path: "../FlotillaStatus/"
+  build: "make"
+  container: false
 
 filemanager:
-  container: true
-  container_name: "FlotillaFileManager"
-  image: flot/filemanager:latest
-  dockerfile: "../Flotilla_File_Manager/dockerfile"
-  volumes:
-    - "/home/${USER}/gcode:/etc/flotilla/gcode"
+  command: "bin/FlotillaFileManager"
+  path: "../Flotilla_File_Manager/"
+  build: "make"
+  container: false
+
+flotapi:
+  command: "bin/FlotillaWebAPI serve"
+  path: "../FlotillaWebAPI"
+  build: "make"
+  container: false
 
 nats:
   container: true

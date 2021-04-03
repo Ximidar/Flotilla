@@ -18,11 +18,11 @@ import (
 
 const (
 	// DockerNATS is used by background tasks
-	DockerNATS = "nats://0.0.0.0:4222"
+	DockerNATS = nats.DefaultURL
 	//DockerNATS = "nats:4222"
 
 	// LocalNATS is used by programs that are not within docker
-	LocalNATS = "nats://0.0.0.0:4222"
+	LocalNATS = nats.DefaultURL
 )
 
 // DefaultConn will Create a NatsConnect object and not modify past the server URL and
