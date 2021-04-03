@@ -20,7 +20,7 @@ import (
 	DS "github.com/Ximidar/Flotilla/DataStructures"
 	CS "github.com/Ximidar/Flotilla/DataStructures/CommStructures"
 	proto "github.com/golang/protobuf/proto"
-	"github.com/nats-io/go-nats"
+	"github.com/nats-io/nats.go"
 )
 
 // TermChannel will monitor for an exit signal

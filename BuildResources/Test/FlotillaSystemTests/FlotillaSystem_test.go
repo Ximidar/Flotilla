@@ -32,7 +32,7 @@ import (
 	"github.com/Ximidar/Flotilla/Flotilla_File_Manager/FileManager"
 	"github.com/nats-io/gnatsd/server"
 	"github.com/nats-io/gnatsd/test"
-	nats "github.com/nats-io/go-nats"
+	"github.com/nats-io/nats.go"
 )
 
 var TestLocation = "/tmp/FlotillaSystem/Test/Flotilla"

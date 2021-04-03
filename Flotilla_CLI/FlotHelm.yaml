@@ -18,14 +18,6 @@ filemanager:
   volumes:
     - "/home/${USER}/gcode:/etc/flotilla/gcode"
 
-fakeprinter:
-  container: true
-  container_name: "FakePrinter"
-  image: flot/fakeprinter:latest
-  dockerfile: ../BuildResources/Test/FakeSerialDevice/dockerfile
-  volumes:
-    - "/dev:/dev"
-
 nats:
   container: true
   container_name: "Nats"

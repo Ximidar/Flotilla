@@ -9,7 +9,7 @@ package CommRelayStructures
 
 import (
 	"github.com/golang/protobuf/proto"
-	nats "github.com/nats-io/go-nats"
+	"github.com/nats-io/nats.go"
 )
 
 const (

@@ -14,7 +14,7 @@ import (
 	"errors"
 	"time"
 
-	nats "github.com/nats-io/go-nats"
+	"github.com/nats-io/nats.go"
 )
 
 // ConfigReply will be sent to the config to retrieve certain values

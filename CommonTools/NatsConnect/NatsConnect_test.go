@@ -5,32 +5,17 @@ import (
 	"testing"
 
 	"github.com/Ximidar/Flotilla/BuildResources/Test/CommonTestTools"
-
-	"github.com/nats-io/gnatsd/test"
 )
 
 func TestRegularConnection(t *testing.T) {
 
-	// Start a default server
-	srv := test.RunDefaultServer()
-	defer srv.Shutdown()
-	addr := srv.Addr()
-
 	// try to connect
-	conn, err := DefaultConn(addr.String(), "regular")
+	conn, err := DefaultConn(LocalNATS, "regular")
 	CommonTestTools.CheckErr(t, "Couldn't connect to regular server", err)
 
 	fmt.Printf("Connected? %v", conn.IsConnected())
 }
 
-func TestDefaultConnection(t *testing.T) {
-	conn, err := DefaultConn(DockerNATS, "regular")
-	CommonTestTools.CheckErr(t, "Couldn't connect to regular server", err)
-
-	fmt.Printf("Connected? %v", conn.IsConnected())
-}
-
-// func TestTLSConnection(t *testing.T) {
 // 	fmt.Println("starting tls")
 // 	// Make temp certs
 // 	MakeCert()

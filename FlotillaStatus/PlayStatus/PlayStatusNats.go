@@ -10,9 +10,9 @@ package PlayStatus
 import (
 	"fmt"
 
-	nats "github.com/nats-io/go-nats"
 	"github.com/Ximidar/Flotilla/DataStructures"
 	"github.com/Ximidar/Flotilla/DataStructures/StatusStructures/PlayStructures"
+	"github.com/nats-io/nats.go"
 )
 
 // PlayStatusNats will act as the Nats connection for setting the play status.

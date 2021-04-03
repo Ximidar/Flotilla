@@ -10,8 +10,8 @@ package NatsFile
 import (
 	"encoding/json"
 
-	nats "github.com/nats-io/go-nats"
 	"github.com/Ximidar/Flotilla/DataStructures/ConfigStructures"
+	"github.com/nats-io/nats.go"
 )
 
 // Config will query for the settings it needs and store them in a struct

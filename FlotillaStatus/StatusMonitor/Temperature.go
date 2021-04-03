@@ -16,7 +16,7 @@ import (
 	"strings"
 	"time"
 
-	nats "github.com/nats-io/go-nats"
+	"github.com/nats-io/nats.go"
 )
 
 // Temperature will hold the value of the temperature at a certain time

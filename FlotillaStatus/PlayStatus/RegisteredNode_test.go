@@ -12,10 +12,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/nats-io/gnatsd/test"
-	nats "github.com/nats-io/go-nats"
 	"github.com/Ximidar/Flotilla/BuildResources/Test/CommonTestTools"
 	"github.com/Ximidar/Flotilla/DataStructures/StatusStructures/PlayStructures"
+	"github.com/nats-io/gnatsd/test"
+	"github.com/nats-io/nats.go"
 )
 
 // Before running this test package you will need a nats server up

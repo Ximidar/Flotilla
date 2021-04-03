@@ -11,7 +11,7 @@ import (
 	"encoding/json"
 	"strings"
 
-	nats "github.com/nats-io/go-nats"
+	"github.com/nats-io/nats.go"
 )
 
 // Nats will return a version JSON package of the version when queried over NATS

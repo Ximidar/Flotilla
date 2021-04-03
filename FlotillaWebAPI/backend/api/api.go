@@ -12,7 +12,7 @@ import (
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/websocket"
-	"github.com/nats-io/go-nats"
+	"github.com/nats-io/nats.go"
 )
 
 // Global

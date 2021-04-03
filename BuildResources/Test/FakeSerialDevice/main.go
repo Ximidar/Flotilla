@@ -22,17 +22,36 @@ func main() {
 	go serial.ReadMaster()
 	//go serial.SendMaster()
 
+	go watchSignals(serial)
 	run(serial)
 
+}
+
+func watchSignals(serial *FakeSerialDevice.FakeSerial) {
+	// shutdown signal
+	quit := make(chan os.Signal, 1)
+	all_sig := make(chan os.Signal, 100)
+	signal.Notify(quit, syscall.SIGTERM)
+	signal.Notify(quit, syscall.SIGINT)
+	signal.Notify(all_sig)
+
+	for {
+		select {
+		case sig := <-quit:
+			fmt.Println("Got Quit Signal:", sig)
+			serial.Close()
+			os.Exit(0)
+		case sig := <-all_sig:
+			fmt.Println("Got Signal:", sig)
+			os.Exit(0)
+		}
+	}
 }
 
 func run(serial *FakeSerialDevice.FakeSerial) {
 	var buffer []byte
 	ok := "ok\n"
 
-	// shutdown signal
-	quit := make(chan os.Signal, 1)
-	signal.Notify(quit, syscall.SIGTERM)
 	for {
 		select {
 		case buf := <-serial.ReceiveStream:
@@ -52,9 +71,7 @@ func run(serial *FakeSerialDevice.FakeSerial) {
 		case <-time.After(10 * time.Second):
 			waitb := []byte("wait\n")
 			serial.SendBytes(waitb)
-		case <-quit:
-			fmt.Println("Got Quit Signal")
-			os.Exit(0)
+
 		}
 
 	}

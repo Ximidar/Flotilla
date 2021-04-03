@@ -22,7 +22,7 @@ import (
 	FM "github.com/Ximidar/Flotilla/Flotilla_File_Manager/FileManager"
 	"github.com/Ximidar/Flotilla/Flotilla_File_Manager/FileStreamer"
 	"github.com/golang/protobuf/proto"
-	"github.com/nats-io/go-nats"
+	"github.com/nats-io/nats.go"
 )
 
 // NatsFile will broadcast file system services to the NATS server.
