@@ -18,9 +18,15 @@ filemanager:
 
 flotapi:
   command: "bin/FlotillaWebAPI serve"
-  path: "../FlotillaWebAPI"
+  path: "../FlotillaWebAPI/"
   build: "make"
   container: false
+
+flotweb:
+  command: "npm run serve"
+  path: "../FlotillaWeb/"
+  build: "pwd"
+  comtainer: false
 
 nats:
   container: true
