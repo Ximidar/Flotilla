@@ -74,7 +74,7 @@ $root.PlayStructures = (function() {
         Action.encode = function encode(message, writer) {
             if (!writer)
                 writer = $Writer.create();
-            if (message.Action != null && message.hasOwnProperty("Action"))
+            if (message.Action != null && Object.hasOwnProperty.call(message, "Action"))
                 writer.uint32(/* id 1, wireType 2 =*/10).string(message.Action);
             return writer;
         };

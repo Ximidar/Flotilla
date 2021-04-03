@@ -1,36 +1,61 @@
 <template>
-    <li v-on:click="ClickEvent">
-        
-        <FileIcon class="iconsize" v-if="File.FileType === 'file'"/>
-        <FolderIcon class="iconsize" v-else/>
-        <div class="file-details">
-            <div class="file-details name"><b>{{File.Name}}</b></div>
-            <div class="file-details size">{{ ReadableSize }}</div> 
-            <div class="file-details date">{{ FileDate }}</div>
-        </div>
-          
-    </li>
+    <v-expansion-panel @click="ClickEvent">
+        <v-expansion-panel-header class="pa-0 ma-0">
+            <v-hover v-slot:default="{ hover }">
+                <v-toolbar class="toolbar-override" rounded='lg' :elevation="hover ? 12 : 5" :color="hover ? 'secondary' : 'primary'">
+                    <v-icon v-if="File.FileType === 'file'">$vuetify.icons.solid_file</v-icon>
+                    <v-icon v-else>$vuetify.icons.solid_folder</v-icon>
+                    <v-toolbar-title class="pl-5" >{{File.Name}}</v-toolbar-title>
+                    <v-spacer></v-spacer>
+                    <v-icon class="mx-1">$vuetify.icons.solid_info</v-icon>
+                    <span>{{ ReadableSize }}</span>
+                    <v-icon class="mx-1">$vuetify.icons.solid_carrot</v-icon>
+                    <span>{{ FileDate }}</span>
+                </v-toolbar>
+            </v-hover>
+        </v-expansion-panel-header>
+        <v-expansion-panel-content class="pa-0 pt-3 ma-0">
+            <v-row v-if="File.FileType === 'file'">
+                <v-btn @click="playFile">
+                    <v-icon class="pr-1">$vuetify.icons.regular_play_circle</v-icon>
+                    <span>Play</span>
+                    <v-snackbar v-model="snackbar"
+                            centered
+                            timeout="4000"
+                            color="secondary"
+                    >{{ snackbar_text }}</v-snackbar>
+                </v-btn>
+                <v-spacer></v-spacer>
+                <v-btn>
+                    <v-icon class="pr-1">$vuetify.icons.solid_download</v-icon>
+                    <span>Download</span>
+                </v-btn>
+                <v-btn>
+                    <v-icon class="pr-1">$vuetify.icons.solid_skull</v-icon>
+                    <span>Delete</span>
+                </v-btn>
+            </v-row>
+        </v-expansion-panel-content>
+    </v-expansion-panel>
 </template>
 
 <script>
-import FileIcon from "@/assets/svg/solid/file.svg"
-import FolderIcon from "@/assets/svg/solid/folder.svg"
+import flotilla from "@/flotilla"
 export default {
     name: 'FileItem',
-    components:{
-        FileIcon,
-        FolderIcon
-    },
     props:{
         File:{
             type: Object,
             default: {}
         }
     },
+    mixins: [flotilla],
     data: function() {
         return {
             ReadableSize: this.HumanReadable(this.File.Size),
-            FileDate: this.ConvertUnixTimestamp(this.File.UnixTime)
+            FileDate: this.ConvertUnixTimestamp(this.File.UnixTime),
+            snackbar: false,
+            snackbar_text: "Playing " + this.File.Name
         }
     },
     methods:{
@@ -58,6 +83,16 @@ export default {
         },
         ClickEvent: function() {
             this.$emit('clicked', this.File)
+        },
+        playFile: function() {
+            this.snackbar = true
+            this.flotSelectFile(this.File).then( response=>{
+                console.log(response)
+                // play file after it is selected
+                this.flotPostAction("Play")
+                console.log("Sent Play")
+            })
+
         }
     },
     watch: {
@@ -74,18 +109,10 @@ export default {
 
 <style scoped>
 
-li:hover{
+hover:hover{
     opacity: 0.75;
 }
 
-li{
-  min-height: 50px;
-  max-height: 50px;
-  width: 100%;
-  margin: 0 0 5px 0;
-  text-align: left;
-  cursor: default;
-}
 
 .iconsize{
   width: 25px;
@@ -96,12 +123,6 @@ li{
   display:inline-block;
 }
 
-.file-details{
-    display:inline-block;
-    transform: translate(0%, -20%);
-    padding-right: 10px;
-    
-}
 .name{
     color: #859900;
     

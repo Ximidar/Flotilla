@@ -13,6 +13,8 @@ import (
 	"os"
 	"syscall"
 
+	"golang.org/x/sys/unix"
+
 	"github.com/pkg/term/termios"
 	fsEvents "github.com/tywkeene/go-fsevents"
 )
@@ -32,7 +34,7 @@ const (
 type FakeSerial struct {
 	ptyMaster   *os.File
 	ptySlave    *os.File
-	ptySettings *syscall.Termios
+	ptySettings *unix.Termios
 
 	// Streams
 	ReceiveStream chan byte
@@ -73,7 +75,7 @@ func NewFakeSerial() *FakeSerial {
 
 	// Set up fake device
 	//setNonBlock(fs.ptyMaster)
-	fs.ptySettings = new(syscall.Termios)
+	fs.ptySettings = new(unix.Termios)
 	termios.Tcgetattr(fs.ptyMaster.Fd(), fs.ptySettings)
 	termios.Tcsetattr(fs.ptyMaster.Fd(), termios.TCSADRAIN, fs.ptySettings)
 

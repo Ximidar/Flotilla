@@ -13,9 +13,10 @@ import (
 
 	"github.com/Ximidar/Flotilla/Flotilla_CLI/ui/ContentBox"
 
-	"github.com/spf13/cobra"
+	"github.com/Ximidar/Flotilla/Flotilla_CLI/Helm"
 	"github.com/Ximidar/Flotilla/Flotilla_CLI/UserInterface"
 	"github.com/Ximidar/Flotilla/Flotilla_CLI/ui"
+	"github.com/spf13/cobra"
 )
 
 var rootCmd = &cobra.Command{
@@ -46,6 +47,7 @@ func Execute() {
 func init() {
 	rootCmd.AddCommand(printerface)
 	rootCmd.AddCommand(tcellInterface)
+	rootCmd.AddCommand(helm)
 }
 
 var printerface = &cobra.Command{
@@ -74,5 +76,13 @@ var tcellInterface = &cobra.Command{
 		ContentBox.NewContentBox(tgui.Screen, "MainBox!", 10, 10, 20, 20)
 
 		tgui.Run()
+	},
+}
+
+var helm = &cobra.Command{
+	Use:   "helm",
+	Short: "start a flotilla instance",
+	Run: func(cmd *cobra.Command, args []string) {
+		Helm.StartHelm("")
 	},
 }

@@ -92,11 +92,11 @@ $root.CommStructures = (function() {
         CommStatus.encode = function encode(message, writer) {
             if (!writer)
                 writer = $Writer.create();
-            if (message.port != null && message.hasOwnProperty("port"))
+            if (message.port != null && Object.hasOwnProperty.call(message, "port"))
                 writer.uint32(/* id 1, wireType 2 =*/10).string(message.port);
-            if (message.baud != null && message.hasOwnProperty("baud"))
+            if (message.baud != null && Object.hasOwnProperty.call(message, "baud"))
                 writer.uint32(/* id 2, wireType 0 =*/16).int32(message.baud);
-            if (message.connected != null && message.hasOwnProperty("connected"))
+            if (message.connected != null && Object.hasOwnProperty.call(message, "connected"))
                 writer.uint32(/* id 3, wireType 0 =*/24).bool(message.connected);
             return writer;
         };
@@ -315,9 +315,9 @@ $root.CommStructures = (function() {
         InitComm.encode = function encode(message, writer) {
             if (!writer)
                 writer = $Writer.create();
-            if (message.port != null && message.hasOwnProperty("port"))
+            if (message.port != null && Object.hasOwnProperty.call(message, "port"))
                 writer.uint32(/* id 1, wireType 2 =*/10).string(message.port);
-            if (message.baud != null && message.hasOwnProperty("baud"))
+            if (message.baud != null && Object.hasOwnProperty.call(message, "baud"))
                 writer.uint32(/* id 2, wireType 0 =*/16).int32(message.baud);
             return writer;
         };
@@ -460,6 +460,226 @@ $root.CommStructures = (function() {
         return InitComm;
     })();
 
+    CommStructures.CommOptions = (function() {
+
+        /**
+         * Properties of a CommOptions.
+         * @memberof CommStructures
+         * @interface ICommOptions
+         * @property {CommStructures.IPorts|null} [ports] CommOptions ports
+         * @property {CommStructures.IBauds|null} [bauds] CommOptions bauds
+         */
+
+        /**
+         * Constructs a new CommOptions.
+         * @memberof CommStructures
+         * @classdesc Represents a CommOptions.
+         * @implements ICommOptions
+         * @constructor
+         * @param {CommStructures.ICommOptions=} [properties] Properties to set
+         */
+        function CommOptions(properties) {
+            if (properties)
+                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * CommOptions ports.
+         * @member {CommStructures.IPorts|null|undefined} ports
+         * @memberof CommStructures.CommOptions
+         * @instance
+         */
+        CommOptions.prototype.ports = null;
+
+        /**
+         * CommOptions bauds.
+         * @member {CommStructures.IBauds|null|undefined} bauds
+         * @memberof CommStructures.CommOptions
+         * @instance
+         */
+        CommOptions.prototype.bauds = null;
+
+        /**
+         * Creates a new CommOptions instance using the specified properties.
+         * @function create
+         * @memberof CommStructures.CommOptions
+         * @static
+         * @param {CommStructures.ICommOptions=} [properties] Properties to set
+         * @returns {CommStructures.CommOptions} CommOptions instance
+         */
+        CommOptions.create = function create(properties) {
+            return new CommOptions(properties);
+        };
+
+        /**
+         * Encodes the specified CommOptions message. Does not implicitly {@link CommStructures.CommOptions.verify|verify} messages.
+         * @function encode
+         * @memberof CommStructures.CommOptions
+         * @static
+         * @param {CommStructures.ICommOptions} message CommOptions message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        CommOptions.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.ports != null && Object.hasOwnProperty.call(message, "ports"))
+                $root.CommStructures.Ports.encode(message.ports, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+            if (message.bauds != null && Object.hasOwnProperty.call(message, "bauds"))
+                $root.CommStructures.Bauds.encode(message.bauds, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+            return writer;
+        };
+
+        /**
+         * Encodes the specified CommOptions message, length delimited. Does not implicitly {@link CommStructures.CommOptions.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof CommStructures.CommOptions
+         * @static
+         * @param {CommStructures.ICommOptions} message CommOptions message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        CommOptions.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a CommOptions message from the specified reader or buffer.
+         * @function decode
+         * @memberof CommStructures.CommOptions
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {CommStructures.CommOptions} CommOptions
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        CommOptions.decode = function decode(reader, length) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.CommStructures.CommOptions();
+            while (reader.pos < end) {
+                var tag = reader.uint32();
+                switch (tag >>> 3) {
+                case 1:
+                    message.ports = $root.CommStructures.Ports.decode(reader, reader.uint32());
+                    break;
+                case 2:
+                    message.bauds = $root.CommStructures.Bauds.decode(reader, reader.uint32());
+                    break;
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a CommOptions message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof CommStructures.CommOptions
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {CommStructures.CommOptions} CommOptions
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        CommOptions.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a CommOptions message.
+         * @function verify
+         * @memberof CommStructures.CommOptions
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        CommOptions.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.ports != null && message.hasOwnProperty("ports")) {
+                var error = $root.CommStructures.Ports.verify(message.ports);
+                if (error)
+                    return "ports." + error;
+            }
+            if (message.bauds != null && message.hasOwnProperty("bauds")) {
+                var error = $root.CommStructures.Bauds.verify(message.bauds);
+                if (error)
+                    return "bauds." + error;
+            }
+            return null;
+        };
+
+        /**
+         * Creates a CommOptions message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof CommStructures.CommOptions
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {CommStructures.CommOptions} CommOptions
+         */
+        CommOptions.fromObject = function fromObject(object) {
+            if (object instanceof $root.CommStructures.CommOptions)
+                return object;
+            var message = new $root.CommStructures.CommOptions();
+            if (object.ports != null) {
+                if (typeof object.ports !== "object")
+                    throw TypeError(".CommStructures.CommOptions.ports: object expected");
+                message.ports = $root.CommStructures.Ports.fromObject(object.ports);
+            }
+            if (object.bauds != null) {
+                if (typeof object.bauds !== "object")
+                    throw TypeError(".CommStructures.CommOptions.bauds: object expected");
+                message.bauds = $root.CommStructures.Bauds.fromObject(object.bauds);
+            }
+            return message;
+        };
+
+        /**
+         * Creates a plain object from a CommOptions message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof CommStructures.CommOptions
+         * @static
+         * @param {CommStructures.CommOptions} message CommOptions
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        CommOptions.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            var object = {};
+            if (options.defaults) {
+                object.ports = null;
+                object.bauds = null;
+            }
+            if (message.ports != null && message.hasOwnProperty("ports"))
+                object.ports = $root.CommStructures.Ports.toObject(message.ports, options);
+            if (message.bauds != null && message.hasOwnProperty("bauds"))
+                object.bauds = $root.CommStructures.Bauds.toObject(message.bauds, options);
+            return object;
+        };
+
+        /**
+         * Converts this CommOptions to JSON.
+         * @function toJSON
+         * @memberof CommStructures.CommOptions
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        CommOptions.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        };
+
+        return CommOptions;
+    })();
+
     CommStructures.CommMessage = (function() {
 
         /**
@@ -516,7 +736,7 @@ $root.CommStructures = (function() {
         CommMessage.encode = function encode(message, writer) {
             if (!writer)
                 writer = $Writer.create();
-            if (message.message != null && message.hasOwnProperty("message"))
+            if (message.message != null && Object.hasOwnProperty.call(message, "message"))
                 writer.uint32(/* id 1, wireType 2 =*/10).string(message.message);
             return writer;
         };
@@ -703,7 +923,7 @@ $root.CommStructures = (function() {
         WrittenBytes.encode = function encode(message, writer) {
             if (!writer)
                 writer = $Writer.create();
-            if (message.bytes != null && message.hasOwnProperty("bytes"))
+            if (message.bytes != null && Object.hasOwnProperty.call(message, "bytes"))
                 writer.uint32(/* id 1, wireType 0 =*/8).int32(message.bytes);
             return writer;
         };
@@ -890,7 +1110,7 @@ $root.CommStructures = (function() {
         Port.encode = function encode(message, writer) {
             if (!writer)
                 writer = $Writer.create();
-            if (message.address != null && message.hasOwnProperty("address"))
+            if (message.address != null && Object.hasOwnProperty.call(message, "address"))
                 writer.uint32(/* id 1, wireType 2 =*/10).string(message.address);
             return writer;
         };
@@ -1227,6 +1447,401 @@ $root.CommStructures = (function() {
         };
 
         return Ports;
+    })();
+
+    CommStructures.Baud = (function() {
+
+        /**
+         * Properties of a Baud.
+         * @memberof CommStructures
+         * @interface IBaud
+         * @property {number|null} [speed] Baud speed
+         */
+
+        /**
+         * Constructs a new Baud.
+         * @memberof CommStructures
+         * @classdesc Represents a Baud.
+         * @implements IBaud
+         * @constructor
+         * @param {CommStructures.IBaud=} [properties] Properties to set
+         */
+        function Baud(properties) {
+            if (properties)
+                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * Baud speed.
+         * @member {number} speed
+         * @memberof CommStructures.Baud
+         * @instance
+         */
+        Baud.prototype.speed = 0;
+
+        /**
+         * Creates a new Baud instance using the specified properties.
+         * @function create
+         * @memberof CommStructures.Baud
+         * @static
+         * @param {CommStructures.IBaud=} [properties] Properties to set
+         * @returns {CommStructures.Baud} Baud instance
+         */
+        Baud.create = function create(properties) {
+            return new Baud(properties);
+        };
+
+        /**
+         * Encodes the specified Baud message. Does not implicitly {@link CommStructures.Baud.verify|verify} messages.
+         * @function encode
+         * @memberof CommStructures.Baud
+         * @static
+         * @param {CommStructures.IBaud} message Baud message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        Baud.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.speed != null && Object.hasOwnProperty.call(message, "speed"))
+                writer.uint32(/* id 1, wireType 0 =*/8).int32(message.speed);
+            return writer;
+        };
+
+        /**
+         * Encodes the specified Baud message, length delimited. Does not implicitly {@link CommStructures.Baud.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof CommStructures.Baud
+         * @static
+         * @param {CommStructures.IBaud} message Baud message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        Baud.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a Baud message from the specified reader or buffer.
+         * @function decode
+         * @memberof CommStructures.Baud
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {CommStructures.Baud} Baud
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        Baud.decode = function decode(reader, length) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.CommStructures.Baud();
+            while (reader.pos < end) {
+                var tag = reader.uint32();
+                switch (tag >>> 3) {
+                case 1:
+                    message.speed = reader.int32();
+                    break;
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a Baud message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof CommStructures.Baud
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {CommStructures.Baud} Baud
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        Baud.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a Baud message.
+         * @function verify
+         * @memberof CommStructures.Baud
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        Baud.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.speed != null && message.hasOwnProperty("speed"))
+                if (!$util.isInteger(message.speed))
+                    return "speed: integer expected";
+            return null;
+        };
+
+        /**
+         * Creates a Baud message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof CommStructures.Baud
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {CommStructures.Baud} Baud
+         */
+        Baud.fromObject = function fromObject(object) {
+            if (object instanceof $root.CommStructures.Baud)
+                return object;
+            var message = new $root.CommStructures.Baud();
+            if (object.speed != null)
+                message.speed = object.speed | 0;
+            return message;
+        };
+
+        /**
+         * Creates a plain object from a Baud message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof CommStructures.Baud
+         * @static
+         * @param {CommStructures.Baud} message Baud
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        Baud.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            var object = {};
+            if (options.defaults)
+                object.speed = 0;
+            if (message.speed != null && message.hasOwnProperty("speed"))
+                object.speed = message.speed;
+            return object;
+        };
+
+        /**
+         * Converts this Baud to JSON.
+         * @function toJSON
+         * @memberof CommStructures.Baud
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        Baud.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        };
+
+        return Baud;
+    })();
+
+    CommStructures.Bauds = (function() {
+
+        /**
+         * Properties of a Bauds.
+         * @memberof CommStructures
+         * @interface IBauds
+         * @property {Array.<CommStructures.IBaud>|null} [bauds] Bauds bauds
+         */
+
+        /**
+         * Constructs a new Bauds.
+         * @memberof CommStructures
+         * @classdesc Represents a Bauds.
+         * @implements IBauds
+         * @constructor
+         * @param {CommStructures.IBauds=} [properties] Properties to set
+         */
+        function Bauds(properties) {
+            this.bauds = [];
+            if (properties)
+                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * Bauds bauds.
+         * @member {Array.<CommStructures.IBaud>} bauds
+         * @memberof CommStructures.Bauds
+         * @instance
+         */
+        Bauds.prototype.bauds = $util.emptyArray;
+
+        /**
+         * Creates a new Bauds instance using the specified properties.
+         * @function create
+         * @memberof CommStructures.Bauds
+         * @static
+         * @param {CommStructures.IBauds=} [properties] Properties to set
+         * @returns {CommStructures.Bauds} Bauds instance
+         */
+        Bauds.create = function create(properties) {
+            return new Bauds(properties);
+        };
+
+        /**
+         * Encodes the specified Bauds message. Does not implicitly {@link CommStructures.Bauds.verify|verify} messages.
+         * @function encode
+         * @memberof CommStructures.Bauds
+         * @static
+         * @param {CommStructures.IBauds} message Bauds message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        Bauds.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.bauds != null && message.bauds.length)
+                for (var i = 0; i < message.bauds.length; ++i)
+                    $root.CommStructures.Baud.encode(message.bauds[i], writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+            return writer;
+        };
+
+        /**
+         * Encodes the specified Bauds message, length delimited. Does not implicitly {@link CommStructures.Bauds.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof CommStructures.Bauds
+         * @static
+         * @param {CommStructures.IBauds} message Bauds message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        Bauds.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a Bauds message from the specified reader or buffer.
+         * @function decode
+         * @memberof CommStructures.Bauds
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {CommStructures.Bauds} Bauds
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        Bauds.decode = function decode(reader, length) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.CommStructures.Bauds();
+            while (reader.pos < end) {
+                var tag = reader.uint32();
+                switch (tag >>> 3) {
+                case 1:
+                    if (!(message.bauds && message.bauds.length))
+                        message.bauds = [];
+                    message.bauds.push($root.CommStructures.Baud.decode(reader, reader.uint32()));
+                    break;
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a Bauds message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof CommStructures.Bauds
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {CommStructures.Bauds} Bauds
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        Bauds.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a Bauds message.
+         * @function verify
+         * @memberof CommStructures.Bauds
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        Bauds.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.bauds != null && message.hasOwnProperty("bauds")) {
+                if (!Array.isArray(message.bauds))
+                    return "bauds: array expected";
+                for (var i = 0; i < message.bauds.length; ++i) {
+                    var error = $root.CommStructures.Baud.verify(message.bauds[i]);
+                    if (error)
+                        return "bauds." + error;
+                }
+            }
+            return null;
+        };
+
+        /**
+         * Creates a Bauds message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof CommStructures.Bauds
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {CommStructures.Bauds} Bauds
+         */
+        Bauds.fromObject = function fromObject(object) {
+            if (object instanceof $root.CommStructures.Bauds)
+                return object;
+            var message = new $root.CommStructures.Bauds();
+            if (object.bauds) {
+                if (!Array.isArray(object.bauds))
+                    throw TypeError(".CommStructures.Bauds.bauds: array expected");
+                message.bauds = [];
+                for (var i = 0; i < object.bauds.length; ++i) {
+                    if (typeof object.bauds[i] !== "object")
+                        throw TypeError(".CommStructures.Bauds.bauds: object expected");
+                    message.bauds[i] = $root.CommStructures.Baud.fromObject(object.bauds[i]);
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Creates a plain object from a Bauds message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof CommStructures.Bauds
+         * @static
+         * @param {CommStructures.Bauds} message Bauds
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        Bauds.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            var object = {};
+            if (options.arrays || options.defaults)
+                object.bauds = [];
+            if (message.bauds && message.bauds.length) {
+                object.bauds = [];
+                for (var j = 0; j < message.bauds.length; ++j)
+                    object.bauds[j] = $root.CommStructures.Baud.toObject(message.bauds[j], options);
+            }
+            return object;
+        };
+
+        /**
+         * Converts this Bauds to JSON.
+         * @function toJSON
+         * @memberof CommStructures.Bauds
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        Bauds.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        };
+
+        return Bauds;
     })();
 
     return CommStructures;

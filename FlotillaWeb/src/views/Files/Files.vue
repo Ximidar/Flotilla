@@ -1,41 +1,49 @@
 <template>
-  <div class="files">
-    <div class="path-bar">
-      <ArrowLeft v-on:click="GoPrevious" class="iconsize" />
-      {{ FileList.CurrentFL.Path }}
-    </div>
-    <div class="filecontainer">
-      <div class="file-items">
-        <ul v-for="file in Contents" v-bind:key="file.Path">
-          <FileItem :File=file
-                    @clicked="ClickFile">
+  <v-container>
+    <v-toolbar dense color="primary">
+      <v-btn icon v-on:click.native="GoPrevious">
+        <v-icon>$vuetify.icons.solid_arrow_left</v-icon>
+      </v-btn>
+      <v-toolbar-title class="px-3" >{{ FileList.CurrentFL.Path }}</v-toolbar-title>
+      <v-spacer></v-spacer>
+      <v-btn @click="uploadFile" icon>
+        <v-icon>$vuetify.icons.solid_plus</v-icon>
+      </v-btn>
+      <v-btn @click="newFolder" icon>
+        <v-icon>$vuetify.icons.solid_folder_plus</v-icon>
+      </v-btn>
+      <v-btn icon>
+        <v-icon>$vuetify.icons.solid_ellipsis_h</v-icon>
+      </v-btn>
+    </v-toolbar>
+    <v-expansion-panels>
+          <FileItem v-for="file in Contents" v-bind:key="file.Path"
+            :File=file
+            @clicked="ClickFile">
           </FileItem>
-        </ul>  
-      </div>
-      <div class=fileinfo>
-        <FileInfo v-bind:File="SelectedFile">
-        </FileInfo>
-      </div>
-
-    </div>
-  </div>
+    </v-expansion-panels>
+    <FileUploadOverlay v-model="viewFileUpload" />
+  </v-container>
 </template>
 
 <script>
 import FileItem from '@/views/Files/FileItem'
 import FileInfo from '@/views/Files/FileInfo'
+import FileUploadOverlay from '@/views/Files/FileUpload'
 import ArrowLeft from '@/assets/svg/solid/arrow-left.svg'
 import Vue from 'vue'
 import { isNullOrUndefined } from 'util'
-import { Flotilla } from "@/flotilla"
+import flotilla from "@/flotilla"
 
 export default {
   name: 'FlotillaFiles',
   components:{
     FileItem,
     FileInfo,
+    FileUploadOverlay,
     ArrowLeft
   },
+  mixins: [flotilla],
   data(){
     return{
       RootFS: {},
@@ -44,7 +52,10 @@ export default {
         PreviousFL: null,
       },
       Contents: [],
-      SelectedFile: {}
+      SelectedFile: {},
+
+      // file upload
+      viewFileUpload: false
     }
   },
   
@@ -59,9 +70,8 @@ export default {
     }
   },
   RequestFiles: function(){
-    console.log(Flotilla)
-    var flot = new Flotilla()
-    flot.GetFiles().then( (files) => {
+    
+    this.flotGetFiles().then( (files) => {
       this.RootFS = files
       this.SwitchTo(this.RootFS)
     })
@@ -91,6 +101,14 @@ export default {
     for (var file in this.FileList.CurrentFL.Contents){
       this.Contents.push(this.FileList.CurrentFL.Contents[file])
     }
+  },
+  newFolder: function() {
+    // Add folder to current directory
+    console.log("New Folder Button Pushed!")
+  },
+  uploadFile: function() {
+    console.log("upload file button has been pushed!")
+    this.viewFileUpload = true
   }
 },
 created(){

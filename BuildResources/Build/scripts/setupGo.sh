@@ -54,6 +54,8 @@ echo "Getting Gorilla Mux"
 go get github.com/gorilla/mux
 echo "Getting Gorilla websocket"
 go get github.com/gorilla/websocket
+echo "Getting Gorilla handlers"
+go get github.com/gorilla/handlers
 
 
 # Setup Protobuffer

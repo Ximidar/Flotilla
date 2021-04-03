@@ -3,11 +3,10 @@ package main
 import (
 	"fmt"
 	"os"
+	"os/exec"
 	"path"
 	"path/filepath"
 	"strings"
-
-	"github.com/Ximidar/Flotilla/NodeLauncher/Monitor"
 )
 
 // ######################### USE PBJS!
@@ -38,8 +37,8 @@ func RefreshDataStructures() {
 	}
 
 	// Check for protoc
-	monitor := ProtocWithArgs("--version")
-	if monitor.Error != nil {
+	_, err := CommandWithArgs("protoc", "--version")
+	if err != nil {
 		err := fmt.Errorf("protoc Not installed")
 		panic(err)
 	}
@@ -58,19 +57,19 @@ func RefreshDataStructures() {
 		// Make go protoc files
 		gargs := make([]string, 0)
 		gargs = append(gargs, "--proto_path="+dumpDir, "--go_out="+dumpDir, proto)
-		ProtocWithArgs("protoc", gargs...)
+		CommandWithArgs("protoc", gargs...)
 
 		// Make pbjs files
 		jargs := make([]string, 0)
 		jargs = append(jargs, pbjsArgs...)
 		jargs = append(jargs, dumpDir+jsBase, proto)
-		ProtocWithArgs(PBJSCLI, jargs...)
+		CommandWithArgs(PBJSCLI, jargs...)
 
 		// Make pbjs files in FlotillaWeb
 		jargs = make([]string, 0)
 		jargs = append(jargs, pbjsArgs...)
 		jargs = append(jargs, webproto+jsBase, proto)
-		ProtocWithArgs(PBJSCLI, jargs...)
+		CommandWithArgs(PBJSCLI, jargs...)
 	}
 
 }
@@ -79,17 +78,21 @@ func logger(name string, message string) {
 	fmt.Println(name, ": ", message)
 }
 
-// ProtocWithArgs Runs Protoc with associated arguments
-func ProtocWithArgs(bin string, args ...string) *Monitor.Monitor {
+// CommandWithArgs Runs Protoc with associated arguments
+func CommandWithArgs(bin string, args ...string) (*exec.Cmd, error) {
 	var err error
 
-	monitor, err := Monitor.NewMonitor(bin, logger, args...)
-	if err != nil {
-		panic(err)
-	}
-	go monitor.ConsumeLines()
-	monitor.StartProcess()
-	return monitor
+	// setup the command
+	cmd := exec.Command(bin, args...)
+	cmd.Env = append(os.Environ())
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+
+	// run
+	err = cmd.Run()
+
+	// return the result
+	return cmd, err
 
 }
 

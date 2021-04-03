@@ -14,6 +14,12 @@ message InitComm {
   int32 baud = 2;
 }
 
+// CommOptions is the combined options of ports and speeds
+message CommOptions{
+  Ports ports = 1;
+  Bauds bauds = 2;
+}
+
 // CommMessage is just a string message it could be a written message or a received message
 message CommMessage {
   string message = 1;
@@ -32,4 +38,14 @@ message Port {
 // Ports is a list of serial Ports
 message Ports{
   repeated Port ports = 1;
+}
+
+// Baud is the serial port speed
+message Baud {
+  int32 speed = 1;
+}
+
+// Bauds is a list of serial port speeds
+message Bauds{
+  repeated Baud bauds = 1;
 }

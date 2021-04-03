@@ -1,0 +1,36 @@
+commango:
+  command: "bin/Commango"
+  path: "../Commango/"
+  build: "make"
+  container: false
+
+flotillastatus:
+  container: true
+  container_name: "FlotillaStatus"
+  image: flot/flotillastatus:latest
+  dockerfile: "../FlotillaStatus/dockerfile"
+
+filemanager:
+  container: true
+  container_name: "FlotillaFileManager"
+  image: flot/filemanager:latest
+  dockerfile: "../Flotilla_File_Manager/dockerfile"
+  volumes:
+    - "/home/${USER}/gcode:/etc/flotilla/gcode"
+
+fakeprinter:
+  container: true
+  container_name: "FakePrinter"
+  image: flot/fakeprinter:latest
+  dockerfile: ../BuildResources/Test/FakeSerialDevice/dockerfile
+  volumes:
+    - "/dev:/dev"
+
+nats:
+  container: true
+  container_name: "Nats"
+  image: 'nats:latest'
+  ports:
+    - "4222:4222"
+    - "6222:6222"
+    - "8222:8222"

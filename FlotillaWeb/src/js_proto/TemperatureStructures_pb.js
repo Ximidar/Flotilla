@@ -92,11 +92,11 @@ $root.TemperatureStructures = (function() {
         Temperature.encode = function encode(message, writer) {
             if (!writer)
                 writer = $Writer.create();
-            if (message.Tool != null && message.hasOwnProperty("Tool"))
+            if (message.Tool != null && Object.hasOwnProperty.call(message, "Tool"))
                 writer.uint32(/* id 1, wireType 2 =*/10).string(message.Tool);
-            if (message.Temp != null && message.hasOwnProperty("Temp"))
+            if (message.Temp != null && Object.hasOwnProperty.call(message, "Temp"))
                 writer.uint32(/* id 2, wireType 0 =*/16).int32(message.Temp);
-            if (message.Target != null && message.hasOwnProperty("Target"))
+            if (message.Target != null && Object.hasOwnProperty.call(message, "Target"))
                 writer.uint32(/* id 3, wireType 0 =*/24).int32(message.Target);
             return writer;
         };

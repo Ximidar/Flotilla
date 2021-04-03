@@ -27,14 +27,15 @@ type NatsAdapter interface {
 
 // Comm handles the Serial Connection
 type Comm struct {
-	options        *serial.Mode
-	AvailablePorts *CS.Ports
-	PortPath       string
-	Port           serial.Port
-	connected      bool
-	ReadStream     chan string
-	ByteStream     chan byte
-	ErrorStream    chan error
+	options         *serial.Mode
+	AvailablePorts  *CS.Ports
+	SuggestedSpeeds *CS.Bauds
+	PortPath        string
+	Port            serial.Port
+	connected       bool
+	ReadStream      chan string
+	ByteStream      chan byte
+	ErrorStream     chan error
 
 	adapter         NatsAdapter
 	finishedReading bool
@@ -108,6 +109,18 @@ func (comm Comm) GetCommStatus() *CS.CommStatus {
 	return cs
 }
 
+// GetCommOptions will return the ports and speeds for the available Comms
+func (comm *Comm) GetCommOptions() (*CS.CommOptions, error) {
+	comm.GetAvailablePorts()
+	comm.GetSuggestedSpeeds()
+
+	options := new(CS.CommOptions)
+	options.Ports = comm.AvailablePorts
+	options.Bauds = comm.SuggestedSpeeds
+
+	return options, nil
+}
+
 // GetAvailablePorts will query the system for all available ports we can connect to
 func (comm *Comm) GetAvailablePorts() (*CS.Ports, error) {
 	// Reset the available ports
@@ -130,6 +143,21 @@ func (comm *Comm) GetAvailablePorts() (*CS.Ports, error) {
 	}
 
 	return comm.AvailablePorts, nil
+}
+
+// GetSuggestedSpeeds will get a list of port speeds
+func (comm *Comm) GetSuggestedSpeeds() (*CS.Bauds, error) {
+	comm.SuggestedSpeeds = new(CS.Bauds)
+	speeds := []int32{250000, 230400, 115200, 57600, 38400, 19200, 9600}
+
+	for _, b := range speeds {
+		speed := new(CS.Baud)
+		speed.Speed = b
+		comm.SuggestedSpeeds.Bauds = append(comm.SuggestedSpeeds.Bauds, speed)
+	}
+
+	return comm.SuggestedSpeeds, nil
+
 }
 
 // PreCheck Do a little error checking for good start
