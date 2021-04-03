@@ -11,6 +11,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"os"
 	"path"
 
 	"github.com/Ximidar/Flotilla/CommonTools/NatsConnect"
@@ -42,7 +43,7 @@ func NewNatsFile() (nf *NatsFile, err error) {
 	nf = new(NatsFile)
 
 	// Make Nats Connection
-	nf.NC, err = NatsConnect.DefaultConn(NatsConnect.DockerNATS, FS.Name)
+	nf.NC, err = NatsConnect.DefaultConn(nats.DefaultURL, FS.Name)
 	if err != nil {
 		fmt.Printf("Can't connect: %v\n", err)
 		return nil, err
@@ -83,10 +84,24 @@ func NewNatsFile() (nf *NatsFile, err error) {
 
 	// TODO create this off of a config
 	// Create File manager
-	home := "/etc/flotilla"
-	defaultPath := path.Clean(home + "/gcode")
+
+	home, err := os.UserHomeDir()
+	if err != nil {
+		fmt.Println("Could not get home directory:", err)
+		panic(err)
+	}
+	defaultPath := path.Join(home, "/gcode")
+	defaultPath = path.Clean(defaultPath)
 	nf.FileManager, err = FM.NewFileManager(defaultPath)
+	if err != nil {
+		fmt.Println("Could not set up file manager:", err)
+		panic(err)
+	}
 	nf.FileStreamer, err = FileStreamer.NewFileStreamer(nf)
+	if err != nil {
+		fmt.Println("Could not set up file streamer:", err)
+		panic(err)
+	}
 
 	// Setup RNode Observers
 	err = nf.setupRNodeObservers()

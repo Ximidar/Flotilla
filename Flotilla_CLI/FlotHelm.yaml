@@ -22,12 +22,6 @@ flotapi:
   build: "make"
   container: false
 
-flotweb:
-  command: "npm run serve"
-  path: "../FlotillaWeb/"
-  build: "pwd"
-  comtainer: false
-
 nats:
   container: true
   container_name: "Nats"

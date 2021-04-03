@@ -87,15 +87,22 @@ func (nc *NatsConnect) Connect() (*nats.Conn, error) {
 
 	// attempt a Connection to Nats
 	var err error
-	nc.NC, err = nc.Options.Connect()
-	if err != nil {
-		if nc.recoverable(err) {
-			return nc.RetryNatsConn()
+	attempts := 0
+	for {
+		nc.NC, err = nc.Options.Connect()
+		if err != nil {
+			attempts += 1
+			fmt.Printf("Attempt %d failed: %s", attempts, err)
+			if attempts >= 10 {
+				break
+			}
+			<-time.After(15 * time.Second)
+			continue
 		}
-		return nil, err
+		return nc.NC, nil
 	}
 
-	return nc.NC, nil
+	return nc.RetryNatsConn()
 }
 
 // RetryNatsConn will attempt to retry the connection five times
