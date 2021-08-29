@@ -6,37 +6,17 @@ Building happens with docker. Docker will take in all of the repos and dependenc
 ### Building Manually
 Each repository should have a makefile in it already. Simply navigate to the repo and type in the command
 ```
-make
+make build
 ```
-This will drop the two binaries in a folder called `bin`. This way will fail if you do not have all the dependencies installed. 
+This will drop the binaries in a folder called `bin`. 
 
-### Building with Docker
-To test building:
+### Testing with Docker
+Build:
 ```
-docker build -t ximidar/flotilla:latest .
+docker build --rm -t ximidar/flotilla_root:latest .
 ```
-This command will run all tests then build the Flotilla Package.
-
-To get the binaries out:
+Then running it:
 ```
-mkdir buildFlotilla
-
-# Run this command inside of Flotilla directory
-docker build -t ximidar/flotilla:latest .
-
-# Run this command anywhere
-docker run -v ./buildFlotilla:/home/flotilla/ ximidar/flotilla:latest
+docker-compose up --build
 ```
-This will drop a Flotilla Package Folder into `./buildFlotilla`
-
-### Note
-Currently this will only make the x86 Flotilla Package. You will have to construct an arm package yourself for right now. This will change soon. 
-
-### Running Flotilla
-To start Flotilla use the `NodeLauncher` Program in the `Flotilla/bin/Extras` folder. You will need to remember the path to where you placed your Flotilla Folder. For simplicity I placed mine in my home folder. To start Flotilla run this command:
-
-```
-~/Flotilla/bin/Extras/NodeLauncher Start -p ~/Flotilla/
-```
-
-This will start a Flotilla Instance using the binaries in the `~/Flotilla` folder
+This will also make the code be in hot reload mode. This mode is really slow for the webserver, but go files get reloaded very fast.
