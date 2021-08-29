@@ -9,7 +9,7 @@ import { BufferReader } from 'protobufjs'
 export default {
     data(){
         return {
-            base: "0.0.0.0:5000"
+            base: "0.0.0.0:3000"
         }
     },
     methods: {

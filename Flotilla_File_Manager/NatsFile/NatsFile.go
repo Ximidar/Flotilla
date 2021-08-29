@@ -43,7 +43,7 @@ func NewNatsFile() (nf *NatsFile, err error) {
 	nf = new(NatsFile)
 
 	// Make Nats Connection
-	nf.NC, err = NatsConnect.DefaultConn(nats.DefaultURL, FS.Name)
+	nf.NC, err = NatsConnect.DefaultConn(NatsConnect.DockerNATS, FS.Name)
 	if err != nil {
 		fmt.Printf("Can't connect: %v\n", err)
 		return nil, err

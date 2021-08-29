@@ -10,6 +10,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 	unzip \
 	openssl \
 	fswatch \
+	npm \
 	&& rm -rf /var/lib/apt/lists/*
 
 
@@ -21,7 +22,8 @@ RUN mkdir -p $HOME
 WORKDIR $HOME
 
 # Define, make, and populate the Flotilla Directory
-ENV FLOTILLA_DIR=$HOME/Flotilla/
+ENV FLOTILLA_DIR=$HOME
+ENV GIT_DISCOVERY_ACROSS_FILESYSTEM=1
 RUN mkdir -p $FLOTILLA_DIR
 COPY . $FLOTILLA_DIR
 

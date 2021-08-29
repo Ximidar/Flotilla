@@ -41,7 +41,7 @@ type FlotillaInterface struct {
 func NewFlotillaInterface() (*FlotillaInterface, error) {
 	fi := new(FlotillaInterface)
 	var err error
-	fi.NC, err = NatsConnect.DefaultConn(NatsConnect.LocalNATS, "flotillaInterface")
+	fi.NC, err = NatsConnect.DefaultConn(NatsConnect.DockerNATS, "flotillaInterface")
 	fi.Timeout = nats.DefaultTimeout
 
 	if err != nil {

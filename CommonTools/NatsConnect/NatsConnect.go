@@ -18,8 +18,7 @@ import (
 
 const (
 	// DockerNATS is used by background tasks
-	DockerNATS = nats.DefaultURL
-	//DockerNATS = "nats:4222"
+	DockerNATS = "nats:4222"
 
 	// LocalNATS is used by programs that are not within docker
 	LocalNATS = nats.DefaultURL

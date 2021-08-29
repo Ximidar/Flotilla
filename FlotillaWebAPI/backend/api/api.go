@@ -84,7 +84,7 @@ func NewFlotillaWeb(port int, directory string) *FlotillaWeb {
 	var err error
 
 	//setup nats
-	fw.Nats, err = NatsConnect.DefaultConn(NatsConnect.LocalNATS, "flotillaInterface")
+	fw.Nats, err = NatsConnect.DefaultConn(NatsConnect.DockerNATS, "flotillaInterface")
 	if err != nil {
 		log.Fatal(err)
 	}

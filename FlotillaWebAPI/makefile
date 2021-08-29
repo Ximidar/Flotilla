@@ -56,6 +56,16 @@ build_all:
 	@echo
 	@echo All Binaries are built to the ${OUT_DIR} Folder
 
+	@echo Building Web Distribution
+	cd ${WEB_ENTRY_POINT}; \
+		npm run prod;
+
+	if [ -d "$(OUT_DIR)/dist" ]; then \
+		echo "Deleting previous run"; \
+		rm -rf $(OUT_DIR)/dist; \
+	fi
+	cp -r ${WEB_DIST} ${OUT_DIR}
+
 build:
 	@echo Building ${BINARY} Binary for this machine
 	${GO_BUILD} ${LDFLAGS} -o ${OUT_DIR}/${BINARY} ${ENTRY_POINT}
@@ -79,8 +89,9 @@ clean:
 	rm -rf $(OUT_DIR)
 
 
-start: build
-	${OUT_DIR}/${BINARY} & echo $$! > $(TASK_PID)
+start:
+	cd $(OUT_DIR); \
+		./${BINARY} serve & echo $$! > $(TASK_PID);
 
 stop: 
 	-kill `pstree -p \`cat $(TASK_PID)\` | tr "\n" " " |sed "s/[^0-9]/ /g" |sed "s/\s\s*/ /g"`
@@ -90,7 +101,7 @@ before:
 	@echo "STOPED $(BINARY)" && printf '%*s\n' "40" '' | tr ' ' -
 
 # Restart task will execute stop, before and start tasks in strict order and prints message. 
-restart: stop before start
+restart: stop before build start
 	@echo "STARTED $(BINARY)" && printf '%*s\n' "40" '' | tr ' ' -
 
 # Serve task will run fswatch monitor and performs restart task if any source file changed. Before serving it will execute start task.
