@@ -3,13 +3,13 @@
         <v-expansion-panel-header class="pa-0 ma-0">
             <v-hover v-slot:default="{ hover }">
                 <v-toolbar class="toolbar-override" rounded='lg' :elevation="hover ? 12 : 5" :color="hover ? 'secondary' : 'primary'">
-                    <v-icon v-if="File.FileType === 'file'">$vuetify.icons.solid_file</v-icon>
-                    <v-icon v-else>$vuetify.icons.solid_folder</v-icon>
+                    <v-icon class="basic-icon" v-if="File.FileType === 'file'">$vuetify.icons.solid_file</v-icon>
+                    <v-icon  class="basic-icon" v-else>$vuetify.icons.solid_folder</v-icon>
                     <v-toolbar-title class="pl-5" >{{File.Name}}</v-toolbar-title>
                     <v-spacer></v-spacer>
-                    <v-icon class="mx-1">$vuetify.icons.solid_info</v-icon>
+                    <v-icon class="mx-1 basic-icon">$vuetify.icons.solid_info</v-icon>
                     <span>{{ ReadableSize }}</span>
-                    <v-icon class="mx-1">$vuetify.icons.solid_carrot</v-icon>
+                    <v-icon class="mx-1 basic-icon">$vuetify.icons.solid_carrot</v-icon>
                     <span>{{ FileDate }}</span>
                 </v-toolbar>
             </v-hover>
@@ -113,6 +113,10 @@ hover:hover{
     opacity: 0.75;
 }
 
+.basic-icon{
+    width: 50px;
+    height: 50px;
+}
 
 .iconsize{
   width: 25px;

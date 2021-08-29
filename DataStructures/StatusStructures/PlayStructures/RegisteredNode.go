@@ -12,8 +12,8 @@ import (
 	"fmt"
 	"time"
 
-	nats "github.com/nats-io/go-nats"
 	"github.com/Ximidar/Flotilla/DataStructures"
+	"github.com/nats-io/nats.go"
 )
 
 // Node just keeps track of the node name and status

@@ -189,7 +189,8 @@ func (fs *FakeSerial) ReadMaster() {
 		buf := make([]byte, 1)
 		_, err := io.ReadAtLeast(fs.ptyMaster, buf, 1)
 		if err != nil {
-			continue
+			fmt.Println("ReadMaster got Err: ", err)
+			return
 		}
 
 		fs.ReceiveStream <- buf[0]
@@ -203,7 +204,8 @@ func (fs *FakeSerial) SendBytes(buf []byte) {
 	}
 	_, err := fs.ptyMaster.Write(buf)
 	if err != nil {
-		fmt.Println(err.Error())
+		fmt.Println("SEND BYTES ERR: ", err.Error())
+		return
 	}
 }
 
@@ -213,15 +215,15 @@ func (fs *FakeSerial) SendMaster() {
 	if !fs.SlaveOpen {
 		return
 	}
-	for {
-		select {
-		case buf := <-fs.SendStream:
-			buffy := make([]byte, 1)
-			buffy[0] = buf
-			_, err := fs.ptyMaster.Write(buffy)
-			if err != nil {
-				fmt.Println(err.Error())
-			}
+	for buf := range fs.SendStream {
+
+		buffy := make([]byte, 1)
+		buffy[0] = buf
+		_, err := fs.ptyMaster.Write(buffy)
+		if err != nil {
+			fmt.Println("SEND MASTER ERR:", err.Error())
+			return
 		}
+
 	}
 }

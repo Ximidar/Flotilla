@@ -10,7 +10,7 @@ package DataStructures
 import (
 	"encoding/json"
 
-	nats "github.com/nats-io/go-nats"
+	"github.com/nats-io/nats.go"
 )
 
 // ReplyString will return a reply status with a success boolean and a message attached

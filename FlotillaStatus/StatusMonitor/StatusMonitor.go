@@ -7,7 +7,7 @@
 
 package StatusMonitor
 
-import nats "github.com/nats-io/go-nats"
+import "github.com/nats-io/nats.go"
 
 // StatusMonitor is a struct to hold all the different status monitors
 type StatusMonitor struct {

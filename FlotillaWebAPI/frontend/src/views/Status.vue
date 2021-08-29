@@ -4,11 +4,11 @@
                   fixed
                   window
     >
-      <v-icon>$vuetify.icons.solid_lock_open</v-icon>
-      <v-icon>$vuetify.icons.solid_lock</v-icon>
+      <v-icon class="basic-icon">$vuetify.icons.solid_lock_open</v-icon>
+      <v-icon class="basic-icon">$vuetify.icons.solid_lock</v-icon>
       <span>{{ Status }}</span>
       <v-spacer></v-spacer>
-      <v-icon>$vuetify.icons.solid_wifi</v-icon>
+      <v-icon class="basic-icon">$vuetify.icons.solid_wifi</v-icon>
     </v-system-bar>
     <v-tabs>
       <v-tab
@@ -88,6 +88,11 @@ export default {
     -moz-osx-font-smoothing: grayscale;
     color: White;
   
+}
+
+.basic-icon{
+    width: 25px;
+    height: 25px;
 }
 
 .comm-wrapper{

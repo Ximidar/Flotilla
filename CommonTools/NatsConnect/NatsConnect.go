@@ -13,16 +13,15 @@ import (
 	"strings"
 	"time"
 
-	nats "github.com/nats-io/go-nats"
+	"github.com/nats-io/nats.go"
 )
 
 const (
 	// DockerNATS is used by background tasks
-	//DockerNATS = "nats://0.0.0.0:4222"
 	DockerNATS = "nats:4222"
 
 	// LocalNATS is used by programs that are not within docker
-	LocalNATS = "nats://0.0.0.0:4222"
+	LocalNATS = nats.DefaultURL
 )
 
 // DefaultConn will Create a NatsConnect object and not modify past the server URL and
@@ -87,15 +86,22 @@ func (nc *NatsConnect) Connect() (*nats.Conn, error) {
 
 	// attempt a Connection to Nats
 	var err error
-	nc.NC, err = nc.Options.Connect()
-	if err != nil {
-		if nc.recoverable(err) {
-			return nc.RetryNatsConn()
+	attempts := 0
+	for {
+		nc.NC, err = nc.Options.Connect()
+		if err != nil {
+			attempts += 1
+			fmt.Printf("Attempt %d failed: %s", attempts, err)
+			if attempts >= 10 {
+				break
+			}
+			<-time.After(15 * time.Second)
+			continue
 		}
-		return nil, err
+		return nc.NC, nil
 	}
 
-	return nc.NC, nil
+	return nc.RetryNatsConn()
 }
 
 // RetryNatsConn will attempt to retry the connection five times

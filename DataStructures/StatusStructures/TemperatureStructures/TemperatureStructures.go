@@ -10,8 +10,8 @@ package TemperatureStructures
 import (
 	"encoding/json"
 
-	nats "github.com/nats-io/go-nats"
 	"github.com/Ximidar/Flotilla/FlotillaStatus/StatusMonitor"
+	"github.com/nats-io/nats.go"
 )
 
 const (

@@ -12,7 +12,7 @@ import (
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/websocket"
-	"github.com/nats-io/go-nats"
+	"github.com/nats-io/nats.go"
 )
 
 // Global
@@ -28,7 +28,6 @@ func Serve(port int, directory string) {
 
 	FlotillaWeb := NewFlotillaWeb(port, directory)
 
-	http.Handle("/", FlotillaWeb)
 	http.HandleFunc("/api/ws", FlotillaWeb.websocketHandler)
 
 	//Make CORS
@@ -73,6 +72,9 @@ type FlotillaWeb struct {
 	// flotilla
 	Node *PlayStructures.RegisteredNode
 	mux  sync.Mutex
+
+	// frontend
+	workingDir string
 }
 
 // NewFlotillaWeb will create a new flotilla webserver
@@ -81,21 +83,25 @@ func NewFlotillaWeb(port int, directory string) *FlotillaWeb {
 	fw := new(FlotillaWeb)
 	var err error
 
-	// setup nats
-	fw.Nats, err = NatsConnect.DefaultConn(NatsConnect.LocalNATS, "flotillaInterface")
+	//setup nats
+	fw.Nats, err = NatsConnect.DefaultConn(NatsConnect.DockerNATS, "flotillaInterface")
 	if err != nil {
 		log.Fatal(err)
 	}
 	fw.NatsTimeout = nats.DefaultTimeout
 
-	go fw.setupRouter()
+	fw.setupRouter()
+
+	//frontend
+	fw.workingDir = directory
+	fw.SetupFileServer()
 
 	// TODO figure out why websockets mess with the file upload function
-	go fw.setupWebSocket()
+	fw.setupWebSocket()
 
-	// setup Flotilla stuff
-	go fw.setupCommRelay()
-	go fw.setupStatus()
+	//setup Flotilla stuff
+	fw.setupCommRelay()
+	fw.setupStatus()
 
 	return fw
 
@@ -103,6 +109,9 @@ func NewFlotillaWeb(port int, directory string) *FlotillaWeb {
 
 func (fw *FlotillaWeb) setupRouter() {
 	fw.r = mux.NewRouter()
+
+	// Frontend
+	fw.r.HandleFunc("/", fw.IndexHandler).Methods("GET")
 
 	// Files
 	fw.r.HandleFunc("/api/getfiles", fw.GetFiles).Methods("GET")

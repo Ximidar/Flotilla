@@ -14,7 +14,7 @@ import (
 	DS "github.com/Ximidar/Flotilla/DataStructures"
 	FS "github.com/Ximidar/Flotilla/DataStructures/FileStructures"
 	"github.com/golang/protobuf/proto"
-	"github.com/nats-io/go-nats"
+	"github.com/nats-io/nats.go"
 )
 
 // GetFiles will get the files from Nats and return them

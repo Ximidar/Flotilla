@@ -4,9 +4,6 @@
 # @Last Modified by:   Ximidar
 # @Last Modified time: 2019-02-26 17:12:00
 
-# NATS
-echo "Getting nats-io"
-go get github.com/nats-io/go-nats
 
 # Flotilla_CLI
 echo "Getting Cobra"
@@ -43,11 +40,11 @@ go get gopkg.in/natefinch/lumberjack.v2
 echo "Getting viper"
 go get github.com/spf13/viper
 
-# Test
+# Nats
 echo "Getting go-nats"
-go get github.com/nats-io/go-nats
+go get github.com/nats-io/nats.go/
 echo "Getting nats server"
-go get github.com/nats-io/gnatsd
+go get github.com/nats-io/nats-server/v2
 
 # Flotilla Web
 echo "Getting Gorilla Mux"

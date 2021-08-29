@@ -18,6 +18,14 @@ VERSION_PATH=github.com/Ximidar/Flotilla/CommonTools/versioning
 SOURCE_DIR=./
 OUT_DIR=bin
 ENTRY_POINT=${SOURCE_DIR}/FlotillaWebAPI.go
+TASK_PID = /tmp/flotillawebapi.pid
+FILES=$(shell find $(SOURCE_DIR) -type f \( -iname "*.go" ! -iname "*_test.go" \))
+
+# Web Sources
+WEB_ENTRY_POINT=./frontend
+WEB_SOURCE=./frontend/src
+WEB_FILES=$(shell find $(WEB_SOURCE) -type f \( -iname "*.vue" -or -iname "*.js" -or -iname "*.css" -or -iname "*.html" \))
+WEB_DIST=./frontend/dist
 
 # Setup the -ldflags option for go build here, interpolate the variable values
 LDFLAGS=-ldflags "-X '${VERSION_PATH}.Version=${VERSION}' -X '${VERSION_PATH}.CompiledBy=${AUTHOR}' -X '${VERSION_PATH}.CompiledDate=${DATE}' -X '${VERSION_PATH}.CommitHash=${COMMIT_HASH}'"
@@ -29,7 +37,7 @@ ENVAMD64=env GOOS=linux GOARCH=amd64
 GO_BUILD=go build
 
 # Builds the project
-build:
+build_all:
 	@echo Building ${BINARY} Binary for this machine
 	${GO_BUILD} ${LDFLAGS} -o ${OUT_DIR}/${BINARY} ${ENTRY_POINT}
 
@@ -48,8 +56,57 @@ build:
 	@echo
 	@echo All Binaries are built to the ${OUT_DIR} Folder
 
+	@echo Building Web Distribution
+	cd ${WEB_ENTRY_POINT}; \
+		npm run prod;
+
+	if [ -d "$(OUT_DIR)/dist" ]; then \
+		echo "Deleting previous run"; \
+		rm -rf $(OUT_DIR)/dist; \
+	fi
+	cp -r ${WEB_DIST} ${OUT_DIR}
+
+build:
+	@echo Building ${BINARY} Binary for this machine
+	${GO_BUILD} ${LDFLAGS} -o ${OUT_DIR}/${BINARY} ${ENTRY_POINT}
+	@echo
+	@echo $(BINARY) built in ${OUT_DIR} Folder
+
+	@echo Building Web Distribution
+	cd ${WEB_ENTRY_POINT}; \
+		npm run develop;
+
+	if [ -d "$(OUT_DIR)/dist" ]; then \
+		echo "Deleting previous run"; \
+		rm -rf $(OUT_DIR)/dist; \
+	fi
+	cp -r ${WEB_DIST} ${OUT_DIR}
+
 
 clean:
 	@echo
 	@echo Cleaning the $(OUT_DIR) Folder
 	rm -rf $(OUT_DIR)
+
+
+start:
+	cd $(OUT_DIR); \
+		./${BINARY} serve & echo $$! > $(TASK_PID);
+
+stop: 
+	-kill `pstree -p \`cat $(TASK_PID)\` | tr "\n" " " |sed "s/[^0-9]/ /g" |sed "s/\s\s*/ /g"`
+
+# Before task will only prints message. Actually, it is not necessary. You can remove it, if you want.
+before:
+	@echo "STOPED $(BINARY)" && printf '%*s\n' "40" '' | tr ' ' -
+
+# Restart task will execute stop, before and start tasks in strict order and prints message. 
+restart: stop before build start
+	@echo "STARTED $(BINARY)" && printf '%*s\n' "40" '' | tr ' ' -
+
+# Serve task will run fswatch monitor and performs restart task if any source file changed. Before serving it will execute start task.
+serve: start
+	fswatch -or --event=Updated $(FILES) $(WEB_FILES) | \
+	xargs -n1 -I {} make restart
+
+.PHONY: start before stop restart serve build build_all clean

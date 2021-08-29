@@ -34,7 +34,7 @@ var serveAPI = &cobra.Command{
 	Long:  `Serve the API`,
 	Run: func(cmd *cobra.Command, args []string) {
 
-		api.Serve(Port, WorkingPath+"/dist")
+		api.Serve(Port, WorkingPath)
 
 	},
 }
@@ -51,6 +51,6 @@ func Execute(workingPath string) {
 
 func init() {
 	// Serve API command
-	serveAPI.Flags().IntVarP(&Port, "port", "p", 5000, "Port to serve API")
+	serveAPI.Flags().IntVarP(&Port, "port", "p", 3000, "Port to serve API")
 	rootCmd.AddCommand(serveAPI)
 }

@@ -1,19 +1,22 @@
-version: "3"
+version: "3.5"
 
 networks:
-    flotilla-bridge:
-        driver: bridge
+    nats:
+        name: nats
 
 services:
     nats:
         container_name: Flotilla-NATS
         image: 'nats:latest'
+        expose:
+            - "4222"
         ports:
             - 4222:4222
             - 6222:6222
             - 8222:8222
-        networks:
-            - flotilla-bridge
+        networks: 
+            - "nats"
+
     
     status:
         container_name: Flotilla-Status
@@ -21,10 +24,13 @@ services:
             context: ./FlotillaStatus/
             dockerfile: dockerfile
         image: flotilla-status:latest
+        volumes: 
+            - ./FlotillaStatus:/home/flotilla/FlotillaStatus
+        command: bash -c "go mod download && make serve"
+        networks: 
+            - "nats"
         depends_on: 
             - "nats"
-        networks: 
-            - flotilla-bridge
 
     file_manager:
         container_name: Flotilla-File-Manager
@@ -35,10 +41,12 @@ services:
         depends_on:
             - "status"
             - "nats"
-        networks:
-            - flotilla-bridge
         volumes:
             - /home/ximidar/gcode:/etc/flotilla/gcode
+            - ./Flotilla_File_Manager:/home/flotilla/Flotilla_File_Manager
+        command: bash -c "go mod download && make serve"
+        networks: 
+            - "nats"
     
     comm:
         container_name: Flotilla-Commango
@@ -49,60 +57,45 @@ services:
         depends_on: 
             - "status"
             - "nats"
-        networks:
-            - flotilla-bridge
         volumes: 
             - /dev:/dev
-    
-    fake_printer:
-        container_name: Fake-Printer
-        build:
-            context: ./BuildResources/Test/FakeSerialDevice
-            dockerfile: dockerfile
-        image: flotilla-fake-printer:latest
-        depends_on: 
-            - "comm"
+            - ./Commango:/home/flotilla/Commango
+        command: bash -c "go mod download && make serve"
         networks: 
-            - flotilla-bridge
-        volumes:
-            - /dev:/dev
- 
-
-    # flotilla_web:
-    #     container_name: Flot-Web
-    #     build:
-    #         context: ./FlotillaWeb
-    #         dockerfile: dockerfile
-    #     image: flotilla_web:latest
-    #     depends_on: 
-    #         - "nats"
-    #     networks: 
-    #         - flotilla-bridge
-    #     volumes: 
-    #         - ./FlotillaWeb:/code
-    #     ports:
-    #         - "8080:8080"
+            - "nats"
     
-    # flotilla_api:
-    #     container_name: Flot-API
+    # fake_printer:
+    #     container_name: Fake-Printer
     #     build:
-    #         context: ./FlotillaWebAPI
+    #         context: ./BuildResources/Test/FakeSerialDevice
     #         dockerfile: dockerfile
-    #     image: flotilla_api:latest
+    #     image: flotilla-fake-printer:latest
     #     depends_on: 
-    #         - "nats"
-    #         - "status"
-    #         - "file_manager"
-    #     networks: 
-    #         - flotilla-bridge
-    #     ports:
-    #         - "5000:5000"
+    #         - "comm"
+    #     volumes:
+    #         - /dev:/dev 
 
-
+    flotilla_web:
+        container_name: Flot-Web
+        build:
+            context: ./FlotillaWebAPI
+            dockerfile: dockerfile
+        image: flotilla_web:latest
+        depends_on: 
+            - "status"
+            - "nats"
+        volumes: 
+            - ./FlotillaWebAPI:/home/flotilla/FlotillaWebAPI
+        ports:
+            - "3000:3000"
+        expose: 
+            - 3000
+        command: bash -c "go mod download && make serve"
+        networks: 
+            - "nats"
+    
     # State Keeping
     # redis:
     #     container_name: redis
     #     image: redis:latest
-    #     networks: 
-    #         - flotilla-bridge
 

@@ -27,7 +27,7 @@ import (
 	"github.com/Ximidar/Flotilla/FlotillaStatus/PlayStatus"
 	"github.com/Ximidar/Flotilla/FlotillaStatus/StatusMonitor"
 	"github.com/golang/protobuf/proto"
-	nats "github.com/nats-io/go-nats"
+	"github.com/nats-io/nats.go"
 )
 
 // TermChannel will monitor for an exit signal

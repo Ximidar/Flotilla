@@ -1,6 +1,6 @@
-FROM golang:stretch
+FROM golang:latest
 
-# Install Resources
+# Install basic Resources
 RUN apt-get update && apt-get install -y --no-install-recommends \
 	ca-certificates \
 	build-essential \
@@ -9,32 +9,26 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 	git \
 	unzip \
 	openssl \
+	fswatch \
+	npm \
 	&& rm -rf /var/lib/apt/lists/*
+
 
 # Add Home variable for later use
 ENV HOME=/home/flotilla
 
 # Setup scripts and variables for setup
-ENV NATS_LOC=/nats
-RUN mkdir -p $HOME/scripts
-RUN mkdir -p $NATS_LOC
-COPY ./BuildResources/Build/scripts/* $HOME/scripts/
-
-# Download NATS
-# RUN bash $HOME/scripts/setupNats.sh
-
-# Download Go packages
-RUN bash $HOME/scripts/setupGo.sh
+RUN mkdir -p $HOME
+WORKDIR $HOME
 
 # Define, make, and populate the Flotilla Directory
-ENV FLOTILLA_DIR=$GOPATH/src/github.com/Ximidar/Flotilla/
+ENV FLOTILLA_DIR=$HOME
+ENV GIT_DISCOVERY_ACROSS_FILESYSTEM=1
 RUN mkdir -p $FLOTILLA_DIR
 COPY . $FLOTILLA_DIR
 
-# Test
-# RUN bash $FLOTILLA_DIR/BuildResources/Test/scripts/test.sh
-
 # Build
-WORKDIR $HOME/
-RUN exit
+WORKDIR $FLOTILLA_DIR
+RUN go mod download
+
 
