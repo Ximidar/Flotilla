@@ -1,0 +1,17 @@
+# Goals of this dockerfile. Set up for Go and a website
+FROM node:lts-alpine
+
+RUN mkdir code
+# install depends
+WORKDIR /code
+RUN npm install -g @vue/cli
+RUN npm install -g @vue/cli-service-global
+# copy over all files 
+COPY . .
+RUN npm install
+
+# Expose port
+EXPOSE 8080
+WORKDIR /code/src
+CMD ["npm", "run", "serve"]
+
