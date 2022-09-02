@@ -14,7 +14,7 @@ import (
 
 	"github.com/Ximidar/Flotilla/BuildResources/Test/CommonTestTools"
 	"github.com/Ximidar/Flotilla/DataStructures/StatusStructures/PlayStructures"
-	"github.com/nats-io/gnatsd/test"
+	"github.com/nats-io/nats-server/v2/test"
 	"github.com/nats-io/nats.go"
 )
 
