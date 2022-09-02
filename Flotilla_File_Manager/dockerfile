@@ -1,7 +1,0 @@
-FROM ximidar/flotilla_root:latest
-
-RUN mkdir -p $HOME/gcode/
-
-WORKDIR $FLOTILLA_DIR/Flotilla_File_Manager/
-COPY . .
-RUN make build

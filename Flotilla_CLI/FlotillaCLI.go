@@ -5,24 +5,69 @@
 * @Last Modified time: 2019-02-27 19:12:42
  */
 
-package main
+package CLTools
 
 import (
-	"log"
-	"os"
+	"github.com/Ximidar/Flotilla/Flotilla_CLI/Helm"
+	"github.com/Ximidar/Flotilla/Flotilla_CLI/ui/ContentBox"
 
-	"github.com/Ximidar/Flotilla/Flotilla_CLI/CLTools"
+	"github.com/Ximidar/Flotilla/Flotilla_CLI/UserInterface"
+	"github.com/Ximidar/Flotilla/Flotilla_CLI/ui"
+	"github.com/spf13/cobra"
 )
 
-func main() {
-	file, err := os.OpenFile("CLI.log", os.O_CREATE|os.O_APPEND, 0644)
-	if err != nil {
-		log.Fatal(err)
-	}
+func Init(rootCmd *cobra.Command) {
 
-	defer file.Close()
+	UITools.AddCommand(Printerface)
+	UITools.AddCommand(TcellInterface)
+	UITools.AddCommand(HelmCLI)
+	rootCmd.AddCommand(UITools)
 
-	log.SetOutput(file)
-	log.Print("Logging to a file in Go!")
-	CLTools.Execute()
+}
+
+var UITools = &cobra.Command{
+	Use:   "ui",
+	Short: "commands for user interface flotilla",
+	Run: func(cmd *cobra.Command, args []string) {
+		if len(args) == 0 {
+			cmd.Help()
+		}
+	},
+}
+
+var Printerface = &cobra.Command{
+	Use:   "gui",
+	Short: "Show the cli UI for Flotilla",
+	Long:  `This will open the cli UI for Flotilla. This has tools for monitoring the command line and starting prints (or it will in the future)`,
+	Run: func(cmd *cobra.Command, args []string) {
+		cligui, err := UserInterface.NewCliGui()
+		if err != nil {
+			panic(err)
+		}
+		cligui.ScreenInit()
+	},
+}
+
+var TcellInterface = &cobra.Command{
+	Use:   "tui",
+	Short: "Show the cli UI for Flotilla",
+	Long:  `This will open the cli UI for Flotilla. This has tools for monitoring the command line and starting prints (or it will in the future)`,
+	Run: func(cmd *cobra.Command, args []string) {
+		tgui, err := ui.NewMainScreen()
+		if err != nil {
+			panic(err)
+		}
+		tgui.AddQuitKey("q")
+		ContentBox.NewContentBox(tgui.Screen, "MainBox!", 10, 10, 20, 20)
+
+		tgui.Run()
+	},
+}
+
+var HelmCLI = &cobra.Command{
+	Use:   "helm",
+	Short: "start a flotilla instance",
+	Run: func(cmd *cobra.Command, args []string) {
+		Helm.StartHelm("")
+	},
 }

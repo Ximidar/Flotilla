@@ -1,7 +1,0 @@
-FROM ximidar/flotilla_root:latest
-
-WORKDIR $FLOTILLA_DIR/FlotillaWebAPI/
-COPY . .
-
-RUN make build
-EXPOSE 3000
