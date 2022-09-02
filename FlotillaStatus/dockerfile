@@ -1,5 +1,0 @@
-FROM ximidar/flotilla_root:latest
-
-WORKDIR $FLOTILLA_DIR/FlotillaStatus/
-COPY . .
-RUN make build

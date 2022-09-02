@@ -1,5 +1,5 @@
 # Name of output
-BINARY=Commango
+BINARY=flot
 
 # Prefixes
 ARM_PREFIX=arm_
@@ -17,8 +17,8 @@ VERSION_PATH=github.com/Ximidar/Flotilla/CommonTools/versioning
 # Sources 
 SOURCE_DIR=./
 OUT_DIR=bin
-ENTRY_POINT=${SOURCE_DIR}/Commango.go
-TASK_PID = /tmp/commango.pid
+ENTRY_POINT=${SOURCE_DIR}/main.go
+TASK_PID = /tmp/flotilla_build.pid
 FILES=$(shell find $(SOURCE_DIR) -type f \( -iname "*.go" ! -iname "*_test.go" \))
 
 # Setup the -ldflags option for go build here, interpolate the variable values
