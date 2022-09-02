@@ -24,11 +24,17 @@ WORKDIR $HOME
 # Define, make, and populate the Flotilla Directory
 ENV FLOTILLA_DIR=$HOME
 ENV GIT_DISCOVERY_ACROSS_FILESYSTEM=1
+ENV GOPROXY=direct
 RUN mkdir -p $FLOTILLA_DIR
 COPY . $FLOTILLA_DIR
 
 # Build
 WORKDIR $FLOTILLA_DIR
-RUN go mod download
+RUN go mod tidy
+RUN make build
+
+#TODO start a second lightweight image here that lifts the executable out of the first image
+
+ENTRYPOINT [ "${FLOTILLA_DIR}/bin/flot" ]
 
 

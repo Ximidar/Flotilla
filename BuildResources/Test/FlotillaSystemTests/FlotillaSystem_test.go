@@ -30,8 +30,8 @@ import (
 	"github.com/Ximidar/Flotilla/DataStructures/StatusStructures/PlayStructures"
 	"github.com/Ximidar/Flotilla/Flotilla_CLI/FlotillaInterface"
 	"github.com/Ximidar/Flotilla/Flotilla_File_Manager/FileManager"
-	"github.com/nats-io/gnatsd/server"
-	"github.com/nats-io/gnatsd/test"
+	"github.com/nats-io/nats-server/v2/server"
+	"github.com/nats-io/nats-server/v2/test"
 	"github.com/nats-io/nats.go"
 )
 

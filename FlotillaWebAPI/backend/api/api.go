@@ -23,7 +23,7 @@ var EMPTY []byte
 // Nats is the access variable to the nats server
 var Nats *nats.Conn
 
-//Serve will serve the api
+// Serve will serve the api
 func Serve(port int, directory string) {
 
 	FlotillaWeb := NewFlotillaWeb(port, directory)
