@@ -30,6 +30,23 @@ const (
 	SerialName = "/dev/fakeprinter"
 )
 
+var eventids = map[uint32]string{
+	fsEvents.Accessed:   "Accessed",
+	fsEvents.Modified:   "Modified",
+	fsEvents.AttrChange: "AttrChange",
+	fsEvents.CloseWrite: "CloseWrite",
+	fsEvents.CloseRead:  "CloseRead",
+	fsEvents.Open:       "Open",
+	fsEvents.MovedFrom:  "MovedFrom",
+	fsEvents.MovedTo:    "MovedTo",
+	fsEvents.Move:       "Move",
+	fsEvents.Create:     "Create",
+	fsEvents.Delete:     "Delete",
+	fsEvents.RootDelete: "RootDelete",
+	fsEvents.RootMove:   "RootMove",
+	fsEvents.IsDir:      "IsDir",
+}
+
 // FakeSerial is an object that will emulate a serial device
 type FakeSerial struct {
 	ptyMaster   *os.File
@@ -133,27 +150,14 @@ func (fs *FakeSerial) Handle(w *fsEvents.Watcher, event *fsEvents.FsEvent) error
 		// someone sent a line to the serial device
 		return nil
 	default:
-		eventids := make(map[string]uint32)
-		eventids["Accessed"] = fsEvents.Accessed
-		eventids["Modified"] = fsEvents.Modified
-		eventids["AttrChange"] = fsEvents.AttrChange
-		eventids["CloseWrite"] = fsEvents.CloseWrite
-		eventids["CloseRead"] = fsEvents.CloseRead
-		eventids["Open"] = fsEvents.Open
-		eventids["MovedFrom"] = fsEvents.MovedFrom
-		eventids["MovedTo"] = fsEvents.MovedTo
-		eventids["Move"] = fsEvents.Move
-		eventids["Create"] = fsEvents.Create
-		eventids["Delete"] = fsEvents.Delete
-		eventids["RootDelete"] = fsEvents.RootDelete
-		eventids["RootMove"] = fsEvents.RootMove
-		eventids["IsDir"] = fsEvents.IsDir
 		fmt.Println("Slave had something else happen to it")
-		for ev, id := range eventids {
-			if mask == id {
-				fmt.Println("Event was ", ev)
-			}
+		event, ok := eventids[mask]
+		if ok {
+			fmt.Println("Event was ", event)
+			return nil
 		}
+		fmt.Println("UNMAPPED: Event was ", mask)
+
 	}
 
 	return nil
