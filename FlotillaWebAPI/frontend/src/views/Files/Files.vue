@@ -28,20 +28,20 @@
 
 <script>
 import FileItem from '@/views/Files/FileItem'
-import FileInfo from '@/views/Files/FileInfo'
+// import FileInfo from '@/views/Files/FileInfo'
 import FileUploadOverlay from '@/views/Files/FileUpload'
-import ArrowLeft from '@/assets/svg/solid/arrow-left.svg'
-import Vue from 'vue'
-import { isNullOrUndefined } from 'util'
+// import ArrowLeft from '@/assets/svg/solid/arrow-left.svg'
+// import Vue from 'vue'
+import { isNullOrUndefined } from 'is-what'
 import flotilla from "@/flotilla"
 
 export default {
   name: 'FlotillaFiles',
   components:{
     FileItem,
-    FileInfo,
+    // FileInfo,
     FileUploadOverlay,
-    ArrowLeft
+    // ArrowLeft
   },
   mixins: [flotilla],
   data(){

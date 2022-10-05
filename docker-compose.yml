@@ -21,12 +21,10 @@ services:
     status:
         container_name: Flotilla-Status
         build:
-            context: ./FlotillaStatus/
+            context: .
             dockerfile: dockerfile
-        image: flotilla-status:latest
-        volumes: 
-            - ./FlotillaStatus:/home/flotilla/FlotillaStatus
-        command: bash -c "go mod download && make serve"
+        image: ximidar/flotilla:latest
+        command: status start
         networks: 
             - "nats"
         depends_on: 
@@ -35,32 +33,30 @@ services:
     file_manager:
         container_name: Flotilla-File-Manager
         build: 
-            context: ./Flotilla_File_Manager/
+            context: .
             dockerfile: dockerfile
-        image: flotilla-file-manager:latest
+        image: ximidar/flotilla:latest
         depends_on:
             - "status"
             - "nats"
         volumes:
-            - /home/ximidar/gcode:/etc/flotilla/gcode
-            - ./Flotilla_File_Manager:/home/flotilla/Flotilla_File_Manager
-        command: bash -c "go mod download && make serve"
+            - ~/gcode:/etc/flotilla/gcode
+        command: ffm start
         networks: 
             - "nats"
     
     comm:
         container_name: Flotilla-Commango
         build:
-            context: ./Commango
+            context: .
             dockerfile: dockerfile
-        image: flotilla-commango:latest
+        image: ximidar/flotilla:latest
         depends_on: 
             - "status"
             - "nats"
         volumes: 
             - /dev:/dev
-            - ./Commango:/home/flotilla/Commango
-        command: bash -c "go mod download && make serve"
+        command: comm start
         networks: 
             - "nats"
     
@@ -78,19 +74,17 @@ services:
     flotilla_web:
         container_name: Flot-Web
         build:
-            context: ./FlotillaWebAPI
+            context: .
             dockerfile: dockerfile
         image: flotilla_web:latest
         depends_on: 
             - "status"
             - "nats"
-        volumes: 
-            - ./FlotillaWebAPI:/home/flotilla/FlotillaWebAPI
         ports:
             - "3000:3000"
         expose: 
             - 3000
-        command: bash -c "go mod download && make serve"
+        command: api start
         networks: 
             - "nats"
     

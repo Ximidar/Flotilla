@@ -22,7 +22,7 @@ export default {
     props:{
         File: {
             type: Object,
-            default: {}
+            default: function(){return {}}
         }
 
     },
@@ -45,7 +45,7 @@ export default {
         
     },
     watch: {
-        File: function (newval, oldval){
+        File: function (newval){
             console.log("New File Selected")
             this.SelectedFile=newval
             this.Name=this.SelectedFile.Name

@@ -2,7 +2,7 @@ const axios = require("axios")
 import { FileStructures } from './js_proto/FileStructures_pb.js'
 import { PlayStructures } from './js_proto/action_pb.js'
 import { CommStructures } from './js_proto/CommStructures_pb.js'
-import { BufferReader } from 'protobufjs'
+// import { BufferReader } from 'protobufjs'
 
 //const base = "0.0.0.0:5000"
 

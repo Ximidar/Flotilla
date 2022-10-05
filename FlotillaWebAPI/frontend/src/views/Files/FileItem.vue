@@ -46,7 +46,7 @@ export default {
     props:{
         File:{
             type: Object,
-            default: {}
+            default: function(){return {}}
         }
     },
     mixins: [flotilla],
@@ -96,7 +96,7 @@ export default {
         }
     },
     watch: {
-        File: function(newval, oldval){
+        File: function(newval){
             this.ReadableSize = this.HumanReadable(newval.Size)
             this.FileDate = this.ConvertUnixTimestamp(this.File.UnixTime)
 

@@ -89,8 +89,8 @@ export default {
 
             let ci = this.flotCreateCommInit(this.selectedPort, this.selectedBaud)
             console.log(ci)
-            this.flotSendCommInit(ci).then( reply =>{
-                this.flotCommConnect().then( reply =>{
+            this.flotSendCommInit(ci).then( () =>{
+                this.flotCommConnect().then( () =>{
                     console.log("Check if we are connected!")
                     this.connected = true
                 })
@@ -98,7 +98,7 @@ export default {
         },
         commDisconnect: function() {
             console.log("Disconnect Button pushed")
-            this.flotCommDisconnect().then( reply=>{
+            this.flotCommDisconnect().then( () =>{
                 console.log("Check if we are disconnected!")
                 this.connected = false
             })

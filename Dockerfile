@@ -34,6 +34,6 @@ RUN make build
 
 #TODO start a second lightweight image here that lifts the executable out of the first image
 
-ENTRYPOINT [ "${FLOTILLA_DIR}/bin/flot" ]
+ENTRYPOINT [ "/home/flotilla/bin/flot" ]
 
 

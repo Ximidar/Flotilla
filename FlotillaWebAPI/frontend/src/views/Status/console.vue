@@ -41,7 +41,7 @@ import PConsole from "@/views/Status/printer_connection.vue"
 import flotilla from '@/flotilla'
 
 export default {
-    name: 'console',
+    name: 'FlotillaConsole',
     components: {
         ConsoleItem,
         PConsole,

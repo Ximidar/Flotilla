@@ -8,3 +8,10 @@
 
 <style>
 </style>
+
+<script>
+export default {
+  name: 'FlotillaAbout',
+}
+</script>
+
