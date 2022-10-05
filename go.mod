@@ -25,6 +25,6 @@ require (
 	github.com/spf13/viper v1.7.1
 	github.com/tywkeene/go-fsevents v0.2.0
 	go.bug.st/serial v1.1.3
-	golang.org/x/sys v0.0.0-20220111092808-5a964db01320
+	golang.org/x/sys v0.0.0-20220412211240-33da011f77ad
 	gotest.tools/v3 v3.3.0 // indirect
 )
