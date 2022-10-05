@@ -24,7 +24,6 @@ WORKDIR $HOME
 # Define, make, and populate the Flotilla Directory
 ENV FLOTILLA_DIR=$HOME
 ENV GIT_DISCOVERY_ACROSS_FILESYSTEM=1
-ENV GOPROXY=direct
 RUN mkdir -p $FLOTILLA_DIR
 COPY . $FLOTILLA_DIR
 
