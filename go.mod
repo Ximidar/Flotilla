@@ -5,7 +5,7 @@ go 1.16
 require (
 	github.com/Microsoft/hcsshim v0.9.4 // indirect
 	github.com/deckarep/golang-set v1.7.1
-	github.com/docker/docker v20.10.5+incompatible
+	github.com/docker/docker v20.10.24+incompatible
 	github.com/docker/go-connections v0.4.0
 	github.com/dustin/go-humanize v1.0.0
 	github.com/fsnotify/fsnotify v1.4.9
